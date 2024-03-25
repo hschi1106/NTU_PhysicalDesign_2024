@@ -21,7 +21,6 @@ void Partitioner::initPartition()
         Cell *pickedCell = _cellArray[i];
         if (i % 2 == 0)
         {
-            // cout << "Cell " << pickedCell->getName() << " is in partition 0" << endl;
             pickedCell->setPart(0);
             partSize[0]++;
             _unlockNum[0]++;
@@ -33,7 +32,6 @@ void Partitioner::initPartition()
         }
         else
         {
-            // cout << "Cell " << pickedCell->getName() << " is in partition 1" << endl;
             pickedCell->setPart(1);
             partSize[1]++;
             _unlockNum[1]++;
@@ -296,9 +294,6 @@ void Partitioner::moveCell()
     Cell *movedCell = _cellArray[_maxGainCell->getId()];
     bool fromPart = movedCell->getPart();
     movedCell->move();
-    // cout << "Move cell " << movedCell->getName() << " from partition " << fromPart << " to partition " << !fromPart << endl;
-    // cout << "Gain value of the moved cell: " << movedCell->getGain() << endl;
-    // cell was locked in updateGain
     vector<int> movedCellNetList = movedCell->getNetList();
     for (int i = 0; i < movedCellNetList.size(); ++i)
     {
@@ -351,7 +346,6 @@ void Partitioner::reRunInit()
     for (int i = 0; i < _cellNum; ++i)
     {
         Cell *pickedCell = _cellArray[i];
-        // cout << pickedCell->getName() << " is at partition " << pickedCell->getPart() << endl;
         pickedCell->unlock();
         pickedCell->setGain(0);
     }
@@ -422,24 +416,27 @@ void Partitioner::partition()
     this->initPartition();
     while (true)
     {
+        _iterNum++;
         this->initGain();
         while (this->pickMaxGainCell())
         {
+            // report blist for debugging
             // this->reportbList();
-            _iterNum++;
             this->updateGain();
             this->moveCell();
         }
+        cout << "runtime untill iteration " << _iterNum << ": " << (double)clock() / CLOCKS_PER_SEC << " seconds" << endl;
         if (_maxAccGain > 0)
         {
-            // cout << _maxAccGain << endl;
+            cout << "max accumulated gain: " << _maxAccGain << endl;
+            cout << "Repartitioning..." << endl;
             this->toBest();
             this->reRunInit();
-            // cout << "Repartitioning..." << endl;
         }
         else
         {
-            // cout << "No more improvement, stop partitioning." << endl;
+            cout << "max accumulated gain: " << _maxAccGain << endl;
+            cout << "No more improvement, stop partitioning." << endl;
             break;
         }
     }
@@ -567,24 +564,4 @@ void Partitioner::reportbList()
     }
     cout << endl;
     cout << endl;
-}
-
-void Partitioner::printCellList() const
-{
-    cout << "Cell List: " << endl;
-    for (size_t i = 0, end = _cellArray.size(); i < end; ++i)
-    {
-        cout << "Cell " << i << ": " << _cellArray[i]->getName() << endl;
-    }
-    return;
-}
-
-void Partitioner::printNetList() const
-{
-    cout << "Net List: " << endl;
-    for (size_t i = 0, end = _netArray.size(); i < end; ++i)
-    {
-        cout << "Net " << i << ": " << _netArray[i]->getName() << endl;
-    }
-    return;
 }

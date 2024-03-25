@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <time.h> 
 #include "partitioner.h"
 using namespace std;
 
@@ -31,6 +32,7 @@ int main(int argc, char** argv)
     partitioner->partition();
     partitioner->printSummary();
     partitioner->writeResult(output);
+    cout << "total runtime: " << (double)clock() / CLOCKS_PER_SEC << " seconds" << endl;
 
     return 0;
 }
