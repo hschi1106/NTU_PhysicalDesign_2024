@@ -21,6 +21,7 @@ void Partitioner::initPartition()
         Cell *pickedCell = _cellArray[i];
         if (i % 2 == 0)
         {
+            // cout << "Cell " << pickedCell->getName() << " is in partition 0" << endl;
             pickedCell->setPart(0);
             partSize[0]++;
             _unlockNum[0]++;
@@ -32,6 +33,7 @@ void Partitioner::initPartition()
         }
         else
         {
+            // cout << "Cell " << pickedCell->getName() << " is in partition 1" << endl;
             pickedCell->setPart(1);
             partSize[1]++;
             _unlockNum[1]++;
@@ -182,20 +184,24 @@ void Partitioner::updateGain()
                 Cell *freeCell = _cellArray[movedCellNetCellList[j]];
                 if (!freeCell->getLock())
                 {
+                    this->removeNode(freeCell->getNode());
                     freeCell->incGain();
+                    this->addNode(freeCell->getNode());
                 }
             }
         }
         else if (toSide == 1)
         {
-            // if toSide == 1, increment the gain of the only free cell at toSide
+            // if toSide == 1, decrement the gain of the only free cell at toSide
             vector<int> movedCellNetCellList = movedCellNet->getCellList();
             for (int j = 0; j < movedCellNetCellList.size(); ++j)
             {
                 Cell *freeCell = _cellArray[movedCellNetCellList[j]];
                 if (!freeCell->getLock() && freeCell->getPart() == !movedCell->getPart())
                 {
-                    freeCell->incGain();
+                    this->removeNode(freeCell->getNode());
+                    freeCell->decGain();
+                    this->addNode(freeCell->getNode());
                     break;
                 }
             }
@@ -211,7 +217,9 @@ void Partitioner::updateGain()
                 Cell *freeCell = _cellArray[movedCellNetCellList[j]];
                 if (!freeCell->getLock())
                 {
+                    this->removeNode(freeCell->getNode());
                     freeCell->decGain();
+                    this->addNode(freeCell->getNode());
                 }
             }
         }
@@ -224,7 +232,9 @@ void Partitioner::updateGain()
                 Cell *freeCell = _cellArray[movedCellNetCellList[j]];
                 if (!freeCell->getLock() && freeCell->getPart() == movedCell->getPart())
                 {
-                    freeCell->decGain();
+                    this->removeNode(freeCell->getNode());
+                    freeCell->incGain();
+                    this->addNode(freeCell->getNode());
                     break;
                 }
             }
@@ -274,7 +284,7 @@ bool Partitioner::pickMaxGainCell()
     // pick the max gain cell
     Node *pickedNode;
     pickedPart ? pickedNode = max1It->second : pickedNode = max0It->second;
-    // remove the picked node from the bucket list, therefore no unlock node in the bucket list
+    // remove the picked node from the bucket list, therefore no lock node in the bucket list
     this->removeNode(pickedNode);
     _maxGainCell = pickedNode;
     return 1;
@@ -286,6 +296,8 @@ void Partitioner::moveCell()
     Cell *movedCell = _cellArray[_maxGainCell->getId()];
     bool fromPart = movedCell->getPart();
     movedCell->move();
+    // cout << "Move cell " << movedCell->getName() << " from partition " << fromPart << " to partition " << !fromPart << endl;
+    // cout << "Gain value of the moved cell: " << movedCell->getGain() << endl;
     // cell was locked in updateGain
     vector<int> movedCellNetList = movedCell->getNetList();
     for (int i = 0; i < movedCellNetList.size(); ++i)
@@ -297,6 +309,7 @@ void Partitioner::moveCell()
     // update partition
     _moveStack.push_back(_maxGainCell->getId());
     _accGain += movedCell->getGain();
+    ++_moveNum;
     if (_maxAccGain < _accGain)
     {
         _maxAccGain = _accGain;
@@ -305,16 +318,21 @@ void Partitioner::moveCell()
     _unlockNum[fromPart]--;
     --_partSize[fromPart];
     ++_partSize[!fromPart];
-    ++_moveNum;
 }
 
 void Partitioner::toBest()
 {
-    // todo: needs to be checked
+    // back to the best move
     for (int i = _moveNum - 1; i >= _bestMoveNum; --i)
     {
         Cell *restoredCell = _cellArray[_moveStack[i]];
         restoredCell->move();
+        for (int j = 0;j<restoredCell->getNetList().size();++j)
+        {
+            Net *restoredCellNet = _netArray[restoredCell->getNetList()[j]];
+            restoredCellNet->decPartCount(!restoredCell->getPart());
+            restoredCellNet->incPartCount(restoredCell->getPart());
+        }
         ++_partSize[restoredCell->getPart()];
         --_partSize[!restoredCell->getPart()];
     }
@@ -329,9 +347,11 @@ void Partitioner::reRunInit()
     _moveNum = 0;
     _bestMoveNum = 0;
     _moveStack.clear();
+    // unlock all cells
     for (int i = 0; i < _cellNum; ++i)
     {
         Cell *pickedCell = _cellArray[i];
+        // cout << pickedCell->getName() << " is at partition " << pickedCell->getPart() << endl;
         pickedCell->unlock();
         pickedCell->setGain(0);
     }
@@ -399,25 +419,27 @@ void Partitioner::parseInput(fstream &inFile)
 
 void Partitioner::partition()
 {
+    this->initPartition();
     while (true)
     {
-        this->initPartition();
         this->initGain();
         while (this->pickMaxGainCell())
         {
-            // stuck in the loop
+            // this->reportbList();
             _iterNum++;
             this->updateGain();
             this->moveCell();
         }
         if (_maxAccGain > 0)
         {
-            break;
+            // cout << _maxAccGain << endl;
             this->toBest();
             this->reRunInit();
+            // cout << "Repartitioning..." << endl;
         }
         else
         {
+            // cout << "No more improvement, stop partitioning." << endl;
             break;
         }
     }
@@ -529,7 +551,6 @@ void Partitioner::reportbList()
         }
     }
     cout << endl;
-    cout << endl;
     cout << "In the bList[1]" << endl;
     for (unordered_map<int, Node *>::iterator iter = _bList[1].begin(); iter != _bList[1].end(); iter++)
     {
@@ -544,4 +565,26 @@ void Partitioner::reportbList()
             }
         }
     }
+    cout << endl;
+    cout << endl;
+}
+
+void Partitioner::printCellList() const
+{
+    cout << "Cell List: " << endl;
+    for (size_t i = 0, end = _cellArray.size(); i < end; ++i)
+    {
+        cout << "Cell " << i << ": " << _cellArray[i]->getName() << endl;
+    }
+    return;
+}
+
+void Partitioner::printNetList() const
+{
+    cout << "Net List: " << endl;
+    for (size_t i = 0, end = _netArray.size(); i < end; ++i)
+    {
+        cout << "Net " << i << ": " << _netArray[i]->getName() << endl;
+    }
+    return;
 }

@@ -51,8 +51,11 @@ public:
     void toBest();
     void reRunInit();
 
-    // test
+    // member functions for debugging
+    void printCellList() const;
+    void printNetList() const;
     void reportbList();
+
 
 private:
     int                 _cutSize;       // cut size
