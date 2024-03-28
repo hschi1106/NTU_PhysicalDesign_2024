@@ -414,6 +414,9 @@ void Partitioner::parseInput(fstream &inFile)
 void Partitioner::partition()
 {
     this->initPartition();
+    cout << "Initial cutsize: " << _cutSize << endl;
+    int stopAt = _cutSize * 0.01;
+    cout << "Stop at cutsize: " << stopAt << endl;
     while (true)
     {
         _iterNum++;
@@ -426,7 +429,7 @@ void Partitioner::partition()
             this->moveCell();
         }
         cout << "runtime untill iteration " << _iterNum << ": " << (double)clock() / CLOCKS_PER_SEC << " seconds" << endl;
-        if (_maxAccGain > 0)
+        if (_maxAccGain > stopAt)
         {
             cout << "max accumulated gain: " << _maxAccGain << endl;
             cout << "Repartitioning..." << endl;
