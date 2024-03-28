@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include "cell.h"
 #include "net.h"
 using namespace std;
@@ -65,7 +66,7 @@ private:
     Node*               _maxGainCell;   // pointer to max gain cell
     vector<Net*>        _netArray;      // net array of the circuit
     vector<Cell*>       _cellArray;     // cell array of the circuit
-    unordered_map<int, Node*>     _bList[2];      // bucket list of partition A(0) and B(1)
+    map<int, Node*>     _bList[2];      // bucket list of partition A(0) and B(1)
     unordered_map<string, int>    _netName2Id;    // mapping from net name to id
     unordered_map<string, int>    _cellName2Id;   // mapping from cell name to id
  

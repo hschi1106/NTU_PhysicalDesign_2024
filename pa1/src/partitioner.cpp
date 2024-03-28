@@ -67,7 +67,7 @@ void Partitioner::addNode(Node *targetNode)
     // add targetNode to the linkedlist
     Cell *addedCell = _cellArray[targetNode->getId()];
     addedCell->setNode(targetNode);
-    unordered_map<int, Node *>::iterator it = _bList[addedCell->getPart()].find(addedCell->getGain());
+    map<int, Node *>::iterator it = _bList[addedCell->getPart()].find(addedCell->getGain());
     // if the gain is not in the map, create new
     if (it == _bList[addedCell->getPart()].end())
     {
@@ -242,22 +242,6 @@ void Partitioner::updateGain()
 
 bool Partitioner::pickMaxGainCell()
 {
-    // traverse the bucket list to find max gain
-    unordered_map<int, Node *>::iterator max0It = _bList[0].begin(), max1It = _bList[1].begin();
-    for (unordered_map<int, Node *>::iterator it = _bList[0].begin(); it != _bList[0].end(); ++it)
-    {
-        if (it->first > max0It->first)
-        {
-            max0It = it;
-        }
-    }
-    for (unordered_map<int, Node *>::iterator it = _bList[1].begin(); it != _bList[1].end(); ++it)
-    {
-        if (it->first > max1It->first)
-        {
-            max1It = it;
-        }
-    }
     // decide which partition to pick
     bool pickedPart, part0Avail, part1Avail;
     double lowerBound = (1 - _bFactor) / 2 * _cellNum, upperBound = (1 + _bFactor) / 2 * _cellNum;
@@ -265,6 +249,9 @@ bool Partitioner::pickMaxGainCell()
     part1Avail = !_bList[1].empty() && _partSize[1] - 1 >= lowerBound && _partSize[1] - 1 <= upperBound;
     if (part0Avail && part1Avail)
     {
+        map<int, Node *>::iterator max0It = _bList[0].end(), max1It = _bList[1].end();
+        max0It--;
+        max1It--;
         pickedPart = max0It->first > max1It->first ? 0 : 1;
     }
     else if (part0Avail)
@@ -280,8 +267,10 @@ bool Partitioner::pickMaxGainCell()
         return 0;
     }
     // pick the max gain cell
+    map<int, Node *>::iterator maxIt = _bList[pickedPart].end();
+    maxIt--;
     Node *pickedNode;
-    pickedPart ? pickedNode = max1It->second : pickedNode = max0It->second;
+    pickedNode = maxIt->second;
     // remove the picked node from the bucket list, therefore no lock node in the bucket list
     this->removeNode(pickedNode);
     _maxGainCell = pickedNode;
@@ -322,7 +311,7 @@ void Partitioner::toBest()
     {
         Cell *restoredCell = _cellArray[_moveStack[i]];
         restoredCell->move();
-        for (int j = 0;j<restoredCell->getNetList().size();++j)
+        for (int j = 0; j < restoredCell->getNetList().size(); ++j)
         {
             Net *restoredCellNet = _netArray[restoredCell->getNetList()[j]];
             restoredCellNet->decPartCount(!restoredCell->getPart());
@@ -537,7 +526,7 @@ void Partitioner::clear()
 void Partitioner::reportbList()
 {
     cout << "In the bList[0]" << endl;
-    for (unordered_map<int, Node *>::iterator iter = _bList[0].begin(); iter != _bList[0].end(); iter++)
+    for (map<int, Node *>::iterator iter = _bList[0].begin(); iter != _bList[0].end(); iter++)
     {
         if (iter->second != NULL)
         {
@@ -552,7 +541,7 @@ void Partitioner::reportbList()
     }
     cout << endl;
     cout << "In the bList[1]" << endl;
-    for (unordered_map<int, Node *>::iterator iter = _bList[1].begin(); iter != _bList[1].end(); iter++)
+    for (map<int, Node *>::iterator iter = _bList[1].begin(); iter != _bList[1].end(); iter++)
     {
         if (iter->second != NULL)
         {
