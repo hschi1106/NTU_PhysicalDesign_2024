@@ -3,8 +3,8 @@
 
 #include <fstream>
 #include <vector>
-#include <unordered_map>
 #include <map>
+#include <unordered_map>
 #include "cell.h"
 #include "net.h"
 using namespace std;
@@ -54,7 +54,6 @@ public:
 
     // member functions for debugging
     void reportbList();
-
 
 private:
     int                 _cutSize;       // cut size

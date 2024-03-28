@@ -6,6 +6,8 @@
 #include <vector>
 #include <cmath>
 #include <unordered_map>
+#include <map>
+#include <algorithm>
 #include "cell.h"
 #include "net.h"
 #include "partitioner.h"
@@ -16,11 +18,73 @@ void Partitioner::initPartition()
 {
     int maxPinNum = 0, partSize[2] = {0, 0};
     // initialize partition with odd or even number
+    // for (int i = 0; i < _cellNum; ++i)
+    // {
+    //     Cell *pickedCell = _cellArray[i];
+    //     if (i % 2 == 0)
+    //     {
+    //         pickedCell->setPart(0);
+    //         partSize[0]++;
+    //         _unlockNum[0]++;
+    //         vector<int> pickedCellNetList = pickedCell->getNetList();
+    //         for (int j = 0; j < pickedCellNetList.size(); ++j)
+    //         {
+    //             _netArray[pickedCellNetList[j]]->incPartCount(0);
+    //         }
+    //     }
+    //     else
+    //     {
+    //         pickedCell->setPart(1);
+    //         partSize[1]++;
+    //         _unlockNum[1]++;
+    //         vector<int> pickedCellNetList = pickedCell->getNetList();
+    //         for (int j = 0; j < pickedCellNetList.size(); ++j)
+    //         {
+    //             _netArray[pickedCellNetList[j]]->incPartCount(1);
+    //         }
+    //     }
+    //     // update maxPinNum
+    //     if (pickedCell->getPinNum() > maxPinNum)
+    //     {
+    //         maxPinNum = pickedCell->getPinNum();
+    //     }
+    // }
+
+    // initialize partition with f(x)=max(netSize)+alpha*average(netSize)
+    vector<Cell *> cellArrayBySortingIndex;
     for (int i = 0; i < _cellNum; ++i)
     {
+        int maxNetSize = 0;
+        int totalNetSize = 0;
         Cell *pickedCell = _cellArray[i];
-        if (i % 2 == 0)
+        vector<int> pickedCellNetList = pickedCell->getNetList();
+        for (int j = 0; j < pickedCellNetList.size(); ++j)
         {
+            int netSize = _netArray[pickedCellNetList[j]]->getCellList().size();
+            totalNetSize += netSize;
+            if (netSize > maxNetSize)
+            {
+                maxNetSize = netSize;
+            }
+        }
+        pickedCell->setAvgNetSize(totalNetSize / pickedCellNetList.size());
+        pickedCell->setMaxNetSize(maxNetSize);
+        pickedCell->setAlpha(0);
+        pickedCell->setSortingIndex(pickedCell->getMaxNetSize() + pickedCell->getAlpha() * pickedCell->getAvgNetSize());
+        cellArrayBySortingIndex.push_back(pickedCell);
+    }
+    sort(cellArrayBySortingIndex.begin(), cellArrayBySortingIndex.end(), [](Cell *a, Cell *b)
+         { return a->getSortingIndex() < b->getSortingIndex(); });
+    int splitSize = _cellNum / 2;
+    double lowerBound = (1 - _bFactor) / 2 * _cellNum, upperBound = (1 + _bFactor) / 2 * _cellNum;
+    cout << "lowerBound: " << lowerBound << endl;
+    cout << "upperBound: " << upperBound << endl;
+    for (int i = 0; i < _cellNum; ++i)
+    {
+        Cell *pickedCell = cellArrayBySortingIndex[i];
+        if (i < splitSize)
+        {
+            // cout << "pickedCell: " << pickedCell->getName() << " sortingIndex: " << pickedCell->getSortingIndex() << endl;
             pickedCell->setPart(0);
             partSize[0]++;
             _unlockNum[0]++;
@@ -32,6 +96,7 @@ void Partitioner::initPartition()
         }
         else
         {
+            // cout << "pickedCell: " << pickedCell->getName() << " sortingIndex: " << pickedCell->getSortingIndex() << endl;
             pickedCell->setPart(1);
             partSize[1]++;
             _unlockNum[1]++;
@@ -47,6 +112,7 @@ void Partitioner::initPartition()
             maxPinNum = pickedCell->getPinNum();
         }
     }
+
     // init _maxPinNum
     _maxPinNum = maxPinNum;
 
@@ -406,6 +472,8 @@ void Partitioner::partition()
     cout << "Initial cutsize: " << _cutSize << endl;
     int stopAt = _cutSize * 0.01;
     cout << "Stop at cutsize: " << stopAt << endl;
+    cout << "part A: " << _partSize[0] << endl;
+    cout << "part B: " << _partSize[1] << endl;
     while (true)
     {
         _iterNum++;

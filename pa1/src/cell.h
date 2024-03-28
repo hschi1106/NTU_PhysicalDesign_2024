@@ -50,12 +50,22 @@ public:
     string getName() const  { return _name; }
     int getFirstNet() const { return _netList[0]; }
     vector<int> getNetList() const  { return _netList; }
+    // added access methods
+    int getMaxNetSize() const { return _maxNetSize; }
+    int getAvgNetSize() const { return _avgNetSize; }
+    int getAlpha() const      { return _alpha; }
+    int getSortingIndex() const { return _sortingIndex; }
 
     // Set functions
     void setNode(Node* node)        { _node = node; }
     void setGain(const int gain)    { _gain = gain; }
     void setPart(const bool part)   { _part = part; }
     void setName(const string name) { _name = name; }
+    // added set functions
+    void setMaxNetSize(const int maxNetSize) { _maxNetSize = maxNetSize; }
+    void setAvgNetSize(const int avgNetSize) { _avgNetSize = avgNetSize; }
+    void setAlpha(const int alpha)           { _alpha = alpha; }
+    void setSortingIndex(const int sortingIndex) { _sortingIndex = sortingIndex; }
 
     // Modify methods
     void move()         { _part = !_part; }
@@ -75,6 +85,11 @@ private:
     Node*           _node;      // node used to link the cells together
     string          _name;      // name of the cell
     vector<int>     _netList;   // list of nets the cell is connected to
+    // added attributes
+    int             _maxNetSize;
+    int             _avgNetSize;
+    int             _alpha;
+    int             _sortingIndex;
 };
 
 #endif  // CELL_H
