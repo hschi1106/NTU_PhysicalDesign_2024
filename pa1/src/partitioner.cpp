@@ -465,6 +465,7 @@ void Partitioner::partition()
 {
     // initialize partition
     this->initPartition();
+    cout << "Initial cutsize: " << _cutSize << endl;
     cout << "part A: " << _partSize[0] << endl;
     cout << "part B: " << _partSize[1] << endl;
 
@@ -473,8 +474,7 @@ void Partitioner::partition()
     for (int i = 0; i < maxIterNum; ++i)
     {
         this->initGain();
-        cout << "Initial cutsize: " << _cutSize << endl;
-        
+
         // set stop constant
         _stopConstant = _cellNum * (maxIterNum - _iterNum) / maxIterNum;
         _iterNum++;
