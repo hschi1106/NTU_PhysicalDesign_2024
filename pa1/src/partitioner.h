@@ -77,6 +77,9 @@ private:
     int                 _unlockNum[2];  // number of unlocked cells
     vector<int>         _moveStack;     // history of cell movement
 
+    // added member variables
+    int                 _stopConstant;  // stop constant
+
     // Clean up partitioner
     void clear();
 };

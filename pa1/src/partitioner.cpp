@@ -288,6 +288,12 @@ bool Partitioner::pickMaxGainCell()
     part0Avail = !_bList[0].empty() && _partSize[0] - 1 >= lowerBound && _partSize[0] - 1 <= upperBound;
     part1Avail = !_bList[1].empty() && _partSize[1] - 1 >= lowerBound && _partSize[1] - 1 <= upperBound;
 
+    // early stop if reaching the stop constant
+    if (_moveNum >= _stopConstant)
+    {
+        return 0;
+    }
+
     // decide which partition to pick
     if (part0Avail && part1Avail)
     {
@@ -385,6 +391,13 @@ void Partitioner::reRunInit()
         Cell *pickedCell = _cellArray[i];
         pickedCell->unlock();
         pickedCell->setGain(0);
+        this->removeNode(pickedCell->getNode());
+    }
+
+    // initialize blist
+    for (int i = 0; i < 2; ++i)
+    {
+        _bList[i].clear();
     }
     return;
 }
@@ -452,17 +465,18 @@ void Partitioner::partition()
 {
     // initialize partition
     this->initPartition();
-    cout << "Initial cutsize: " << _cutSize << endl;
-    int stopAt = _cutSize * 0.01;
-    cout << "Stop at cutsize: " << stopAt << endl;
     cout << "part A: " << _partSize[0] << endl;
     cout << "part B: " << _partSize[1] << endl;
 
     // start Fiduccia-Mattheyses algorithm
-    while (true)
+    int maxIterNum = 3;
+    for (int i = 0; i < maxIterNum; ++i)
     {
-        _iterNum++;
         this->initGain();
+
+        // set stop constant
+        _stopConstant = _cellNum * (maxIterNum - _iterNum) / maxIterNum;
+        _iterNum++;
 
         // start partitioning
         while (this->pickMaxGainCell())
@@ -473,9 +487,10 @@ void Partitioner::partition()
             this->moveCell();
         }
         cout << "runtime untill iteration " << _iterNum << ": " << (double)clock() / CLOCKS_PER_SEC << " seconds" << endl;
+        cout << _moveNum << " moves in this iteration." << endl;
 
         // decide whether to stop partitioning
-        if (_maxAccGain > stopAt)
+        if (_maxAccGain > 0)
         {
             cout << "max accumulated gain: " << _maxAccGain << endl;
             cout << "Repartitioning..." << endl;
