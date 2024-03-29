@@ -17,38 +17,6 @@ using namespace std;
 void Partitioner::initPartition()
 {
     int maxPinNum = 0, partSize[2] = {0, 0};
-    // initialize partition with odd or even number
-    // for (int i = 0; i < _cellNum; ++i)
-    // {
-    //     Cell *pickedCell = _cellArray[i];
-    //     if (i % 2 == 0)
-    //     {
-    //         pickedCell->setPart(0);
-    //         partSize[0]++;
-    //         _unlockNum[0]++;
-    //         vector<int> pickedCellNetList = pickedCell->getNetList();
-    //         for (int j = 0; j < pickedCellNetList.size(); ++j)
-    //         {
-    //             _netArray[pickedCellNetList[j]]->incPartCount(0);
-    //         }
-    //     }
-    //     else
-    //     {
-    //         pickedCell->setPart(1);
-    //         partSize[1]++;
-    //         _unlockNum[1]++;
-    //         vector<int> pickedCellNetList = pickedCell->getNetList();
-    //         for (int j = 0; j < pickedCellNetList.size(); ++j)
-    //         {
-    //             _netArray[pickedCellNetList[j]]->incPartCount(1);
-    //         }
-    //     }
-    //     // update maxPinNum
-    //     if (pickedCell->getPinNum() > maxPinNum)
-    //     {
-    //         maxPinNum = pickedCell->getPinNum();
-    //     }
-    // }
 
     // initialize partition with f(x)=max(netSize)+alpha*average(netSize)
     vector<Cell *> cellArrayBySortingIndex;
@@ -75,6 +43,8 @@ void Partitioner::initPartition()
     }
     sort(cellArrayBySortingIndex.begin(), cellArrayBySortingIndex.end(), [](Cell *a, Cell *b)
          { return a->getSortingIndex() < b->getSortingIndex(); });
+
+    // initialize partition with f(x)
     int splitSize = _cellNum / 2;
     double lowerBound = (1 - _bFactor) / 2 * _cellNum, upperBound = (1 + _bFactor) / 2 * _cellNum;
     cout << "lowerBound: " << lowerBound << endl;
@@ -84,7 +54,6 @@ void Partitioner::initPartition()
         Cell *pickedCell = cellArrayBySortingIndex[i];
         if (i < splitSize)
         {
-            // cout << "pickedCell: " << pickedCell->getName() << " sortingIndex: " << pickedCell->getSortingIndex() << endl;
             pickedCell->setPart(0);
             partSize[0]++;
             _unlockNum[0]++;
@@ -96,7 +65,6 @@ void Partitioner::initPartition()
         }
         else
         {
-            // cout << "pickedCell: " << pickedCell->getName() << " sortingIndex: " << pickedCell->getSortingIndex() << endl;
             pickedCell->setPart(1);
             partSize[1]++;
             _unlockNum[1]++;
@@ -113,10 +81,10 @@ void Partitioner::initPartition()
         }
     }
 
-    // init _maxPinNum
+    // initialize _maxPinNum
     _maxPinNum = maxPinNum;
 
-    // init _partSize and _cutSize
+    // initialize _partSize and _cutSize
     _partSize[0] = partSize[0];
     _partSize[1] = partSize[1];
     for (int i = 0; i < _netNum; ++i)
@@ -134,6 +102,7 @@ void Partitioner::addNode(Node *targetNode)
     Cell *addedCell = _cellArray[targetNode->getId()];
     addedCell->setNode(targetNode);
     map<int, Node *>::iterator it = _bList[addedCell->getPart()].find(addedCell->getGain());
+
     // if the gain is not in the map, create new
     if (it == _bList[addedCell->getPart()].end())
     {
@@ -157,6 +126,7 @@ void Partitioner::removeNode(Node *targetNode)
     Cell *removedCell = _cellArray[targetNode->getId()];
     Node *prevNode = targetNode->getPrev();
     Node *nextNode = targetNode->getNext();
+
     // remove targetNode from the linkedlist
     if (prevNode != NULL && nextNode != NULL)
     {
@@ -222,7 +192,7 @@ void Partitioner::initGain()
         }
     }
 
-    // blist init
+    // blist initialize
     for (int i = 0; i < _cellNum; ++i)
     {
         this->addNode(_cellArray[i]->getNode());
@@ -235,6 +205,8 @@ void Partitioner::updateGain()
     movedCell->lock();
     vector<int> movedCellNetList = movedCell->getNetList();
     int netSize = movedCellNetList.size();
+
+    // update the gain of all free cells in the net
     for (int i = 0; i < netSize; ++i)
     {
         Net *movedCellNet = _netArray[movedCellNetList[i]];
@@ -311,8 +283,12 @@ bool Partitioner::pickMaxGainCell()
     // decide which partition to pick
     bool pickedPart, part0Avail, part1Avail;
     double lowerBound = (1 - _bFactor) / 2 * _cellNum, upperBound = (1 + _bFactor) / 2 * _cellNum;
+
+    // check if the partition is available
     part0Avail = !_bList[0].empty() && _partSize[0] - 1 >= lowerBound && _partSize[0] - 1 <= upperBound;
     part1Avail = !_bList[1].empty() && _partSize[1] - 1 >= lowerBound && _partSize[1] - 1 <= upperBound;
+
+    // decide which partition to pick
     if (part0Avail && part1Avail)
     {
         map<int, Node *>::iterator max0It = _bList[0].end(), max1It = _bList[1].end();
@@ -332,11 +308,13 @@ bool Partitioner::pickMaxGainCell()
     {
         return 0;
     }
+
     // pick the max gain cell
     map<int, Node *>::iterator maxIt = _bList[pickedPart].end();
     maxIt--;
     Node *pickedNode;
     pickedNode = maxIt->second;
+
     // remove the picked node from the bucket list, therefore no lock node in the bucket list
     this->removeNode(pickedNode);
     _maxGainCell = pickedNode;
@@ -345,10 +323,12 @@ bool Partitioner::pickMaxGainCell()
 
 void Partitioner::moveCell()
 {
-    // move the max gain cell and update cell
+    // move the max gain cell
     Cell *movedCell = _cellArray[_maxGainCell->getId()];
     bool fromPart = movedCell->getPart();
     movedCell->move();
+
+    // update nets connected to the moved cell
     vector<int> movedCellNetList = movedCell->getNetList();
     for (int i = 0; i < movedCellNetList.size(); ++i)
     {
@@ -356,6 +336,7 @@ void Partitioner::moveCell()
         movedCellNet->decPartCount(fromPart);
         movedCellNet->incPartCount(!fromPart);
     }
+
     // update partition
     _moveStack.push_back(_maxGainCell->getId());
     _accGain += movedCell->getGain();
@@ -397,6 +378,7 @@ void Partitioner::reRunInit()
     _moveNum = 0;
     _bestMoveNum = 0;
     _moveStack.clear();
+
     // unlock all cells
     for (int i = 0; i < _cellNum; ++i)
     {
@@ -468,16 +450,21 @@ void Partitioner::parseInput(fstream &inFile)
 
 void Partitioner::partition()
 {
+    // initialize partition
     this->initPartition();
     cout << "Initial cutsize: " << _cutSize << endl;
     int stopAt = _cutSize * 0.01;
     cout << "Stop at cutsize: " << stopAt << endl;
     cout << "part A: " << _partSize[0] << endl;
     cout << "part B: " << _partSize[1] << endl;
+
+    // start Fiduccia-Mattheyses algorithm
     while (true)
     {
         _iterNum++;
         this->initGain();
+
+        // start partitioning
         while (this->pickMaxGainCell())
         {
             // report blist for debugging
@@ -486,6 +473,8 @@ void Partitioner::partition()
             this->moveCell();
         }
         cout << "runtime untill iteration " << _iterNum << ": " << (double)clock() / CLOCKS_PER_SEC << " seconds" << endl;
+
+        // decide whether to stop partitioning
         if (_maxAccGain > stopAt)
         {
             cout << "max accumulated gain: " << _maxAccGain << endl;
