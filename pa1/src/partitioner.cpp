@@ -47,8 +47,6 @@ void Partitioner::initPartition()
     // initialize partition with f(x)
     int splitSize = _cellNum / 2;
     double lowerBound = (1 - _bFactor) / 2 * _cellNum, upperBound = (1 + _bFactor) / 2 * _cellNum;
-    cout << "lowerBound: " << lowerBound << endl;
-    cout << "upperBound: " << upperBound << endl;
     for (int i = 0; i < _cellNum; ++i)
     {
         Cell *pickedCell = cellArrayBySortingIndex[i];
@@ -461,13 +459,10 @@ void Partitioner::partition()
 {
     // initialize partition
     this->initPartition();
-    cout << "Initial cutsize: " << _cutSize << endl;
-    cout << "part A: " << _partSize[0] << endl;
-    cout << "part B: " << _partSize[1] << endl;
+    // cout << "Initial cutsize: " << _cutSize << endl;
 
     // start Fiduccia-Mattheyses algorithm
-    int maxIterNum = 5;
-    for (int i = 0; i < maxIterNum; ++i)
+    while(true)
     {
         this->initGain();
         // set stop constant
@@ -482,26 +477,21 @@ void Partitioner::partition()
             this->updateGain();
             this->moveCell();
         }
-        cout << "runtime untill iteration " << _iterNum << ": " << (double)clock() / CLOCKS_PER_SEC << " seconds" << endl;
-        cout << _moveNum << " moves in this iteration." << endl;
 
         // decide whether to stop partitioning
         if (_maxAccGain > 0)
         {
-            cout << "max accumulated gain: " << _maxAccGain << endl;
-            cout << "max accumulated gain is at: " << _bestMoveNum << " of " << _cellNum << endl;
-            cout << "ratio: " << (double)_bestMoveNum / _cellNum << endl;
+            // cout << "max accumulated gain: " << _maxAccGain << endl;
             this->toBest();
             this->reRunInit();
         }
         else
         {
-            cout << "max accumulated gain: " << _maxAccGain << endl;
-            cout << "No more improvement, stop partitioning." << endl;
+            // cout << "max accumulated gain: " << _maxAccGain << endl;
+            // cout << "No more improvement, stop partitioning." << endl;
             this->toBest();
             break;
         }
-        cout << "Repartitioning..." << endl;
     }
 }
 
