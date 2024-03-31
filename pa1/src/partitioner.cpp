@@ -16,7 +16,6 @@ using namespace std;
 // added member functions
 void Partitioner::initPartition()
 {
-    clock_t start = clock();
     int maxPinNum = 0, partSize[2] = {0, 0};
 
     // initialize partition with f(x)=max(netSize)+alpha*average(netSize)
@@ -95,8 +94,6 @@ void Partitioner::initPartition()
             _cutSize++;
         }
     }
-    clock_t end = clock();
-    cout << "initPartition time: " << (double)(end - start) / CLOCKS_PER_SEC << " seconds" << endl;
 }
 
 void Partitioner::addNode(Node *targetNode)
@@ -190,7 +187,7 @@ void Partitioner::initGain()
             }
         }
     }
-    
+
     // blist initialize
     for (int i = 0; i < _cellNum; ++i)
     {
@@ -210,45 +207,68 @@ void Partitioner::updateGain()
     {
         Net *movedCellNet = _netArray[movedCellNetList[i]];
         int fromSide = movedCellNet->getPartCount(movedCell->getPart()), toSide = movedCellNet->getPartCount(!movedCell->getPart());
-        int fromInc = 0, toDec = 0;
-        if (fromSide == 1)
-            toDec++;
-        if (fromSide == 2)
-            fromInc++;
         if (toSide == 0)
-            fromInc++;
-        if (toSide == 1)
-            toDec++;
-        for (int j = 0; j < movedCellNet->getCellList().size(); ++j)
         {
-            Cell *freeCell = _cellArray[movedCellNet->getCellList()[j]];
-            if (!freeCell->getLock() && freeCell->getPart() == movedCell->getPart() && fromInc)
+            // if toSide == 0, increment the gains of all free cells in the net
+            vector<int> movedCellNetCellList = movedCellNet->getCellList();
+            for (int j = 0; j < movedCellNetCellList.size(); ++j)
             {
-                this->removeNode(freeCell->getNode());
-                if (fromInc == 1)
+                Cell *freeCell = _cellArray[movedCellNetCellList[j]];
+                if (!freeCell->getLock())
                 {
+                    this->removeNode(freeCell->getNode());
                     freeCell->incGain();
+                    this->addNode(freeCell->getNode());
                 }
-                else
-                {
-                    freeCell->incGain();
-                    freeCell->incGain();
-                }
-                this->addNode(freeCell->getNode());
             }
-            else if (!freeCell->getLock() && freeCell->getPart() == !movedCell->getPart() && toDec)
+        }
+        else if (toSide == 1)
+        {
+            // if toSide == 1, decrement the gain of the only free cell at toSide
+            vector<int> movedCellNetCellList = movedCellNet->getCellList();
+            for (int j = 0; j < movedCellNetCellList.size(); ++j)
             {
-                this->removeNode(freeCell->getNode());
-                if (toDec == 1)
+                Cell *freeCell = _cellArray[movedCellNetCellList[j]];
+                if (!freeCell->getLock() && freeCell->getPart() == !movedCell->getPart())
                 {
+                    this->removeNode(freeCell->getNode());
                     freeCell->decGain();
+                    this->addNode(freeCell->getNode());
+                    break;
                 }
-                else
+            }
+        }
+        fromSide--;
+        toSide++;
+        if (fromSide == 0)
+        {
+            // if fromSide == 0, decrement the gains of all free cells in the net
+            vector<int> movedCellNetCellList = movedCellNet->getCellList();
+            for (int j = 0; j < movedCellNetCellList.size(); ++j)
+            {
+                Cell *freeCell = _cellArray[movedCellNetCellList[j]];
+                if (!freeCell->getLock())
                 {
+                    this->removeNode(freeCell->getNode());
                     freeCell->decGain();
-                    freeCell->decGain();
+                    this->addNode(freeCell->getNode());
                 }
-                this->addNode(freeCell->getNode());
+            }
+        }
+        else if (fromSide == 1)
+        {
+            // if fromSide == 1, increment the gain of the only free cell at fromSide
+            vector<int> movedCellNetCellList = movedCellNet->getCellList();
+            for (int j = 0; j < movedCellNetCellList.size(); ++j)
+            {
+                Cell *freeCell = _cellArray[movedCellNetCellList[j]];
+                if (!freeCell->getLock() && freeCell->getPart() == movedCell->getPart())
+                {
+                    this->removeNode(freeCell->getNode());
+                    freeCell->incGain();
+                    this->addNode(freeCell->getNode());
+                    break;
+                }
             }
         }
     }
