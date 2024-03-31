@@ -16,6 +16,7 @@ using namespace std;
 // added member functions
 void Partitioner::initPartition()
 {
+    clock_t start = clock();
     int maxPinNum = 0, partSize[2] = {0, 0};
 
     // initialize partition with f(x)=max(netSize)+alpha*average(netSize)
@@ -94,6 +95,8 @@ void Partitioner::initPartition()
             _cutSize++;
         }
     }
+    clock_t end = clock();
+    cout << "initPartition time: " << (double)(end - start) / CLOCKS_PER_SEC << " seconds" << endl;
 }
 
 void Partitioner::addNode(Node *targetNode)
@@ -110,14 +113,10 @@ void Partitioner::addNode(Node *targetNode)
     }
     else
     {
-        // find the last node in the linkedlist
-        Node *currNode = it->second;
-        while (currNode->getNext() != NULL)
-        {
-            currNode = currNode->getNext();
-        }
-        currNode->setNext(targetNode);
-        targetNode->setPrev(currNode);
+        Node *firstNode = it->second;
+        _bList[addedCell->getPart()][addedCell->getGain()] = targetNode;
+        targetNode->setNext(firstNode);
+        firstNode->setPrev(targetNode);
     }
 }
 
@@ -191,7 +190,7 @@ void Partitioner::initGain()
             }
         }
     }
-
+    
     // blist initialize
     for (int i = 0; i < _cellNum; ++i)
     {
@@ -451,7 +450,6 @@ void Partitioner::partition()
     for (int i = 0; i < maxIterNum; ++i)
     {
         this->initGain();
-
         // set stop constant
         _stopConstant = _iterNum == 0 ? _cellNum * 0.5 : _cellNum * 0.1;
         _iterNum++;
