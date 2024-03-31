@@ -498,6 +498,7 @@ void Partitioner::partition()
         {
             cout << "max accumulated gain: " << _maxAccGain << endl;
             cout << "No more improvement, stop partitioning." << endl;
+            this->toBest();
             break;
         }
         cout << "Repartitioning..." << endl;
