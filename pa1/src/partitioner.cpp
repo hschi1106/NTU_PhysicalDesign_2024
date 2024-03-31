@@ -466,7 +466,7 @@ void Partitioner::partition()
     {
         this->initGain();
         // set stop constant
-        _stopConstant = _iterNum == 0 ? _cellNum * 0.5 : _cellNum * 0.1;
+        _stopConstant = _iterNum == 0 ? _cellNum * 0.5 : _cellNum * 0.2;
         _iterNum++;
 
         // start partitioning
