@@ -470,13 +470,13 @@ void Partitioner::partition()
     cout << "part B: " << _partSize[1] << endl;
 
     // start Fiduccia-Mattheyses algorithm
-    int maxIterNum = 3;
+    int maxIterNum = 5;
     for (int i = 0; i < maxIterNum; ++i)
     {
         this->initGain();
 
         // set stop constant
-        _stopConstant = _cellNum * (maxIterNum - _iterNum) / maxIterNum;
+        _stopConstant = _iterNum == 0 ? _cellNum * 0.5 : _cellNum * 0.1;
         _iterNum++;
 
         // start partitioning
@@ -494,7 +494,8 @@ void Partitioner::partition()
         if (_maxAccGain > 0)
         {
             cout << "max accumulated gain: " << _maxAccGain << endl;
-            cout << "Repartitioning..." << endl;
+            cout << "max accumulated gain is at: " << _bestMoveNum << " of " << _cellNum << endl;
+            cout << "ratio: " << (double)_bestMoveNum / _cellNum << endl;
             this->toBest();
             this->reRunInit();
         }
@@ -504,6 +505,7 @@ void Partitioner::partition()
             cout << "No more improvement, stop partitioning." << endl;
             break;
         }
+        cout << "Repartitioning..." << endl;
     }
 }
 
