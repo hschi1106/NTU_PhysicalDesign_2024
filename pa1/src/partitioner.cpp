@@ -37,8 +37,9 @@ void Partitioner::initPartition()
         }
         pickedCell->setAvgNetSize(totalNetSize / pickedCellNetList.size());
         pickedCell->setMaxNetSize(maxNetSize);
-        pickedCell->setAlpha(0);
-        pickedCell->setSortingIndex(pickedCell->getMaxNetSize() + pickedCell->getAlpha() * pickedCell->getAvgNetSize());
+        pickedCell->setAlpha(1);
+        pickedCell->setBeta(0.5);
+        pickedCell->setSortingIndex(pickedCell->getMaxNetSize() + pickedCell->getAlpha() * pickedCell->getAvgNetSize() + pickedCell->getBeta() * pickedCell->getPinNum());
         cellArrayBySortingIndex.push_back(pickedCell);
     }
     sort(cellArrayBySortingIndex.begin(), cellArrayBySortingIndex.end(), [](Cell *a, Cell *b)
@@ -313,7 +314,16 @@ bool Partitioner::pickMaxGainCell()
     map<int, Node *>::iterator maxIt = _bList[pickedPart].end();
     maxIt--;
     Node *pickedNode;
-    pickedNode = maxIt->second;
+
+    // choose the node with larger sorting index in the front two of the linked list
+    if (maxIt->second->getNext() != NULL)
+    {
+        pickedNode = _cellArray[maxIt->second->getId()]->getSortingIndex() > _cellArray[maxIt->second->getNext()->getId()]->getSortingIndex() ? maxIt->second : maxIt->second->getNext();
+    }
+    else
+    {
+        pickedNode = maxIt->second;
+    }
 
     // remove the picked node from the bucket list, therefore no lock node in the bucket list
     this->removeNode(pickedNode);
@@ -459,10 +469,10 @@ void Partitioner::partition()
 {
     // initialize partition
     this->initPartition();
-    // cout << "Initial cutsize: " << _cutSize << endl;
+    cout << "Initial cutsize: " << _cutSize << endl;
 
     // start Fiduccia-Mattheyses algorithm
-    while(true)
+    while (true)
     {
         this->initGain();
         // set stop constant
@@ -472,8 +482,6 @@ void Partitioner::partition()
         // start partitioning
         while (this->pickMaxGainCell())
         {
-            // report blist for debugging
-            // this->reportbList();
             this->updateGain();
             this->moveCell();
         }
@@ -582,39 +590,4 @@ void Partitioner::clear()
         delete _netArray[i];
     }
     return;
-}
-
-void Partitioner::reportbList()
-{
-    cout << "In the bList[0]" << endl;
-    for (map<int, Node *>::iterator iter = _bList[0].begin(); iter != _bList[0].end(); iter++)
-    {
-        if (iter->second != NULL)
-        {
-            Node *sameGainNode = iter->second;
-            cout << "Gain value = " << iter->first << endl;
-            while (sameGainNode != NULL)
-            {
-                cout << "The Node and Cell with the same Gain has name: " << _cellArray[sameGainNode->getId()]->getName() << endl;
-                sameGainNode = sameGainNode->getNext();
-            }
-        }
-    }
-    cout << endl;
-    cout << "In the bList[1]" << endl;
-    for (map<int, Node *>::iterator iter = _bList[1].begin(); iter != _bList[1].end(); iter++)
-    {
-        if (iter->second != NULL)
-        {
-            Node *sameGainNode = iter->second;
-            cout << "Gain value = " << iter->first << endl;
-            while (sameGainNode != NULL)
-            {
-                cout << "The Node and Cell with the same Gain has name: " << _cellArray[sameGainNode->getId()]->getName() << endl;
-                sameGainNode = sameGainNode->getNext();
-            }
-        }
-    }
-    cout << endl;
-    cout << endl;
 }
