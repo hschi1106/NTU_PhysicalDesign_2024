@@ -52,9 +52,6 @@ public:
     void toBest();
     void reRunInit();
 
-    // member functions for debugging
-    void reportbList();
-
 private:
     int                 _cutSize;       // cut size
     int                 _partSize[2];   // size (cell number) of partition A(0) and B(1)
