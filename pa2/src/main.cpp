@@ -7,7 +7,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-  int alpha;
+  double alpha;
   fstream inputBlock, inputNet, output;
 
   if (argc == 5)

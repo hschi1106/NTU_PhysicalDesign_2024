@@ -12,7 +12,7 @@ class Floorplanner
 {
 public:
   // constructor and destructor
-  Floorplanner(int alpha, fstream &blockInFile, fstream &netInFile) : _alpha(alpha), _totalArea(0)
+  Floorplanner(double alpha, fstream &blockInFile, fstream &netInFile) : _alpha(alpha), _totalArea(0), _chipWidth(0), _chipHeight(0), _totalWirelength(0), _finalCost(0), _totalRuntime(0)
   {
     parseInput(blockInFile, netInFile);
   }
@@ -42,14 +42,20 @@ private:
   size_t _outlineWidth;  // width of the outline
   size_t _outlineHeight; // height of the outline
 
-  int _terminalNum;                              // number of terminals
-  int _blockNum;                                 // number of blocks
-  int _netNum;                                   // number of nets
-  vector<Terminal *> _terminalArray;             // array of terminals
-  vector<Block *> _blockArray;                   // array of blocks
-  vector<Net *> _netArray;                       // array of nets
+  int _terminalNum;                            // number of terminals
+  int _blockNum;                               // number of blocks
+  int _netNum;                                 // number of nets
+  vector<Terminal *> _terminalArray;           // array of terminals
+  vector<Block *> _blockArray;                 // array of blocks
+  vector<Net *> _netArray;                     // array of nets
   unordered_map<string, int> _terminalName2Id; // terminal name to id
   unordered_map<string, int> _blockName2Id;    // block name to id
+
+  size_t _chipWidth;       // width of the chip
+  size_t _chipHeight;      // height of the chip
+  double _totalWirelength; // total wirelength of the floorplan
+  double _finalCost;       // the cost of the floorplan
+  double _totalRuntime;    // total runtime of the floorplanner
 
   void clear();
 };

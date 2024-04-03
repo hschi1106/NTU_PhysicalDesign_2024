@@ -5,7 +5,7 @@ class TreeNode
 {
 public:
   TreeNode() : _left(nullptr), _right(nullptr), _parent(nullptr) {}
-  TreeNode(TreeNode *l, TreeNode *r, TreeNode *p) : _left(l), _right(r), _parent(p) {}
+  TreeNode(TreeNode *left, TreeNode *right, TreeNode *parent) : _left(left), _right(right), _parent(parent) {}
   Block *getBlock() { return _block; }                   // get the block of the node
   TreeNode *getLeft() { return _left; }                  // get the left child of the node
   TreeNode *getRight() { return _right; }                // get the right child of the node
