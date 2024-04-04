@@ -6,6 +6,7 @@
 #include <map>
 #include <unordered_map>
 #include "module.h"
+#include "Bstar.h"
 using namespace std;
 
 class Floorplanner
@@ -25,15 +26,17 @@ public:
   size_t getTotalArea() const { return _totalArea; }
   size_t getOutlineWidth() const { return _outlineWidth; }
   size_t getOutlineHeight() const { return _outlineHeight; }
+  TreeNode *getBStarTreeRoot() const { return _bStarTreeRoot; }
 
   // modify method
   void parseInput(fstream &blockInFile, fstream &netInFile);
-  void compact();
+  void createBStarTree();
   void floorplan();
 
   // member functions about reporting
   void printSummary() const;
   void reportModule() const;
+  void reportBStarTree(TreeNode *node) const;
   void writeResult(fstream &outFile);
 
 private:
@@ -42,14 +45,16 @@ private:
   size_t _outlineWidth;  // width of the outline
   size_t _outlineHeight; // height of the outline
 
-  int _terminalNum;                            // number of terminals
-  int _blockNum;                               // number of blocks
-  int _netNum;                                 // number of nets
-  vector<Terminal *> _terminalArray;           // array of terminals
-  vector<Block *> _blockArray;                 // array of blocks
-  vector<Net *> _netArray;                     // array of nets
-  unordered_map<string, int> _terminalName2Id; // terminal name to id
-  unordered_map<string, int> _blockName2Id;    // block name to id
+  int _terminalNum;                                      // number of terminals
+  int _blockNum;                                         // number of blocks
+  int _netNum;                                           // number of nets
+  vector<Terminal *> _terminalArray;                     // array of terminals
+  vector<Block *> _blockArray;                           // array of blocks
+  vector<Net *> _netArray;                               // array of nets
+  unordered_map<string, int> _terminalName2Id;           // terminal name to id
+  unordered_map<string, int> _blockName2Id;              // block name to id
+  unordered_map<string, TreeNode *> _blockName2TreeNode; // net name to id
+  TreeNode *_bStarTreeRoot;                              // the root of B* tree
 
   size_t _chipWidth;       // width of the chip
   size_t _chipHeight;      // height of the chip

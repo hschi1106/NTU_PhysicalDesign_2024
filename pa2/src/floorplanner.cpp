@@ -36,7 +36,16 @@ void Floorplanner::parseInput(fstream &blockInFile, fstream &netInFile)
     Block *block = new Block(name, width, height);
     _blockArray.push_back(block);
     _totalArea += block->getArea(); // might be changed later
-    _blockName2Id[name] = i;
+  }
+
+  // sort _blockArray by area
+  // this may be deleted if no improvement
+  sort(_blockArray.begin(), _blockArray.end(), [](Block *a, Block *b)
+       { return a->getArea() > b->getArea(); });
+
+  for (int i = 0; i < _blockNum; ++i)
+  {
+    _blockName2Id[_blockArray[i]->getName()] = i;
   }
 
   // input terminal information
@@ -89,9 +98,33 @@ void Floorplanner::parseInput(fstream &blockInFile, fstream &netInFile)
   return;
 }
 
-void Floorplanner::compact()
+void Floorplanner::createBStarTree()
 {
-  cout << "Compacting..." << endl;
+  cout << "Creating initial B* tree..." << endl;
+  for (int i = 0; i < _blockNum; ++i)
+  {
+    TreeNode *node = new TreeNode(_blockArray[i]);
+    _blockName2TreeNode[_blockArray[i]->getName()] = node;
+  }
+
+  _bStarTreeRoot = _blockName2TreeNode[_blockArray[0]->getName()];
+
+  for (int i = 0; i < _blockNum; ++i)
+  {
+    TreeNode *currNode = _blockName2TreeNode[_blockArray[i]->getName()];
+    if (2 * i + 1 < _blockNum)
+    {
+      string leftName = _blockArray[2 * i + 1]->getName();
+      TreeNode *leftNode = _blockName2TreeNode[leftName];
+      currNode->setLeft(leftNode);
+    }
+    if (2 * i + 2 < _blockNum)
+    {
+      string rightName = _blockArray[2 * i + 2]->getName();
+      TreeNode *rightNode = _blockName2TreeNode[rightName];
+      currNode->setRight(rightNode);
+    }
+  }
 
   return;
 }
@@ -99,7 +132,7 @@ void Floorplanner::compact()
 void Floorplanner::floorplan()
 {
   cout << "Floorplanning..." << endl;
-
+  this->createBStarTree();
   return;
 }
 
@@ -138,6 +171,21 @@ void Floorplanner::reportModule() const
 
   // print the total area
   cout << "Total area: " << _totalArea << endl;
+
+  return;
+}
+
+void Floorplanner::reportBStarTree(TreeNode *node) const
+{
+  if (node == nullptr)
+  {
+    return;
+  }
+
+  cout << "Block: " << node->getBlock()->getName() << endl;
+
+  reportBStarTree(node->getLeft());
+  reportBStarTree(node->getRight());
 
   return;
 }

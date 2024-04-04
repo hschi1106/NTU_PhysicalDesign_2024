@@ -1,11 +1,13 @@
+#ifndef BSTAR_H
+#define BSTAR_H
 #include <vector>
 #include "module.h"
 
 class TreeNode
 {
 public:
-  TreeNode() : _left(nullptr), _right(nullptr), _parent(nullptr) {}
-  TreeNode(TreeNode *left, TreeNode *right, TreeNode *parent) : _left(left), _right(right), _parent(parent) {}
+  TreeNode() : _left(nullptr), _right(nullptr), _parent(nullptr), _block(nullptr) {}
+  TreeNode(Block *block) : _left(nullptr), _right(nullptr), _parent(nullptr), _block(block) {}
   Block *getBlock() { return _block; }                   // get the block of the node
   TreeNode *getLeft() { return _left; }                  // get the left child of the node
   TreeNode *getRight() { return _right; }                // get the right child of the node
@@ -22,14 +24,4 @@ private:
   Block *_block;     // the block that the node represents
 };
 
-class BStarTree
-{
-public:
-  BStarTree() : _root(nullptr) {}
-  ~BStarTree() { clear(); }
-
-private:
-  TreeNode *_root;
-
-  void clear(); // clear the tree
-};
+#endif // BSTAR_H

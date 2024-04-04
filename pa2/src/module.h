@@ -41,7 +41,7 @@ class Block : public Terminal
 {
 public:
     // constructor and destructor
-    Block(string &name, size_t w, size_t h) : Terminal(name, 0, 0), _w(w), _h(h) {}
+    Block(string &name, size_t w, size_t h) : Terminal(name, 0, 0), _w(w), _h(h), _rotate(false) {}
     ~Block() {}
 
     // basic access methods
@@ -56,12 +56,20 @@ public:
     void setHeight(size_t h) { _h = h; }
     static void setMaxX(size_t x) { _maxX = x; }
     static void setMaxY(size_t y) { _maxY = y; }
+    void rotateBolock()
+    {
+        _rotate = !_rotate;
+        _maxX = _maxX - _w + _h;
+        _maxY = _maxY - _h + _w;
+        swap(_w, _h);
+    }
 
 private:
     size_t _w;           // width of the block
     size_t _h;           // height of the block
     static size_t _maxX; // maximum x coordinate for all blocks
     static size_t _maxY; // maximum y coordinate for all blocks
+    bool _rotate;        // whether the block is rotated
 };
 
 class Net

@@ -46,10 +46,12 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  Floorplanner *floorplanner = new Floorplanner(alpha, inputBlock, inputNet);
-  floorplanner->floorplan();
-  floorplanner->printSummary();
-  floorplanner->writeResult(output);
+  Floorplanner *fp = new Floorplanner(alpha, inputBlock, inputNet);
+  // fp->reportModule();
+  fp->floorplan();
+  // fp->reportBStarTree(fp->getBStarTreeRoot());
+  fp->printSummary();
+  fp->writeResult(output);
   cout << "total runtime: " << (double)clock() / CLOCKS_PER_SEC << " seconds" << endl;
 
   return 0;
