@@ -6,7 +6,6 @@
 #include <map>
 #include <unordered_map>
 #include "module.h"
-#include "Bstar.h"
 using namespace std;
 
 class Floorplanner
@@ -31,12 +30,18 @@ public:
   // modify method
   void parseInput(fstream &blockInFile, fstream &netInFile);
   void createBStarTree();
+  void calculatePosition(TreeNode *currNode);
+  size_t calculateY(TreeNode *currNode);
+  void calculateChipSize();
+  void calculateWirelength();
+  void calculateCost();
   void floorplan();
 
   // member functions about reporting
   void printSummary() const;
   void reportModule() const;
   void reportBStarTree(TreeNode *node) const;
+  void reportHeightMap() const;
   void writeResult(fstream &outFile);
 
 private:
@@ -55,6 +60,7 @@ private:
   unordered_map<string, int> _blockName2Id;              // block name to id
   unordered_map<string, TreeNode *> _blockName2TreeNode; // net name to id
   TreeNode *_bStarTreeRoot;                              // the root of B* tree
+  map<size_t, size_t> _heightMap;                        // the height map
 
   size_t _chipWidth;       // width of the chip
   size_t _chipHeight;      // height of the chip

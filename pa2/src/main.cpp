@@ -17,25 +17,25 @@ int main(int argc, char **argv)
     inputNet.open(argv[3], ios::in);
     output.open(argv[4], ios::out);
     if (!argv[0]) {
-      cerr << "Lost alpha constant \"" << argv[0]
+      cerr << "Lost alpha constant \"" << argv[1]
            << "\". The program will be terminated..." << endl;
       exit(1);
     }
     if (!inputBlock)
     {
-      cerr << "Cannot open the input block file \"" << argv[1]
+      cerr << "Cannot open the input block file \"" << argv[2]
            << "\". The program will be terminated..." << endl;
       exit(1);
     }
     if (!inputNet)
     {
-      cerr << "Cannot open the input net file \"" << argv[1]
+      cerr << "Cannot open the input net file \"" << argv[3]
            << "\". The program will be terminated..." << endl;
       exit(1);
     }
     if (!output)
     {
-      cerr << "Cannot open the output file \"" << argv[2]
+      cerr << "Cannot open the output file \"" << argv[4]
            << "\". The program will be terminated..." << endl;
       exit(1);
     }

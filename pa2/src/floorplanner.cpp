@@ -9,7 +9,6 @@
 #include <map>
 #include <algorithm>
 #include "module.h"
-#include "Bstar.h"
 #include "floorplanner.h"
 using namespace std;
 
@@ -129,10 +128,160 @@ void Floorplanner::createBStarTree()
   return;
 }
 
+size_t Floorplanner::calculateY(TreeNode *currNode)
+{
+  // basic information of the current node
+  size_t blockWidth = currNode->getBlock()->getWidth(), blockHeight = currNode->getBlock()->getHeight();
+  size_t placeX = currNode->getX();
+  map<size_t, size_t>::iterator it = _heightMap.begin();
+  while (it->first < placeX)
+  {
+    it++;
+  }
+  // now: it->first == placeX
+
+  // find the y coordinate
+  size_t prevY = it->second; // the previous y coordinate before placeX
+  size_t highestY = prevY;   // the highest y coordinate between placeX and placeX + blockWidth
+  while (it != _heightMap.end() && it->first < placeX + blockWidth)
+  {
+    // update the highest y coordinate
+    if (it->second > highestY)
+    {
+      highestY = it->second;
+    }
+
+    // update the previous y coordinate before iterator moves to the next position
+    prevY = it->second;
+
+    // iterator moves to the next position
+    it++;
+
+    // remove the redundant height map between placeX and placeX + blockWidth
+    if (it != _heightMap.begin() && (it)->first > placeX && prev(it)->first < placeX + blockWidth)
+    {
+      _heightMap.erase(prev(it));
+    }
+  }
+
+  // update the height map
+  _heightMap[placeX] = highestY + blockHeight;
+  _heightMap[placeX + blockWidth] = _heightMap.find(placeX + blockWidth) == _heightMap.end() ? prevY : _heightMap[placeX + blockWidth];
+
+  // cout << "updated height map" << endl;
+  // cout << "x " << placeX << " y " << highestY + blockHeight << endl;
+  // cout << "x " << placeX + blockWidth << " y " << prevY << endl;
+
+  // this->reportHeightMap();
+
+  return highestY;
+}
+
+void Floorplanner::calculatePosition(TreeNode *currNode)
+{
+  // if the current node is nullptr, return
+  if (currNode == nullptr)
+  {
+    return;
+  }
+
+  // basic information of the current node
+  size_t blockWidth = currNode->getBlock()->getWidth(), blockHeight = currNode->getBlock()->getHeight();
+  size_t placeX = currNode->getX(), placeY = currNode->getY();
+
+  if (_heightMap.empty())
+  {
+    _heightMap[0] = blockHeight;
+    _heightMap[blockWidth] = placeY;
+    // this->reportHeightMap();
+  }
+
+  if (currNode->getLeft() != nullptr)
+  {
+    // calculate the x position
+    currNode->getLeft()->setX(placeX + blockWidth);
+    currNode->getLeft()->setY(calculateY(currNode->getLeft()));
+    // cout << "place " << currNode->getLeft()->getBlock()->getName() << " at x: " << currNode->getLeft()->getX() << " y: " << currNode->getLeft()->getY() << endl;
+    // cout << "blockWidth: " << currNode->getLeft()->getBlock()->getWidth() << " blockHeight: " << currNode->getLeft()->getBlock()->getHeight() << endl;
+    // cout << endl;
+    // cout << endl;
+    calculatePosition(currNode->getLeft());
+  }
+
+  if (currNode->getRight() != nullptr)
+  {
+    // calculate the x position
+    currNode->getRight()->setX(placeX);
+    currNode->getRight()->setY(calculateY(currNode->getRight()));
+    // cout << "place " << currNode->getRight()->getBlock()->getName() << " at x: " << currNode->getRight()->getX() << " y: " << currNode->getRight()->getY() << endl;
+    // cout << "blockWidth: " << currNode->getRight()->getBlock()->getWidth() << " blockHeight: " << currNode->getRight()->getBlock()->getHeight() << endl;
+    // cout << endl;
+    // cout << endl;
+    calculatePosition(currNode->getRight());
+  }
+
+  return;
+}
+
+void Floorplanner::calculateChipSize()
+{
+  _chipWidth = 0;
+  _chipHeight = 0;
+  for (map<size_t, size_t>::iterator it = _heightMap.begin(); it != _heightMap.end(); ++it)
+  {
+    _chipWidth = max(_chipWidth, it->first);
+    _chipHeight = max(_chipHeight, it->second);
+  }
+  return;
+}
+
+void Floorplanner::calculateWirelength()
+{
+  _totalWirelength = 0;
+  for (int i = 0; i < _netNum; ++i)
+  {
+    vector<Terminal *> terminalList = _netArray[i]->getTermList();
+    double minX = _chipWidth, minY = _chipHeight, maxX = 0, maxY = 0;
+    for (int j = 0; j < terminalList.size(); ++j)
+    {
+      double midX, midY;
+      if (_blockName2Id.count(terminalList[j]->getName()))
+      {
+        TreeNode *node = _blockName2TreeNode[terminalList[j]->getName()];
+        midX = node->getX() + double(node->getBlock()->getWidth() / 2);
+        midY = node->getY() + double(node->getBlock()->getHeight() / 2);
+      }
+      else
+      {
+        midX = terminalList[j]->getX1();
+        midY = terminalList[j]->getY1();
+      }
+      minX = min(minX, midX);
+      minY = min(minY, midY);
+      maxX = max(maxX, midX);
+      maxY = max(maxY, midY);
+    }
+    _totalWirelength += (maxX - minX) + (maxY - minY);
+  }
+  return;
+}
+
+void Floorplanner::calculateCost()
+{
+  _finalCost = _alpha * (_chipWidth * _chipHeight) + (1 - _alpha) * _totalWirelength;
+  return;
+}
+
 void Floorplanner::floorplan()
 {
+  clock_t start = clock();
   cout << "Floorplanning..." << endl;
   this->createBStarTree();
+  this->calculatePosition(_bStarTreeRoot);
+  this->calculateChipSize();
+  this->calculateWirelength();
+  this->calculateCost();
+  _totalRuntime = (double)(clock() - start) / CLOCKS_PER_SEC;
   return;
 }
 
@@ -179,14 +328,27 @@ void Floorplanner::reportBStarTree(TreeNode *node) const
 {
   if (node == nullptr)
   {
+    cout << "NULL" << endl;
     return;
   }
 
-  cout << "Block: " << node->getBlock()->getName() << endl;
+  cout << "Block: " << node->getBlock()->getName() << " width: " << node->getBlock()->getWidth() << " height: " << node->getBlock()->getHeight() << " x: " << node->getX() << " y: " << node->getY() << endl;
 
+  cout << "Left child: " << endl;
   reportBStarTree(node->getLeft());
+  cout << "Right child: " << endl;
   reportBStarTree(node->getRight());
 
+  return;
+}
+
+void Floorplanner::reportHeightMap() const
+{
+  cout << "Report height map..." << endl;
+  for (map<size_t, size_t>::const_iterator it = _heightMap.begin(); it != _heightMap.end(); ++it)
+  {
+    cout << "x: " << it->first << " y: " << it->second << endl;
+  }
   return;
 }
 
@@ -232,8 +394,10 @@ void Floorplanner::writeResult(fstream &outFile)
   // write the block information
   for (int i = 0; i < _blockNum; ++i)
   {
-    buff << _blockArray[i]->getName() << " " << _blockArray[i]->getX1() << " " << _blockArray[i]->getY1() << " " << _blockArray[i]->getX2() << " " << _blockArray[i]->getY2() << endl;
+    TreeNode *node = _blockName2TreeNode[_blockArray[i]->getName()];
+    buff << _blockArray[i]->getName() << " " << node->getX() << " " << node->getY() << " " << node->getX() + _blockArray[i]->getWidth() << " " << node->getY() + _blockArray[i]->getHeight() << endl;
     outFile << buff.str();
+    buff.str("");
   }
 
   return;
