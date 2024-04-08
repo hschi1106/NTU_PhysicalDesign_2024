@@ -1,11 +1,13 @@
 
 Checking Report...
-cost:       actual  16274221.000000/reported 16274200.000000
-wirelength: actual  820941.500000/reported 820957.000000
-area:       actual  31727500.000000/reported 31727500.000000
-width:      outline 6937/actual 5180/reported 5180.000000
-height:     outline 5379/actual 6125/reported 6125.000000
-runtime: 0.000291
+Error: block bk14c overlaps with block P30
+Error: block bk3 overlaps with block POW
+cost:       actual  1435448.250000/reported 1435450.000000
+wirelength: actual  192458.500000/reported 192458.000000
+area:       actual  2678438.000000/reported 2678438.000000
+width:      outline 1326/actual 1057/reported 1057.000000
+height:     outline 1205/actual 2534/reported 2534.000000
+runtime: 0.000056
 Error: reported floorplan cannot fit into the given outline
 
 Sorry, your results are incorrect

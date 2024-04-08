@@ -29,13 +29,27 @@ public:
 
   // modify method
   void parseInput(fstream &blockInFile, fstream &netInFile);
+
+  // B*-tree construction
   void createBStarTree();
-  void calculatePosition(TreeNode *currNode);
   size_t calculateY(TreeNode *currNode);
+  void calculatePosition(TreeNode *currNode);
+  void clearPosition(TreeNode *currNode);
+
+  // perturbation methods
+  void rotateBlock(TreeNode *rotatedNode);
+  void swapNodes(TreeNode *swapedNodeA, TreeNode *swapedNodeB);
+  void deleteNode(TreeNode *deletedNode);
+  void insertNode(TreeNode *inesrtedNode, TreeNode *parent);
+  void randomlyMoveNode(TreeNode *movedNode);
+
+  // floorplanning
+  void floorplan();
+
+  // calculate output value
   void calculateChipSize();
   void calculateWirelength();
   void calculateCost();
-  void floorplan();
 
   // member functions about reporting
   void printSummary() const;
