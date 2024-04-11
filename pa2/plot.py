@@ -43,5 +43,5 @@ for block, (x1, y1, x2, y2) in blocks.items():
 plt.xlabel('X')
 plt.ylabel('Y')
 plt.title('Block Placement')
-plt.gca()
+plt.gca().set_aspect('equal', adjustable='box')  # 固定比例
 plt.show()

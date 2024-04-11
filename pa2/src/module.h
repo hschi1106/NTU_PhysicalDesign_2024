@@ -93,32 +93,47 @@ private:
 class TreeNode
 {
 public:
-    TreeNode() : _left(nullptr), _right(nullptr), _parent(nullptr), _block(nullptr), _x(0), _y(0) {}
-    TreeNode(Block *block) : _left(nullptr), _right(nullptr), _parent(nullptr), _block(block), _x(0), _y(0) {}
+    TreeNode() : _left(nullptr), _right(nullptr), _parent(nullptr), _block(nullptr), _x(0), _y(0), _oldLeft(nullptr), _oldRight(nullptr), _oldParent(nullptr), _lastRotated(false), _lastBlock(nullptr) {}
+    TreeNode(Block *block) : _left(nullptr), _right(nullptr), _parent(nullptr), _block(block), _x(0), _y(0), _oldLeft(nullptr), _oldRight(nullptr), _oldParent(nullptr), _lastRotated(false), _lastBlock(nullptr) {}
 
     // basic access methods
-    Block *getBlock() { return _block; }      // get the block of the node
-    TreeNode *getLeft() { return _left; }     // get the left child of the node
-    TreeNode *getRight() { return _right; }   // get the right child of the node
-    TreeNode *getParent() { return _parent; } // get the parent of the node
-    const size_t getX() { return _x; }        // get the x coordinate of the block
-    const size_t getY() { return _y; }        // get the y coordinate of the block
+    Block *getBlock() { return _block; }            // get the block of the node
+    TreeNode *getLeft() { return _left; }           // get the left child of the node
+    TreeNode *getRight() { return _right; }         // get the right child of the node
+    TreeNode *getParent() { return _parent; }       // get the parent of the node
+    const size_t getX() { return _x; }              // get the x coordinate of the block
+    const size_t getY() { return _y; }              // get the y coordinate of the block
+    TreeNode *getOldLeft() { return _oldLeft; }     // get the left child of the node
+    TreeNode *getOldRight() { return _oldRight; }   // get the right child of the node
+    TreeNode *getOldParent() { return _oldParent; } // get the parent of the node
+    bool getLastRotated() { return _lastRotated; }          // get the rotated status of the block
+    Block *getLastBlock() { return _lastBlock; }    // get the last block of the node
 
     // set functions
-    void setBlock(Block *block) { _block = block; }        // set the block of the node
-    void setLeft(TreeNode *left) { _left = left; }         // set the left child of the node
-    void setRight(TreeNode *right) { _right = right; }     // set the right child of the node
-    void setParent(TreeNode *parent) { _parent = parent; } // set the parent of the node
-    void setX(size_t x) { _x = x; }                        // set the x coordinate of the block
-    void setY(size_t y) { _y = y; }                        // set the y coordinate of the block
+    void setBlock(Block *block) { _block = block; }              // set the block of the node
+    void setLeft(TreeNode *left) { _left = left; }               // set the left child of the node
+    void setRight(TreeNode *right) { _right = right; }           // set the right child of the node
+    void setParent(TreeNode *parent) { _parent = parent; }       // set the parent of the node
+    void setX(size_t x) { _x = x; }                              // set the x coordinate of the block
+    void setY(size_t y) { _y = y; }                              // set the y coordinate of the block
+    void setOldLeft(TreeNode *left) { _oldLeft = left; }         // set the left child of the node
+    void setOldRight(TreeNode *right) { _oldRight = right; }     // set the right child of the node
+    void setOldParent(TreeNode *parent) { _oldParent = parent; } // set the parent of the node
+    void setLastRotated(bool lastRotated) { _lastRotated = lastRotated; }       // set the rotated status of the block
+    void setLastBlock(Block *block) { _lastBlock = block; }      // set the last block of the node
 
 private:
-    Block *_block;     // the block that the node represents
-    size_t _x;         // the x coordinate of the block
-    size_t _y;         // the y coordinate of the block
-    TreeNode *_left;   // the left child of the node
-    TreeNode *_right;  // the right child of the node
-    TreeNode *_parent; // the parent of the node
+    Block *_block;        // the block that the node represents
+    size_t _x;            // the x coordinate of the block
+    size_t _y;            // the y coordinate of the block
+    TreeNode *_left;      // the left child of the node
+    TreeNode *_right;     // the right child of the node
+    TreeNode *_parent;    // the parent of the node
+    TreeNode *_oldLeft;   // the left child of the node
+    TreeNode *_oldRight;  // the right child of the node
+    TreeNode *_oldParent; // the parent of the node
+    bool _lastRotated;        // whether the block is rotated in latest perturbation
+    Block *_lastBlock;    // the block that the node represents in latest perturbation
 };
 
 #endif // MODULE_H
