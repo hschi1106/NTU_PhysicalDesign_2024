@@ -316,7 +316,7 @@ void Floorplanner::randomlyRotateBlock()
   Block *rotatedBlock = rotatedNode->getBlock();
   rotatedBlock->rotateBolock();
 
-  // record resored data
+  // record restored data
   rotatedNode->setLastRotated(true);
   _modifiedNodes.push_back(rotatedNode);
 
@@ -341,12 +341,13 @@ void Floorplanner::randomlySwapNodes()
   Block *blockA = swapedNodeA->getBlock();
   Block *blockB = swapedNodeB->getBlock();
 
-  // record the swapped block
+  // record restored data
   swapedNodeA->setLastBlock(blockA);
   swapedNodeB->setLastBlock(blockB);
   _modifiedNodes.push_back(swapedNodeA);
   _modifiedNodes.push_back(swapedNodeB);
 
+  // swap the blocks
   swapedNodeA->setBlock(blockB);
   swapedNodeB->setBlock(blockA);
 
@@ -359,14 +360,18 @@ void Floorplanner::randomlySwapNodes()
 
 void Floorplanner::randomlyMove()
 {
+  // pick a random block
   int blockId = rand() % _blockNum;
   TreeNode *movedNode = _blockName2TreeNode[_blockArray[blockId]->getName()];
+
+  // to simplfy, make sure the moved node is not the root
   while (movedNode == _bStarTreeRoot)
   {
     blockId = rand() % _blockNum;
     movedNode = _blockName2TreeNode[_blockArray[blockId]->getName()];
   }
 
+  // set parent and record restored data
   movedNode->setOldParent(movedNode->getParent());
   if (movedNode->getParent()->getLeft() == movedNode)
   {
@@ -409,6 +414,7 @@ void Floorplanner::randomlyMove()
     }
   }
 
+  // move the node and record restored data
   if (rand() % 2 == 0)
   {
     leafNode->setLeft(movedNode);
