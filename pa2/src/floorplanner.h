@@ -40,11 +40,13 @@ public:
   void randomlyMove();
   void restoreLastStatus();
   void deleteLastStatus();
+  void perturb();
 
   // floorplanning
   void floorplan();
   void SA(double initTemp, double coolingRate, double stopTemp);
   void writeBestCoordinate(TreeNode *currNode);
+  void calculateAverage();
 
   // calculate output value
   void calculateOutput();
@@ -58,15 +60,14 @@ public:
   void reportModifiedNodes() const;
   void reportBlockName2TreeNode() const;
 
-  // debug
-  void constructTree();
-
 private:
   // attributes for floorplanner
-  double _alpha;         // the alpha constant
-  size_t _totalArea;     // total area of the modules
-  size_t _outlineWidth;  // width of the outline
-  size_t _outlineHeight; // height of the outline
+  double _alpha;             // the alpha constant
+  size_t _totalArea;         // total area of the modules
+  size_t _outlineWidth;      // width of the outline
+  size_t _outlineHeight;     // height of the outline
+  size_t _averageArea;       // average area for calculating cost
+  size_t _averageWirelength; // average wirelength for calculating cost
 
   // attributes for input
   int _terminalNum;                            // number of terminals
@@ -92,6 +93,7 @@ private:
   double _finalCost;       // the cost of the floorplan
   double _totalRuntime;    // total runtime of the floorplanner
 
+  void clearTree(TreeNode *currNode);
   void clear();
 };
 
