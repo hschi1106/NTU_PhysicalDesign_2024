@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <climits>
 #include "module.h"
 using namespace std;
 
@@ -37,7 +38,8 @@ public:
   // perturbation methods
   void randomlyRotateBlock();
   void randomlySwapNodes();
-  void randomlyMove();
+  void randomlyMoveLeaf();
+  void randomlyMoveSubtree();
   void restoreLastStatus();
   void deleteLastStatus();
   void perturb();
@@ -45,6 +47,7 @@ public:
   // floorplanning
   void floorplan();
   void SA(double initTemp, double coolingRate, double stopTemp);
+  void fastSA();
   void writeBestCoordinate(TreeNode *currNode);
   void calculateAverage();
 
@@ -61,13 +64,21 @@ public:
   void reportBlockName2TreeNode() const;
 
 private:
+  // hyperparameters
+  double _alpha;  // the alpha constant
+  double _beta;   // the beta constant
+  double _constP; // the constant P
+  double _constC; // the constant c
+  double _constk; // the constant k
+
   // attributes for floorplanner
-  double _alpha;             // the alpha constant
-  size_t _totalArea;         // total area of the modules
-  size_t _outlineWidth;      // width of the outline
-  size_t _outlineHeight;     // height of the outline
-  size_t _averageArea;       // average area for calculating cost
-  size_t _averageWirelength; // average wirelength for calculating cost
+  size_t _totalArea;     // total area of the modules
+  size_t _outlineWidth;  // width of the outline
+  size_t _outlineHeight; // height of the outline
+  size_t _averageArea;   // average area for calculating cost
+  size_t _averageWirelength;  // average wirelength for calculating cost
+  size_t _averageCost;        // average cost for calculating cost
+  bool _adaptOutline = false; // whether to adapt the outline
 
   // attributes for input
   int _terminalNum;                            // number of terminals
