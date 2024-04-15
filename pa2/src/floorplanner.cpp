@@ -35,16 +35,19 @@ void Floorplanner::parseInput(fstream &blockInFile, fstream &netInFile)
     Block *block = new Block(name, width, height);
     _blockArray.push_back(block);
     _totalArea += block->getArea(); // might be changed later
-  }
 
-  // sort _blockArray by area
-  sort(_blockArray.begin(), _blockArray.end(), [](Block *a, Block *b)
-       { return a->getArea() > b->getArea(); });
-
-  for (int i = 0; i < _blockNum; ++i)
-  {
     _blockName2Id[_blockArray[i]->getName()] = i;
   }
+
+  // // sort _blockArray by area
+  // // this may be deleted if no improvement
+  // sort(_blockArray.begin(), _blockArray.end(), [](Block *a, Block *b)
+  //      { return a->getArea() > b->getArea(); });
+
+  // for (int i = 0; i < _blockNum; ++i)
+  // {
+  //   _blockName2Id[_blockArray[i]->getName()] = i;
+  // }
 
   // input terminal information
   for (int i = 0; i < _terminalNum; ++i)
@@ -100,11 +103,15 @@ void Floorplanner::createBStarTree()
 {
   for (int i = 0; i < _blockNum; ++i)
   {
-    TreeNode *node = new TreeNode(_blockArray[i]);
+    int blockId = i;
+    string name = _blockArray[i]->getName();
+    size_t width = _blockArray[i]->getWidth();
+    size_t height = _blockArray[i]->getHeight();
+    TreeNode *node = new TreeNode(blockId, name, width, height);
     _blockName2TreeNode[_blockArray[i]->getName()] = node;
   }
 
-  _bStarTreeRoot = _blockName2TreeNode[_blockArray[0]->getName()];
+  _treeRoot = _blockName2TreeNode[_blockArray[0]->getName()];
 
   for (int i = 0; i < _blockNum; ++i)
   {
@@ -128,50 +135,114 @@ void Floorplanner::createBStarTree()
   return;
 }
 
-size_t Floorplanner::calculateTreeY(TreeNode *currNode)
+TreeNode *Floorplanner::replicateBStarTree(TreeNode *currNode, TreeNode *parent)
 {
-  // basic information of the current node
-  size_t blockWidth = currNode->getBlock()->getWidth(), blockHeight = currNode->getBlock()->getHeight();
-  size_t placeX = currNode->getX();
-  map<size_t, size_t>::iterator it = _heightMap.begin();
-  while (it->first < placeX)
+  if (currNode == nullptr)
   {
-    it++;
+    return nullptr;
   }
-  // now: it->first == placeX
+
+  int blockId = currNode->getBlockId();
+  string name = currNode->getName();
+  size_t width = currNode->getWidth();
+  size_t height = currNode->getHeight();
+
+  TreeNode *newNode = new TreeNode(blockId, name, width, height);
+  _blockName2ModifiedTreeNode[currNode->getName()] = newNode;
+
+  newNode->setParent(parent);
+  newNode->setLeft(replicateBStarTree(currNode->getLeft(), newNode));
+  newNode->setRight(replicateBStarTree(currNode->getRight(), newNode));
+  return newNode;
+}
+
+void Floorplanner::deleteTree(TreeNode *currNode)
+{
+  if (currNode == nullptr)
+  {
+    return;
+  }
+
+  deleteTree(currNode->getLeft());
+  deleteTree(currNode->getRight());
+  delete currNode;
+
+  return;
+}
+
+size_t Floorplanner::updateContourLine(TreeNode *currNode)
+{
+  ContourLineNode *curr = _start;
+  size_t x1 = currNode->getX1(), x2 = currNode->getX2();
+  size_t width = currNode->getWidth(), height = currNode->getHeight();
+  if (currNode->getRotate())
+  {
+    swap(width, height);
+  }
+
+  while (curr->getX() < x1)
+  {
+    curr = curr->getNext();
+  }
+  // now: it->first == x1
 
   // find the y coordinate
-  size_t prevY = it->second; // the previous y coordinate before placeX
-  size_t highestY = prevY;   // the highest y coordinate between placeX and placeX + blockWidth
-  while (it != _heightMap.end() && it->first < placeX + blockWidth)
+  ContourLineNode *start = curr;
+  size_t prevY = curr->getY(); // the previous y coordinate before placeX
+  size_t highestY = prevY;     // the highest y coordinate between placeX and placeX + blockWidth
+  bool hasNodeAtX2 = false;    // whether there is a node at x2
+  while (curr != _end && curr->getX() < x2)
   {
     // update the highest y coordinate
-    if (it->second > highestY)
+    if (curr->getY() > highestY)
     {
-      highestY = it->second;
+      highestY = curr->getY();
     }
 
     // update the previous y coordinate before iterator moves to the next position
-    prevY = it->second;
+    prevY = curr->getY();
 
     // iterator moves to the next position
-    it++;
+    curr = curr->getNext();
 
     // remove the redundant height map between placeX and placeX + blockWidth
-    if (it != _heightMap.begin() && prev(it)->first > placeX && prev(it)->first < placeX + blockWidth)
+    if (curr != _start && curr->getPrev()->getX() > x1 && curr->getPrev()->getX() < x2)
     {
-      _heightMap.erase(prev(it));
+      // delete the previous node
+      ContourLineNode *prev = curr->getPrev();
+      prev->getPrev()->setNext(curr);
+      curr->setPrev(prev->getPrev());
+      delete prev;
     }
   }
 
-  // update the height map
-  _heightMap[placeX] = highestY + blockHeight;
-  _heightMap[placeX + blockWidth] = _heightMap.find(placeX + blockWidth) == _heightMap.end() ? prevY : _heightMap[placeX + blockWidth];
+  if (curr->getX() == x2)
+  {
+    hasNodeAtX2 = true;
+  }
+
+  // update the contour line
+  ContourLineNode *newNode1 = new ContourLineNode(x1, highestY + height);
+  start->setNext(newNode1);
+  newNode1->setPrev(start);
+  if (hasNodeAtX2)
+  {
+    newNode1->setNext(curr);
+    curr->setPrev(newNode1);
+  }
+  else
+  {
+    ContourLineNode *newNode2 = new ContourLineNode(x2, prevY);
+    newNode1->setNext(newNode2);
+    newNode2->setPrev(newNode1);
+    newNode2->setNext(curr);
+    curr->setPrev(newNode2);
+  }
 
   return highestY;
 }
 
-void Floorplanner::calculateTreePosition(TreeNode *currNode)
+void Floorplanner::calculatePosition(TreeNode *currNode)
 {
   // if the current node is nullptr, return
   if (currNode == nullptr)
@@ -179,83 +250,91 @@ void Floorplanner::calculateTreePosition(TreeNode *currNode)
     return;
   }
 
-  // if the current node is the root of the B*-tree, clear the height map
-  if (currNode == _bStarTreeRoot)
+  // if the current node is the root node
+  if (currNode->getParent() == nullptr)
   {
-    _heightMap.clear();
-  }
-
-  // basic information of the current node
-  size_t blockWidth = currNode->getBlock()->getWidth(), blockHeight = currNode->getBlock()->getHeight();
-  size_t placeX = currNode->getX(), placeY = currNode->getY();
-
-  if (_heightMap.empty())
-  {
-    _heightMap[placeX] = blockHeight;
-    _heightMap[placeX + blockWidth] = placeY;
+    size_t blockWidth = currNode->getWidth(), blockHeight = currNode->getHeight();
+    if (currNode->getRotate())
+    {
+      swap(blockWidth, blockHeight);
+    }
+    currNode->setPos(0, 0, blockWidth, blockHeight);
+    ContourLineNode *newNode1 = new ContourLineNode(0, blockHeight);
+    ContourLineNode *newNode2 = new ContourLineNode(blockWidth, 0);
+    newNode1->setNext(newNode2);
+    newNode2->setPrev(newNode1);
+    _start->setNext(newNode1);
+    newNode1->setPrev(_start);
+    _end->setPrev(newNode2);
+    newNode2->setNext(_end);
   }
 
   if (currNode->getLeft() != nullptr)
   {
-    // calculate the x position
-    currNode->getLeft()->setX(placeX + blockWidth);
-    currNode->getLeft()->setY(calculateTreeY(currNode->getLeft()));
-    calculateTreePosition(currNode->getLeft());
+    size_t blockWidth = currNode->getLeft()->getWidth(), blockHeight = currNode->getLeft()->getHeight();
+    if (currNode->getLeft()->getRotate())
+    {
+      swap(blockWidth, blockHeight);
+    }
+    size_t x1 = currNode->getX2();
+    currNode->getLeft()->setPos(x1, 0, x1 + blockWidth, 0);
+    size_t y1 = updateContourLine(currNode->getLeft());
+    currNode->getLeft()->setPos(x1, y1, x1 + blockWidth, y1 + blockHeight);
+    calculatePosition(currNode->getLeft());
   }
-
   if (currNode->getRight() != nullptr)
   {
-    // calculate the x position
-    currNode->getRight()->setX(placeX);
-    currNode->getRight()->setY(calculateTreeY(currNode->getRight()));
-    calculateTreePosition(currNode->getRight());
+    size_t blockWidth = currNode->getRight()->getWidth(), blockHeight = currNode->getRight()->getHeight();
+    if (currNode->getRight()->getRotate())
+    {
+      swap(blockWidth, blockHeight);
+    }
+    size_t x1 = currNode->getX1();
+    currNode->getRight()->setPos(x1, 0, x1 + blockWidth, 0);
+    size_t y1 = updateContourLine(currNode->getRight());
+    currNode->getRight()->setPos(x1, y1, x1 + blockWidth, y1 + blockHeight);
+    calculatePosition(currNode->getRight());
   }
-
   return;
 }
 
-void Floorplanner::clearTreePosition(TreeNode *currNode)
+void Floorplanner::clearPosition(TreeNode *currNode)
 {
   if (currNode == nullptr)
   {
     return;
   }
 
-  // clear the x and y position for next iteration
-  currNode->setX(0);
-  currNode->setY(0);
+  currNode->setPos(0, 0, 0, 0);
 
-  clearTreePosition(currNode->getLeft());
-  clearTreePosition(currNode->getRight());
+  clearPosition(currNode->getLeft());
+  clearPosition(currNode->getRight());
 
   return;
 }
 
-size_t Floorplanner::calculateTreeChipWidth()
+size_t Floorplanner::calculateChipWidth()
 {
-  // calculate the chip width by height map
-  size_t chipWidth = 0;
-  for (map<size_t, size_t>::iterator it = _heightMap.begin(); it != _heightMap.end(); ++it)
-  {
-    chipWidth = max(chipWidth, it->first);
-  }
+
+  ContourLineNode *currNode = _end->getPrev();
+  size_t chipWidth = currNode->getX();
   return chipWidth;
 }
 
-size_t Floorplanner::calculateTreeChipHeight()
+size_t Floorplanner::calculateChipHeight()
 {
-  // calculate the chip height by height map
+  ContourLineNode *currNode = _start;
   size_t chipHeight = 0;
-  for (map<size_t, size_t>::iterator it = _heightMap.begin(); it != _heightMap.end(); ++it)
+  while (currNode != nullptr)
   {
-    chipHeight = max(chipHeight, it->second);
+    chipHeight = max(chipHeight, currNode->getY());
+    currNode = currNode->getNext();
   }
   return chipHeight;
 }
 
-double Floorplanner::calculateTreeWirelength()
+double Floorplanner::calculateWirelength(unordered_map<string, TreeNode *> blockName2TreeNode)
 {
-  // calculate the wirelength
   double wirelength = 0;
   for (int i = 0; i < _netNum; ++i)
   {
@@ -264,11 +343,11 @@ double Floorplanner::calculateTreeWirelength()
     for (int j = 0; j < terminalList.size(); ++j)
     {
       double midX, midY;
-      if (_blockName2Id.count(terminalList[j]->getName()))
+      if (blockName2TreeNode.count(terminalList[j]->getName()))
       {
-        TreeNode *node = _blockName2TreeNode[terminalList[j]->getName()];
-        midX = node->getX() + double(node->getBlock()->getWidth() / 2.0);
-        midY = node->getY() + double(node->getBlock()->getHeight() / 2.0);
+        TreeNode *node = blockName2TreeNode[terminalList[j]->getName()];
+        midX = (double)(node->getX1() + node->getX2()) / 2.0;
+        midY = (double)(node->getY1() + node->getY2()) / 2.0;
       }
       else
       {
@@ -282,30 +361,21 @@ double Floorplanner::calculateTreeWirelength()
     }
     wirelength += (maxX - minX) + (maxY - minY);
   }
-
   return wirelength;
 }
 
-double Floorplanner::calculateTreeCost()
+double Floorplanner::calculateCost(TreeNode *currRoot, unordered_map<string, TreeNode *> blockName2TreeNode)
 {
-  _beta = 0.1;
-  // clear the position
-  this->clearTreePosition(_bStarTreeRoot);
-  this->calculateTreePosition(_bStarTreeRoot);
-
+  this->clearPosition(currRoot);
+  this->calculatePosition(currRoot);
   // calculate the chip width and chip height
-  size_t chipWidth = this->calculateTreeChipWidth();
-  size_t chipHeight = this->calculateTreeChipHeight();
-
+  size_t chipWidth = this->calculateChipWidth();
+  size_t chipHeight = this->calculateChipHeight();
   // calculate the wirelength
-  double wirelength = this->calculateTreeWirelength();
+  double wirelength = this->calculateWirelength(blockName2TreeNode);
 
-  // calculate cost
-  // double cost = _alpha * (chipWidth * chipHeight) + (1 - _alpha) * wirelength;
-
-  // cout << "out" << endl;
-  double areaCost = (_alpha) * (chipWidth * chipHeight);
-  double wirelengthCost = (1 - _alpha) * wirelength;
+  double areaCost = (_alpha) * (chipWidth * chipHeight) / _averageArea;
+  double wirelengthCost = (_beta)*wirelength / _averageWirelength;
 
   double desiredAspectRatio = (double)_outlineHeight / _outlineWidth;
   double aspectRatio = (double)chipHeight / chipWidth;
@@ -313,363 +383,234 @@ double Floorplanner::calculateTreeCost()
 
   // cout << "area cost: " << areaCost << " wirelength cost: " << wirelengthCost << " aspect ratio cost: " << aspectRatioCost << endl;
 
-  // cout << "desired aspect ratio: " << desiredAspectRatio << " aspect ratio: " << aspectRatio << endl;
+  // calculate cost
   double cost = areaCost + wirelengthCost + aspectRatioCost;
+
+  // if (chipWidth<_outlineWidth&&chipHeight<_outlineHeight)
+  // {
+  //   cout << "in bound" << endl;
+  // }
 
   return cost;
 }
 
-void Floorplanner::randomlyRotateBlock()
+void Floorplanner::rotateNode(TreeNode *rotatedNode)
 {
-  // randomly pick a block
-  int blockId = rand() % _blockNum;
-  TreeNode *rotatedNode = _blockName2TreeNode[_blockArray[blockId]->getName()];
-
-  // rotate the block
-  Block *rotatedBlock = rotatedNode->getBlock();
-  rotatedBlock->rotateBolock();
-
-  // record restored data
-  rotatedNode->setLastRotated(true);
-  _modifiedNodes.push_back(rotatedNode);
+  // rotate the node
+  rotatedNode->rotateBolock();
 
   return;
 }
 
-void Floorplanner::randomlySwapNodes()
+void Floorplanner::swapNode(TreeNode *swappedNodeA, TreeNode *swappedNodeB)
 {
-  // randomly pick two blocks
-  int blockIdA = rand() % _blockNum;
-  int blockIdB = rand() % _blockNum;
-
-  // make sure two blocks are different
-  while (blockIdA == blockIdB)
-  {
-    blockIdB = rand() % _blockNum;
-  }
-  TreeNode *swapedNodeA = _blockName2TreeNode[_blockArray[blockIdA]->getName()];
-  TreeNode *swapedNodeB = _blockName2TreeNode[_blockArray[blockIdB]->getName()];
-
   // swap two nodes
-  Block *blockA = swapedNodeA->getBlock();
-  Block *blockB = swapedNodeB->getBlock();
+  int blockAId = swappedNodeA->getBlockId();
+  int blockBId = swappedNodeB->getBlockId();
+  Block *blockA = _blockArray[blockAId];
+  Block *blockB = _blockArray[blockBId];
+  string blockAName = blockA->getName();
+  string blockBName = blockB->getName();
+  bool blockARotate = swappedNodeA->getRotate();
+  bool blockBRotate = swappedNodeB->getRotate();
+  swappedNodeA->setBlockId(blockBId);
+  swappedNodeB->setBlockId(blockAId);
+  swappedNodeA->setWidth(blockB->getWidth());
+  swappedNodeA->setHeight(blockB->getHeight());
+  swappedNodeB->setWidth(blockA->getWidth());
+  swappedNodeB->setHeight(blockA->getHeight());
+  swappedNodeA->setName(blockBName);
+  swappedNodeB->setName(blockAName);
+  swappedNodeA->setRotate(blockBRotate);
+  swappedNodeB->setRotate(blockARotate);
+  _blockName2ModifiedTreeNode[blockAName] = swappedNodeB;
+  _blockName2ModifiedTreeNode[blockBName] = swappedNodeA;
+  return;
+}
 
-  // record restored data
-  swapedNodeA->setLastBlock(blockA);
-  swapedNodeB->setLastBlock(blockB);
-  _modifiedNodes.push_back(swapedNodeA);
-  _modifiedNodes.push_back(swapedNodeB);
-
-  // swap the blocks
-  swapedNodeA->setBlock(blockB);
-  swapedNodeB->setBlock(blockA);
-
-  // update the blockName2TreeNode
-  _blockName2TreeNode[blockA->getName()] = swapedNodeB;
-  _blockName2TreeNode[blockB->getName()] = swapedNodeA;
+void Floorplanner::deleteNode(TreeNode *deletedNode)
+{
+  // delete the node
+  if (deletedNode->getLeft() == nullptr && deletedNode->getRight() == nullptr)
+  {
+    // if the deleted node is a leaf node
+    TreeNode *parent = deletedNode->getParent();
+    if (parent->getLeft() == deletedNode)
+    {
+      parent->setLeft(nullptr);
+    }
+    else
+    {
+      parent->setRight(nullptr);
+    }
+    _blockName2ModifiedTreeNode.erase(deletedNode->getName());
+    delete deletedNode;
+  }
+  else if (deletedNode->getLeft() == nullptr)
+  {
+    // if the deleted node has only right child
+    TreeNode *parent = deletedNode->getParent();
+    TreeNode *rightChild = deletedNode->getRight();
+    if (parent != nullptr)
+    {
+      if (parent->getLeft() == deletedNode)
+      {
+        parent->setLeft(rightChild);
+      }
+      else
+      {
+        parent->setRight(rightChild);
+      }
+      rightChild->setParent(parent);
+    }
+    else
+    {
+      rightChild->setParent(nullptr);
+      _modifiedTreeRoot = rightChild;
+    }
+    _blockName2ModifiedTreeNode.erase(deletedNode->getName());
+    delete deletedNode;
+  }
+  else if (deletedNode->getRight() == nullptr)
+  {
+    // if the deleted node has only left child
+    TreeNode *parent = deletedNode->getParent();
+    TreeNode *leftChild = deletedNode->getLeft();
+    if (parent != nullptr)
+    {
+      if (parent->getLeft() == deletedNode)
+      {
+        parent->setLeft(leftChild);
+      }
+      else
+      {
+        parent->setRight(leftChild);
+      }
+      leftChild->setParent(parent);
+    }
+    else
+    {
+      leftChild->setParent(nullptr);
+      _modifiedTreeRoot = leftChild;
+    }
+    _blockName2ModifiedTreeNode.erase(deletedNode->getName());
+    delete deletedNode;
+  }
+  else
+  {
+    // if the deleted node has two children
+    bool leftOrRight = rand() % 2;
+    TreeNode *successor;
+    if (leftOrRight)
+    {
+      successor = deletedNode->getLeft();
+    }
+    else
+    {
+      successor = deletedNode->getRight();
+    }
+    swapNode(deletedNode, successor);
+    deleteNode(successor);
+  }
 
   return;
 }
 
-void Floorplanner::randomlyMoveLeaf()
+void Floorplanner::insertNode(TreeNode *insertedNode)
 {
-  // pick a random block
-  int blockId = rand() % _blockNum;
-  TreeNode *movedNode = _blockName2TreeNode[_blockArray[blockId]->getName()];
-
-  // to simplfy, make sure the moved node is not the root
-  while (movedNode == _bStarTreeRoot || movedNode->getLeft() != nullptr || movedNode->getRight() != nullptr)
+  // randomly choose a target
+  int targetId = rand() % _blockNum;
+  while (_blockName2ModifiedTreeNode.count(_blockArray[targetId]->getName()) == 0)
   {
-    blockId = rand() % _blockNum;
-    movedNode = _blockName2TreeNode[_blockArray[blockId]->getName()];
+    targetId = rand() % _blockNum;
   }
 
-  // set parent and record restored data
-  movedNode->setOldParent(movedNode->getParent());
-  if (movedNode->getParent()->getLeft() == movedNode)
+  TreeNode *targetNode = _blockName2ModifiedTreeNode[_blockArray[targetId]->getName()];
+
+  bool leftOrRight = rand() % 2;
+  if (leftOrRight)
   {
-    movedNode->getParent()->setLeft(nullptr);
-    movedNode->getParent()->setOldLeft(movedNode);
+    TreeNode *leftChild = targetNode->getLeft();
+    if (leftChild != nullptr)
+    {
+      leftChild->setParent(insertedNode);
+    }
+    targetNode->setLeft(insertedNode);
+    insertedNode->setParent(targetNode);
+    insertedNode->setLeft(leftChild);
   }
   else
   {
-    movedNode->getParent()->setRight(nullptr);
-    movedNode->getParent()->setOldRight(movedNode);
-  }
-  _modifiedNodes.push_back(movedNode);
-  _modifiedNodes.push_back(movedNode->getParent());
-
-  // pick a random leaf
-  TreeNode *leafNode = _bStarTreeRoot;
-  while (leafNode->getLeft() != nullptr || leafNode->getRight() != nullptr)
-  {
-    if (rand() % 2 == 0)
+    TreeNode *rightChild = targetNode->getRight();
+    if (rightChild != nullptr)
     {
-      if (leafNode->getLeft() != nullptr)
-      {
-        leafNode = leafNode->getLeft();
-      }
-      else
-      {
-        leafNode = leafNode->getRight();
-      }
+      rightChild->setParent(insertedNode);
     }
-    else
-    {
-      if (leafNode->getRight() != nullptr)
-      {
-        leafNode = leafNode->getRight();
-      }
-      else
-      {
-        leafNode = leafNode->getLeft();
-      }
-    }
+    targetNode->setRight(insertedNode);
+    insertedNode->setParent(targetNode);
+    insertedNode->setRight(rightChild);
   }
 
-  // move the node and record restored data
-  if (rand() % 2 == 0)
-  {
-    leafNode->setLeft(movedNode);
-    leafNode->setOldLeft(_lastIsNull);
-    movedNode->setParent(leafNode);
-  }
-  else
-  {
-    leafNode->setRight(movedNode);
-    leafNode->setOldRight(_lastIsNull);
-    movedNode->setParent(leafNode);
-  }
-  _modifiedNodes.push_back(leafNode);
-
-  return;
-}
-
-void Floorplanner::randomlyMoveSubtree()
-{
-  // pick a random block
-  int blockId = rand() % _blockNum;
-  TreeNode *movedNode = _blockName2TreeNode[_blockArray[blockId]->getName()];
-
-  // to simplfy, make sure the moved node is not the root
-  while (movedNode == _bStarTreeRoot)
-  {
-    blockId = rand() % _blockNum;
-    movedNode = _blockName2TreeNode[_blockArray[blockId]->getName()];
-  }
-
-  // set parent and record restored data
-  movedNode->setOldParent(movedNode->getParent());
-  if (movedNode->getParent()->getLeft() == movedNode)
-  {
-    movedNode->getParent()->setLeft(nullptr);
-    movedNode->getParent()->setOldLeft(movedNode);
-  }
-  else
-  {
-    movedNode->getParent()->setRight(nullptr);
-    movedNode->getParent()->setOldRight(movedNode);
-  }
-  _modifiedNodes.push_back(movedNode);
-  _modifiedNodes.push_back(movedNode->getParent());
-
-  // pick a random leaf
-  TreeNode *leafNode = _bStarTreeRoot;
-  while (leafNode->getLeft() != nullptr || leafNode->getRight() != nullptr)
-  {
-    if (rand() % 2 == 0)
-    {
-      if (leafNode->getLeft() != nullptr)
-      {
-        leafNode = leafNode->getLeft();
-      }
-      else
-      {
-        leafNode = leafNode->getRight();
-      }
-    }
-    else
-    {
-      if (leafNode->getRight() != nullptr)
-      {
-        leafNode = leafNode->getRight();
-      }
-      else
-      {
-        leafNode = leafNode->getLeft();
-      }
-    }
-  }
-
-  // move the node and record restored data
-  if (rand() % 2 == 0)
-  {
-    leafNode->setLeft(movedNode);
-    leafNode->setOldLeft(_lastIsNull);
-    movedNode->setParent(leafNode);
-  }
-  else
-  {
-    leafNode->setRight(movedNode);
-    leafNode->setOldRight(_lastIsNull);
-    movedNode->setParent(leafNode);
-  }
-  _modifiedNodes.push_back(leafNode);
+  _blockName2ModifiedTreeNode[insertedNode->getName()] = insertedNode;
 
   return;
 }
 
 void Floorplanner::perturb()
 {
-  int operation = rand() % 4; // 0: rotate, 1: swap, 2: move
-  if (operation == 0 || operation == 1)
+  int operation = rand() % 3; // 0: rotate, 1: swap, 2: move
+  if (operation == 0)
   {
-    // rotate a block
-    this->randomlyRotateBlock();
+    // choose a random node
+    int Id = rand() % _blockNum;
+    string name = _blockArray[Id]->getName();
+    TreeNode *rotatedNode = _blockName2ModifiedTreeNode[name];
+
+    // rotate a node
+    this->rotateNode(rotatedNode);
   }
-  else if (operation == 2)
+  else if (operation == 1)
   {
+    // choose two random nodes
+    int IdA = rand() % _blockNum;
+    int IdB = rand() % _blockNum;
+    while (IdA == IdB)
+    {
+      IdB = rand() % _blockNum;
+    }
+    string nameA = _blockArray[IdA]->getName();
+    string nameB = _blockArray[IdB]->getName();
+    TreeNode *swappedNodeA = _blockName2ModifiedTreeNode[nameA];
+    TreeNode *swappedNodeB = _blockName2ModifiedTreeNode[nameB];
+
     // swap two nodes
-    this->randomlySwapNodes();
+    this->swapNode(swappedNodeA, swappedNodeB);
   }
   else
   {
-    // move a block
-    this->randomlyMoveLeaf();
+    // choose a random node
+    int Id = rand() % _blockNum;
+    string name = _blockArray[Id]->getName();
+    TreeNode *deletedNode = _blockName2ModifiedTreeNode[name];
+
+    // create a replicate node
+    size_t width = deletedNode->getWidth();
+    size_t height = deletedNode->getHeight();
+    TreeNode *insertedNode = new TreeNode(Id, name, width, height);
+    insertedNode->setRotate(deletedNode->getRotate());
+
+    // delete a node
+    this->deleteNode(deletedNode);
+
+    // insert replicate node
+    this->insertNode(insertedNode);
   }
-  return;
-}
-
-void Floorplanner::deleteLastStatus()
-{
-  // clean the last status
-  for (int i = 0; i < _modifiedNodes.size(); ++i)
-  {
-    TreeNode *currNode = _modifiedNodes[i];
-    currNode->setOldLeft(nullptr);
-    currNode->setOldRight(nullptr);
-    currNode->setOldParent(nullptr);
-    currNode->setLastRotated(false);
-    currNode->setLastBlock(nullptr);
-  }
-  _modifiedNodes.clear();
-
-  return;
-}
-
-void Floorplanner::restoreLastStatus()
-{
-  // restore the last status
-  for (int i = 0; i < _modifiedNodes.size(); ++i)
-  {
-    TreeNode *currNode = _modifiedNodes[i];
-
-    // restore left
-    if (currNode->getOldLeft() == _lastIsNull)
-    {
-      currNode->setLeft(nullptr);
-      currNode->setOldLeft(nullptr);
-    }
-    else if (currNode->getOldLeft() != nullptr)
-    {
-      currNode->setLeft(currNode->getOldLeft());
-      currNode->setOldLeft(nullptr);
-    }
-
-    // restore right
-    if (currNode->getOldRight() == _lastIsNull)
-    {
-      currNode->setRight(nullptr);
-      currNode->setOldRight(nullptr);
-    }
-    else if (currNode->getOldRight() != nullptr)
-    {
-      currNode->setRight(currNode->getOldRight());
-      currNode->setOldRight(nullptr);
-    }
-
-    // restore parent
-    if (currNode->getOldParent() == _lastIsNull)
-    {
-      currNode->setParent(nullptr);
-      currNode->setOldParent(nullptr);
-    }
-    else if (currNode->getOldParent() != nullptr)
-    {
-      currNode->setParent(currNode->getOldParent());
-      currNode->setOldParent(nullptr);
-    }
-
-    // restore rotated block
-    if (currNode->getLastRotated())
-    {
-      currNode->getBlock()->rotateBolock();
-      currNode->setLastRotated(false);
-    }
-
-    // restore swapped block
-    if (currNode->getLastBlock() != nullptr)
-    {
-      _blockName2TreeNode[currNode->getLastBlock()->getName()] = currNode;
-      currNode->setBlock(currNode->getLastBlock());
-      currNode->setLastBlock(nullptr);
-    }
-  }
-
-  // clear the modified nodes
-  _modifiedNodes.clear();
-
-  return;
-}
-
-void Floorplanner::writeBestCoordinate(TreeNode *currNode)
-{
-  if (currNode == nullptr)
-  {
-    return;
-  }
-
-  // write the best coordinate to blocks
-  currNode->getBlock()->setPos(currNode->getX(), currNode->getY(), currNode->getX() + currNode->getBlock()->getWidth(), currNode->getY() + currNode->getBlock()->getHeight());
-
-  writeBestCoordinate(currNode->getLeft());
-  writeBestCoordinate(currNode->getRight());
-
-  return;
-}
-
-void Floorplanner::calculateAverage()
-{
-  // calculate the average area by running SA
-  for (int i = 0; i < 20; ++i)
-  {
-    this->createBStarTree();
-    for (int j = 0; j < 20; ++j)
-    {
-      this->perturb();
-      this->deleteLastStatus();
-    }
-    this->clearTreePosition(_bStarTreeRoot);
-    this->calculateTreePosition(_bStarTreeRoot);
-
-    size_t chipWidth = this->calculateTreeChipWidth();
-    size_t chipHeight = this->calculateTreeChipHeight();
-
-    double wirelength = this->calculateTreeWirelength();
-
-    _averageArea += chipWidth * chipHeight;
-    _averageWirelength += wirelength;
-
-    this->clearTree(_bStarTreeRoot);
-  }
-  _averageArea /= 20;
-  _averageWirelength /= 20;
-
-  return;
 }
 
 void Floorplanner::SA(double initTemp, double coolingRate, double stopTemp)
 {
+  srand(time(NULL));
+
   // Simulated Annealing starts
   for (double T = initTemp; T > stopTemp; T *= coolingRate)
   {
@@ -688,82 +629,263 @@ void Floorplanner::SA(double initTemp, double coolingRate, double stopTemp)
     }
     for (int i = 0; i < iterNum; ++i)
     {
-      double oldCost = this->calculateTreeCost();
-      this->perturb();
-      double newCost = this->calculateTreeCost();
-      double prob = (double)rand() / (RAND_MAX);
-      // size_t chipWidth = this->calculateTreeChipWidth();
-      // size_t chipHeight = this->calculateTreeChipHeight();
-      // bool isLegal = chipWidth <= _outlineWidth && chipHeight <= _outlineHeight;
-      if (newCost < oldCost)
+      double oldCost = this->calculateCost(_treeRoot, _blockName2TreeNode);
+
+      _modifiedTreeRoot = this->replicateBStarTree(_treeRoot, nullptr);
+
+      // randomly perturb modified tree
+      for (int i = 0; i < 2 * _blockNum + 20; ++i)
       {
-        // accept and update best
-        this->writeBestCoordinate(_bStarTreeRoot);
-        this->deleteLastStatus();
+        this->perturb();
       }
-      else if (1 - prob < exp((oldCost - newCost) / T))
+
+      double newCost = this->calculateCost(_modifiedTreeRoot, _blockName2ModifiedTreeNode);
+      double prob = (double)rand() / (RAND_MAX);
+      double deltaCost = newCost - oldCost;
+      // cout << "deltaCost: " << deltaCost << endl;
+      if (deltaCost <= 0)
       {
-        // accept but not update best
-        this->deleteLastStatus();
+        // cout << "better and accept" << endl;
+        // cout << "deltaCost: " << deltaCost << endl;
+        // cout << "=============================" << endl;
+        // accept the new status and update best
+        this->deleteTree(_treeRoot);
+        _treeRoot = _modifiedTreeRoot;
+        _blockName2TreeNode = _blockName2ModifiedTreeNode;
+        _blockName2ModifiedTreeNode.clear();
+        if (newCost < _bestCost)
+        {
+          // cout << "update" << endl;
+          // cout << "cost: " << newCost << endl;
+          // cout << "=============================" << endl;
+          _bestCost = newCost;
+          this->writeBestCoordinateToBlock(_treeRoot);
+        }
+      }
+      else if (1 - prob < exp((-deltaCost) / T))
+      {
+        // cout << "not better but accept" << endl;
+        // cout << "deltaCost: " << deltaCost << endl;
+        // cout << "=============================" << endl;
+        // accept the new status but no update best
+        this->deleteTree(_treeRoot);
+        _treeRoot = _modifiedTreeRoot;
+        _blockName2TreeNode = _blockName2ModifiedTreeNode;
+        _blockName2ModifiedTreeNode.clear();
       }
       else
       {
-        // restore last status
-        this->restoreLastStatus();
+        // restore the original status
+        this->deleteTree(_modifiedTreeRoot);
+        _blockName2ModifiedTreeNode.clear();
       }
     }
   }
 }
 
-void Floorplanner::fastSA()
+void Floorplanner::fastSA(double constP, int constK, int constC)
 {
+  srand(time(NULL));
+
+  // Fast Simulated Annealing starts
+  double T, T1;
+  int iterNum = _blockNum * _blockNum;
+  double totalDeltaCost; // for calculating deltaCostAvg
+  for (int r = 1; r <= iterNum; ++r)
+  {
+    if (r == 1)
+    {
+      T = _deltaAvg / abs(log(constP));
+      T1 = T;
+    }
+    else if (T <= constK)
+    {
+      T = T1 * totalDeltaCost / (2 * _blockNum + 20) / r / r / constC;
+    }
+    else
+    {
+      T = T1 * totalDeltaCost / (2 * _blockNum + 20) / r / r;
+    }
+
+    for (int i = 0; i < 2 * _blockNum + 20; ++i)
+    {
+      double oldCost = this->calculateCost(_treeRoot, _blockName2TreeNode);
+
+      _modifiedTreeRoot = this->replicateBStarTree(_treeRoot, nullptr);
+
+      // randomly perturb modified tree
+      this->perturb();
+
+      double newCost = this->calculateCost(_modifiedTreeRoot, _blockName2ModifiedTreeNode);
+      double prob = (double)rand() / (RAND_MAX);
+      double deltaCost = newCost - oldCost;
+      totalDeltaCost += deltaCost;
+      // cout << "deltaCost: " << deltaCost << endl;
+      if (deltaCost <= 0)
+      {
+        // cout << "better and accept" << endl;
+        // cout << "deltaCost: " << deltaCost << endl;
+        // cout << "=============================" << endl;
+        // accept the new status and update best
+        this->deleteTree(_treeRoot);
+        _treeRoot = _modifiedTreeRoot;
+        _blockName2TreeNode = _blockName2ModifiedTreeNode;
+        _blockName2ModifiedTreeNode.clear();
+        if (newCost < _bestCost)
+        {
+          // cout << "update" << endl;
+          // cout << "cost: " << newCost << endl;
+          // cout << "=============================" << endl;
+          cout << "update at " << r << "th iteration" << endl;
+          _bestCost = newCost;
+          this->writeBestCoordinateToBlock(_treeRoot);
+        }
+      }
+      else if (1 - prob < exp((-deltaCost) / T))
+      {
+        // cout << "not better but accept" << endl;
+        // cout << "deltaCost: " << deltaCost << endl;
+        // cout << "=============================" << endl;
+        // accept the new status but no update best
+        this->deleteTree(_treeRoot);
+        _treeRoot = _modifiedTreeRoot;
+        _blockName2TreeNode = _blockName2ModifiedTreeNode;
+        _blockName2ModifiedTreeNode.clear();
+      }
+      else
+      {
+        // restore the original status
+        this->deleteTree(_modifiedTreeRoot);
+        _blockName2ModifiedTreeNode.clear();
+      }
+    }
+  }
+}
+
+void Floorplanner::initContourLine()
+{
+  ContourLineNode *curr = _start;
+  if (curr != nullptr)
+  {
+    curr = curr->getNext();
+    while (curr != _end)
+    {
+      ContourLineNode *next = curr->getNext();
+      delete curr;
+      curr = next;
+    }
+  }
+  _start = new ContourLineNode(0, 0);
+  _end = new ContourLineNode(SIZE_MAX, 0);
+  _start->setNext(_end);
+  _end->setPrev(_start);
+  return;
+}
+
+void Floorplanner::calculateNorm()
+{
+  int iterNum = 20, perturbNum = _blockNum;
+
+  for (int i = 0; i < iterNum; ++i)
+  {
+    _modifiedTreeRoot = this->replicateBStarTree(_treeRoot, nullptr);
+    this->initContourLine();
+    for (int j = 0; j < perturbNum; ++j)
+    {
+      this->perturb();
+    }
+    this->calculatePosition(_modifiedTreeRoot);
+    size_t chipWidth = this->calculateChipWidth();
+    size_t chipHeight = this->calculateChipHeight();
+    double wirelength = this->calculateWirelength(_blockName2ModifiedTreeNode);
+    this->deleteTree(_modifiedTreeRoot);
+    _blockName2ModifiedTreeNode.clear();
+    _averageArea += chipWidth * chipHeight;
+    _averageWirelength += wirelength;
+    _maxArea = max(_maxArea, chipWidth * chipHeight);
+    _minArea = min(_minArea, chipWidth * chipHeight);
+    _maxWirelength = max(_maxWirelength, wirelength);
+    _minWirelength = min(_minWirelength, wirelength);
+  }
+  _averageArea /= iterNum;
+  _averageWirelength /= iterNum;
+  _deltaAvg = _alpha * _averageArea / _minArea + (1 - _alpha) * _averageWirelength / _minWirelength;
+  cout << "Average area: " << _averageArea << " Average wirelength: " << _averageWirelength << endl;
+  cout << "Max area: " << _maxArea << " Max wirelength: " << _maxWirelength << endl;
+  cout << "Min area: " << _minArea << " Min wirelength: " << _minWirelength << endl;
+
+  return;
 }
 
 void Floorplanner::floorplan()
 {
   clock_t start = clock();
-
-  // calculate the average area and wirelength
-  // this->calculateAverage();
-  // cout << "average area: " << _averageArea << " average wirelength: " << _averageWirelength << endl;
-
-  _chipHeight = _outlineHeight + 1;
-  _chipWidth = _outlineWidth + 1;
-
   srand(time(NULL));
+  this->initContourLine();
   this->createBStarTree();
 
-  this->SA(1000, 0.9, 1);
-  // this->fastSA();
-  this->calculateOutput();
-  cout << "chip width: " << _chipWidth << " chip height: " << _chipHeight << " total area: " << _totalArea << " total wirelength: " << _totalWirelength << " final cost: " << _finalCost << endl;
+  this->calculateNorm();
 
+  // this->SA(0.1, 0.9, 0.0001);
+  this->fastSA(0.9, 7, 100);
+
+  this->calculateOutput();
   _totalRuntime = (double)(clock() - start) / CLOCKS_PER_SEC;
   return;
 }
 
-void Floorplanner::reportModifiedNodes() const
+void Floorplanner::writeBestCoordinateToBlock(TreeNode *currNode)
 {
-  cout << "Report modified nodes..." << endl;
-  for (int i = 0; i < _modifiedNodes.size(); ++i)
+  if (currNode == nullptr)
   {
-    cout << "Node " << i << ": " << _modifiedNodes[i]->getBlock()->getName() << " " << _modifiedNodes[i]->getX() << " " << _modifiedNodes[i]->getY() << endl;
+    return;
+  }
+
+  Block *block = _blockArray[currNode->getBlockId()];
+  block->setPos(currNode->getX1(), currNode->getY1(), currNode->getX2(), currNode->getY2());
+
+  if (currNode->getLeft() != nullptr)
+  {
+    this->writeBestCoordinateToBlock(currNode->getLeft());
+  }
+  if (currNode->getRight() != nullptr)
+  {
+    this->writeBestCoordinateToBlock(currNode->getRight());
+  }
+
+  return;
+}
+
+void Floorplanner::reportBlockName2TreeNode() const
+{
+  cout << "Report block name to tree node..." << endl;
+  for (auto it = _blockName2TreeNode.begin(); it != _blockName2TreeNode.end(); ++it)
+  {
+    cout << "Block name: " << it->first << " ";
+    cout << "Node name: " << it->second->getName() << " ";
+    cout << "Block id: " << it->second->getBlockId() << " ";
+    cout << "Block width: " << it->second->getWidth() << " ";
+    cout << "Block height: " << it->second->getHeight() << endl;
+  }
+  return;
+}
+
+void Floorplanner::reportBlockName2ModifiedTreeNode() const
+{
+  cout << "Report block name to modified tree node..." << endl;
+  for (auto it = _blockName2ModifiedTreeNode.begin(); it != _blockName2ModifiedTreeNode.end(); ++it)
+  {
+    cout << "Block name: " << it->first << " ";
+    cout << "Node name: " << it->second->getName() << " ";
+    cout << "Block id: " << it->second->getBlockId() << " ";
+    cout << "Block width: " << it->second->getWidth() << " ";
+    cout << "Block height: " << it->second->getHeight() << endl;
   }
   return;
 }
 
 void Floorplanner::calculateOutput()
 {
-  _chipWidth = 0;
-  _chipHeight = 0;
-  _totalWirelength = 0;
-
-  for (int i = 0; i < _blockNum; ++i)
-  {
-    _chipWidth = max(_chipWidth, _blockArray[i]->getX2());
-    _chipHeight = max(_chipHeight, _blockArray[i]->getY2());
-  }
-
   for (int i = 0; i < _netNum; ++i)
   {
     vector<Terminal *> terminalList = _netArray[i]->getTermList();
@@ -790,17 +912,16 @@ void Floorplanner::calculateOutput()
     _totalWirelength += (maxX - minX) + (maxY - minY);
   }
 
-  _totalArea = _chipWidth * _chipHeight;
-  _finalCost = _alpha * (_totalArea) + (1 - _alpha) * _totalWirelength;
-}
-
-void Floorplanner::reportBlockName2TreeNode() const
-{
-  cout << "Report block name to tree node..." << endl;
-  for (unordered_map<string, TreeNode *>::const_iterator it = _blockName2TreeNode.begin(); it != _blockName2TreeNode.end(); ++it)
+  for (int i = 0; i < _blockNum; ++i)
   {
-    cout << "Block name: " << it->first << " x: " << it->second->getX() << " y: " << it->second->getY() << endl;
+    _chipWidth = max(_chipWidth, _blockArray[i]->getX2());
+    _chipHeight = max(_chipHeight, _blockArray[i]->getY2());
   }
+
+  double aspectRatio = (1 - _alpha - _beta) * (_outlineHeight / _outlineWidth - _chipHeight / _chipWidth) * (_outlineHeight / _outlineWidth - _chipHeight / _chipWidth);
+
+  _finalCost = _alpha * (_chipWidth * _chipHeight) + (1 - _alpha) * _totalWirelength;
+
   return;
 }
 
@@ -851,7 +972,7 @@ void Floorplanner::reportBStarTree(TreeNode *node) const
     return;
   }
 
-  cout << "Block: " << node->getBlock()->getName() << " width: " << node->getBlock()->getWidth() << " height: " << node->getBlock()->getHeight() << " x: " << node->getX() << " y: " << node->getY() << endl;
+  cout << "Block: " << _blockArray[node->getBlockId()]->getName() << " x1: " << node->getX1() << " y1: " << node->getY1() << " x2: " << node->getX2() << " y2: " << node->getY2() << endl;
 
   cout << "Left child: " << endl;
   reportBStarTree(node->getLeft());
@@ -861,13 +982,15 @@ void Floorplanner::reportBStarTree(TreeNode *node) const
   return;
 }
 
-void Floorplanner::reportHeightMap() const
+void Floorplanner::reportContourLine() const
 {
-  cout << "Report height map..." << endl;
-  for (map<size_t, size_t>::const_iterator it = _heightMap.begin(); it != _heightMap.end(); ++it)
+  ContourLineNode *currNode = _start;
+  while (currNode != nullptr)
   {
-    cout << "x: " << it->first << " y: " << it->second << endl;
+    cout << "x: " << currNode->getX() << " y: " << currNode->getY() << endl;
+    currNode = currNode->getNext();
   }
+  cout << endl;
   return;
 }
 
@@ -913,30 +1036,11 @@ void Floorplanner::writeResult(fstream &outFile)
   // write the block information
   for (int i = 0; i < _blockNum; ++i)
   {
-    // TreeNode *currNode = _blockName2TreeNode[_blockArray[i]->getName()];
-    buff << _blockArray[i]->getName() << " " << _blockArray[i]->getX1() << " " << _blockArray[i]->getY1() << " " << _blockArray[i]->getX2() << " " << _blockArray[i]->getY2() << endl;
-    // buff << currNode->getBlock()->getName() << " " << currNode->getX() << " " << currNode->getY() << " " << currNode->getX() + currNode->getBlock()->getWidth() << " " << currNode->getY() + currNode->getBlock()->getHeight() << endl;
+    Block *block = _blockArray[i];
+    buff << block->getName() << " " << block->getX1() << " " << block->getY1() << " " << block->getX2() << " " << block->getY2() << endl;
     outFile << buff.str();
     buff.str("");
   }
-
-  return;
-}
-
-void Floorplanner::clearTree(TreeNode *currNode)
-{
-  if (currNode == nullptr)
-  {
-    return;
-  }
-
-  clearTree(currNode->getLeft());
-  clearTree(currNode->getRight());
-
-  delete currNode;
-
-  _blockName2TreeNode.clear();
-  _bStarTreeRoot = nullptr;
 
   return;
 }
@@ -955,7 +1059,7 @@ void Floorplanner::clear()
   {
     delete _netArray[i];
   }
-  clearTree(_bStarTreeRoot);
+  deleteTree(_treeRoot);
 
   return;
 }
