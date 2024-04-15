@@ -13,7 +13,7 @@ class Floorplanner
 public:
   // constructor and destructor
   Floorplanner(double alpha, fstream &blockInFile, fstream &netInFile)
-      : _alpha(alpha), _beta(0.2), _totalArea(0), _chipWidth(SIZE_MAX), _chipHeight(SIZE_MAX), _averageArea(0), _averageWirelength(0), _totalWirelength(0), _finalCost(0), _totalRuntime(0), _maxArea(0), _maxWirelength(0), _minArea(SIZE_MAX), _minWirelength(SIZE_MAX), _bestCost(SIZE_MAX)
+      : _alpha(alpha), _beta(0.1), _totalArea(0), _chipWidth(SIZE_MAX), _chipHeight(SIZE_MAX), _averageArea(0), _averageWirelength(0), _totalWirelength(0), _finalCost(0), _totalRuntime(0), _maxArea(0), _maxWirelength(0), _minArea(SIZE_MAX), _minWirelength(SIZE_MAX), _bestCost(SIZE_MAX)
   {
     parseInput(blockInFile, netInFile);
   }
@@ -45,7 +45,7 @@ public:
   void initContourLine();                                        // initialize the contour line
   void calculateNorm();                                          // calculate the norm of the floorplan
   void SA(double initTemp, double coolingRate, double stopTemp); // run simulated annealing
-  void fastSA(double constP, int constK, int constC);            // run fast simulated annealing
+  void fastSA(int iterNum, double constP, int constK, int constC);            // run fast simulated annealing
   void writeBestCoordinateToBlock(TreeNode *currNode);           // write the best coordinate to the blocks
   void calculateOutput();                                        // calculate the output value
 

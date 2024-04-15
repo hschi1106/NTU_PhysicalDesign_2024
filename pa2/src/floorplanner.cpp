@@ -717,10 +717,9 @@ void Floorplanner::SA(double initTemp, double coolingRate, double stopTemp)
   }
 }
 
-void Floorplanner::fastSA(double constP, int constK, int constC)
+void Floorplanner::fastSA(int iterNum ,double constP, int constK, int constC)
 {
   double T, T1;
-  int iterNum = _blockNum * _blockNum;
   double totalDeltaCost; // for calculating deltaCostAvg
 
   // Fast Simulated Annealing starts
@@ -769,7 +768,7 @@ void Floorplanner::fastSA(double constP, int constK, int constC)
         if (newCost < _bestCost)
         {
           // if the status is the globally best status, update the best status
-          cout << "update at " << r << "th iteration" << endl;
+          // cout << "update at " << r << "th iteration" << endl;
           _bestCost = newCost;
           this->writeBestCoordinateToBlock(_treeRoot);
         }
@@ -846,20 +845,21 @@ void Floorplanner::calculateNorm()
   _averageWirelength /= iterNum;
   _deltaAvg = _alpha * _averageArea / _minArea + (1 - _alpha) * _averageWirelength / _minWirelength;
 
-  cout << "Average area: " << _averageArea << " Average wirelength: " << _averageWirelength << endl;
-  cout << "Max area: " << _maxArea << " Max wirelength: " << _maxWirelength << endl;
-  cout << "Min area: " << _minArea << " Min wirelength: " << _minWirelength << endl;
-
   return;
 }
 
 void Floorplanner::floorplan()
 {
   clock_t start = clock();
-  srand(time(NULL));
+
+  // set random seed
+  int seed = 787878;
 
   while (_chipHeight > _outlineHeight || _chipWidth > _outlineWidth)
   {
+    srand(seed);
+    seed += seed;
+
     // Initialize the tree and contour line
     this->initContourLine();
     this->createBStarTree();
@@ -868,11 +868,10 @@ void Floorplanner::floorplan()
     this->calculateNorm();
 
     // fast Simulated Annealing
-    this->fastSA(0.9, 7, 100);
+    this->fastSA(5*_blockNum, 0.9, 7, 100);
 
     // calculate the output
     this->calculateOutput();
-    cout << "Chip width: " << _chipWidth << " Chip height: " << _chipHeight << " Total wirelength: " << _totalWirelength << " Final cost: " << _finalCost << endl;
 
     // clear the tree
     this->deleteTree(_treeRoot);
