@@ -387,6 +387,46 @@ double Floorplanner::calculateWirelength(unordered_map<string, TreeNode *> block
   return wirelength;
 }
 
+size_t Floorplanner::calculateOutBoundArea(unordered_map<string, TreeNode *> blockName2TreeNode)
+{
+  size_t outBoundArea = 0;
+
+  // calculate the out of outline area
+  for (int i = 0; i < _blockNum; ++i)
+  {
+    TreeNode *node = blockName2TreeNode[_blockArray[i]->getName()];
+    size_t x1 = node->getX1(), x2 = node->getX2();
+    size_t y1 = node->getY1(), y2 = node->getY2();
+    if (x2 > _outlineWidth || y2 > _outlineHeight)
+    {
+      // for simplicity, just calculate the area of the block
+      outBoundArea += node->getWidth() * node->getHeight();
+    }
+  }
+
+  return outBoundArea;
+}
+
+double Floorplanner::calculateToCenterLength(unordered_map<string, TreeNode *> blockName2TreeNode)
+{
+  double toCenterLength = 0;
+
+  // calculate the distance to the center
+  for (int i = 0; i < _blockNum; ++i)
+  {
+    TreeNode *node = blockName2TreeNode[_blockArray[i]->getName()];
+    size_t x1 = node->getX1(), x2 = node->getX2();
+    size_t y1 = node->getY1(), y2 = node->getY2();
+    size_t centerX = (x1 + x2) / 2;
+    size_t centerY = (y1 + y2) / 2;
+    size_t distanceX = abs((int)centerX - (int)_outlineWidth / 2);
+    size_t distanceY = abs((int)centerY - (int)_outlineHeight / 2);
+    toCenterLength += distanceX + distanceY;
+  }
+
+  return toCenterLength;
+}
+
 double Floorplanner::calculateCost(TreeNode *currRoot, unordered_map<string, TreeNode *> blockName2TreeNode)
 {
   // clear the position of the tree and calculate the position
@@ -400,6 +440,12 @@ double Floorplanner::calculateCost(TreeNode *currRoot, unordered_map<string, Tre
   // calculate the wirelength
   double wirelength = this->calculateWirelength(blockName2TreeNode);
 
+  // calculate the out of outline area
+  size_t outBoundArea = this->calculateOutBoundArea(blockName2TreeNode);
+
+  // calculate the distance to the center
+  double toCenterLength = this->calculateToCenterLength(blockName2TreeNode);
+
   // calculate the area cost and wirelength cost
   double areaCost = (_alpha) * (chipWidth * chipHeight) / _averageArea;
   double wirelengthCost = (_beta)*wirelength / _averageWirelength;
@@ -409,8 +455,14 @@ double Floorplanner::calculateCost(TreeNode *currRoot, unordered_map<string, Tre
   double aspectRatio = (double)chipHeight / chipWidth;
   double aspectRatioCost = (1 - _alpha - _beta) * (desiredAspectRatio - aspectRatio) * (desiredAspectRatio - aspectRatio);
 
+  // calculate out of outline area cost
+  double outBoundAreaCost = (1 - _alpha - _beta)*outBoundArea / _averageArea;
+
+  // calculate distance to center cost
+  double toCenterCost = (1 - _alpha - _beta)*toCenterLength / _averageWirelength;
+
   // calculate cost with area, wirelength, and aspect ratio
-  double cost = areaCost + wirelengthCost + aspectRatioCost;
+  double cost = areaCost + wirelengthCost + aspectRatioCost + outBoundAreaCost + toCenterCost;
 
   return cost;
 }
@@ -717,7 +769,7 @@ void Floorplanner::SA(double initTemp, double coolingRate, double stopTemp)
   }
 }
 
-void Floorplanner::fastSA(int iterNum ,double constP, int constK, int constC)
+void Floorplanner::fastSA(int iterNum, double constP, int constK, int constC)
 {
   double T, T1;
   double totalDeltaCost; // for calculating deltaCostAvg
@@ -868,10 +920,13 @@ void Floorplanner::floorplan()
     this->calculateNorm();
 
     // fast Simulated Annealing
-    this->fastSA(5*_blockNum, 0.9, 7, 100);
+    this->fastSA(5 * _blockNum, 0.9, 10, 100);
 
     // calculate the output
     this->calculateOutput();
+
+    // report the module information
+    cout << "Chip width: " << _chipWidth << " chip height: " << _chipHeight << " total wirelength: " << _totalWirelength << " final cost: " << _finalCost << endl;
 
     // clear the tree
     this->deleteTree(_treeRoot);
