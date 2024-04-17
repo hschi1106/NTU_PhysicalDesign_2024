@@ -3,7 +3,7 @@ from collections import defaultdict
 
 # 讀取檔案，解析每個block的位置資訊
 blocks = {}
-with open("./output/apte.output", "r") as file:
+with open("./output/ami33.output", "r") as file:
     for idx, line in enumerate(file):
         if idx < 5:  # 跳過前面的幾行
             continue

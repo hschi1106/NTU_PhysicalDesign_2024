@@ -1,30 +1,34 @@
 alpha = 0.25
+Chip width: 1274 chip height: 1043 total wirelength: 93354.5 final cost: 402211
 
 ==================== Summary ====================
  Total block number: 33
  Total terminal number: 40
  Total net number:  121
- Final cost: 397307
- Total wirelength: 91486.5
- Chip area: 1314768
- Chip width: 1204
- Chip height: 1092
- Total runtime: 1.1627
+ Final cost: 402211
+ Total wirelength: 93354.5
+ Chip area: 1328782
+ Chip width: 1274
+ Chip height: 1043
+ Total runtime: 1.11678
 =================================================
 
+Chip width: 7084 chip height: 9688 total wirelength: 1.96358e+06 final cost: 1.86301e+07
+Chip width: 5278 chip height: 7574 total wirelength: 1.32082e+06 final cost: 1.09845e+07
 
 ==================== Summary ====================
  Total block number: 49
  Total terminal number: 22
  Total net number:  396
- Final cost: 1.05973e+07
- Total wirelength: 1.04082e+06
- Chip area: 39266640
- Chip width: 5292
- Chip height: 7420
- Total runtime: 9.59984
+ Final cost: 1.09845e+07
+ Total wirelength: 1.32082e+06
+ Chip area: 39975572
+ Chip width: 5278
+ Chip height: 7574
+ Total runtime: 9.42092
 =================================================
 
+Chip width: 9764 chip height: 5496 total wirelength: 889082 final cost: 1.40825e+07
 
 ==================== Summary ====================
  Total block number: 9
@@ -35,73 +39,75 @@ alpha = 0.25
  Chip area: 53662944
  Chip width: 9764
  Chip height: 5496
- Total runtime: 0.067889
+ Total runtime: 0.085317
 =================================================
 
+Chip width: 4284 chip height: 2520 total wirelength: 256283 final cost: 2.89113e+06
 
 ==================== Summary ====================
  Total block number: 11
  Total terminal number: 45
  Total net number:  70
- Final cost: 2.9236e+06
- Total wirelength: 252531
- Chip area: 10936800
- Chip width: 4340
+ Final cost: 2.89113e+06
+ Total wirelength: 256283
+ Chip area: 10795680
+ Chip width: 4284
  Chip height: 2520
- Total runtime: 0.077319
+ Total runtime: 0.088099
 =================================================
 
+Chip width: 5180 chip height: 4186 total wirelength: 513830 final cost: 5.80624e+06
 
 ==================== Summary ====================
  Total block number: 10
  Total terminal number: 2
  Total net number:  182
- Final cost: 6.21798e+06
- Total wirelength: 584212
- Chip area: 23119278
- Chip width: 5523
+ Final cost: 5.80624e+06
+ Total wirelength: 513830
+ Chip area: 21683480
+ Chip width: 5180
  Chip height: 4186
- Total runtime: 0.139488
+ Total runtime: 0.143886
 =================================================
 
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/ami33.block ./input/ami33.nets ./output/ami33.output 0.25
 
 Checking Report...
-cost:       actual  397306.875000/reported 397307.000000
-wirelength: actual  91486.500000/reported 91486.500000
-area:       actual  1314768.000000/reported 1314768.000000
-width:      outline 1326/actual 1204/reported 1204.000000
-height:     outline 1205/actual 1092/reported 1092.000000
-runtime: 1.162700
+cost:       actual  402211.375000/reported 402211.000000
+wirelength: actual  93354.500000/reported 93354.500000
+area:       actual  1328782.000000/reported 1328782.000000
+width:      outline 1326/actual 1274/reported 1274.000000
+height:     outline 1205/actual 1043/reported 1043.000000
+runtime: 1.116780
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 1314768.000000 & 91486.500000
-[Eval] Your runtime: 1.162700
-[Eval] Your normalized cost = 0.25*(A-minA)/(maxA-minA) + 0.75*(WL-minWL)/(maxWL-minWL) = 0.267366
+[Eval] Your area & wirelength: 1328782.000000 & 93354.500000
+[Eval] Your runtime: 1.116780
+[Eval] Your normalized cost = 0.25*(A-minA)/(maxA-minA) + 0.75*(WL-minWL)/(maxWL-minWL) = 0.294209
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 3.238828*0.8 + 6.8382334*0.2
-             = 3.95871
+             = 3.027677*0.8 + 6.881620171*0.2
+             = 3.79846
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/ami49.block ./input/ami49.nets ./output/ami49.output 0.25
 
 Checking Report...
-cost:       actual  10597272.000000/reported 10597300.000000
-wirelength: actual  1040816.000000/reported 1040820.000000
-area:       actual  39266640.000000/reported 39266640.000000
-width:      outline 5336/actual 5292/reported 5292.000000
-height:     outline 7673/actual 7420/reported 7420.000000
-runtime: 9.599840
+cost:       actual  10984505.000000/reported 10984500.000000
+wirelength: actual  1320816.000000/reported 1320820.000000
+area:       actual  39975572.000000/reported 39975572.000000
+width:      outline 5336/actual 5278/reported 5278.000000
+height:     outline 7673/actual 7574/reported 7574.000000
+runtime: 9.420920
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 39266640.000000 & 1040816.000000
-[Eval] Your runtime: 9.599840
-[Eval] Your normalized cost = 0.25*(A-minA)/(maxA-minA) + 0.75*(WL-minWL)/(maxWL-minWL) = 0.0554802
+[Eval] Your area & wirelength: 39975572.000000 & 1320816.000000
+[Eval] Your runtime: 9.420920
+[Eval] Your normalized cost = 0.25*(A-minA)/(maxA-minA) + 0.75*(WL-minWL)/(maxWL-minWL) = 0.1348
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 8.3791717*0.8 + 5.1476166*0.2
-             = 7.73286
+             = 6.9193558*0.8 + 5.1810086*0.2
+             = 6.57168
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/apte.block ./input/apte.nets ./output/apte.output 0.25
 
@@ -111,368 +117,393 @@ wirelength: actual  889082.000000/reported 889082.000000
 area:       actual  53662944.000000/reported 53662944.000000
 width:      outline 11894/actual 9764/reported 9764.000000
 height:     outline 6314/actual 5496/reported 5496.000000
-runtime: 0.067889
+runtime: 0.085317
 
 Congradulations, your results are correct
 
 [Eval] Your area & wirelength: 53662944.000000 & 889082.000000
-[Eval] Your runtime: 0.067889
+[Eval] Your runtime: 0.085317
 [Eval] Your normalized cost = 0.25*(A-minA)/(maxA-minA) + 0.75*(WL-minWL)/(maxWL-minWL) = 0.448532
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 5.3236947*0.8 + 7.4322386*0.2
-             = 5.74541
+             = 5.3236947*0.8 + 7.3387969*0.2
+             = 5.72672
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/hp.block ./input/hp.nets ./output/hp.output 0.25
 
 Checking Report...
-cost:       actual  2923598.250000/reported 2923600.000000
-wirelength: actual  252531.000000/reported 252531.000000
-area:       actual  10936800.000000/reported 10936800.000000
-width:      outline 5412/actual 4340/reported 4340.000000
+cost:       actual  2891132.250000/reported 2891130.000000
+wirelength: actual  256283.000000/reported 256283.000000
+area:       actual  10795680.000000/reported 10795680.000000
+width:      outline 5412/actual 4284/reported 4284.000000
 height:     outline 3704/actual 2520/reported 2520.000000
-runtime: 0.077319
+runtime: 0.088099
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 10936800.000000 & 252531.000000
-[Eval] Your runtime: 0.077319
-[Eval] Your normalized cost = 0.25*(A-minA)/(maxA-minA) + 0.75*(WL-minWL)/(maxWL-minWL) = 0.094815
+[Eval] Your area & wirelength: 10795680.000000 & 256283.000000
+[Eval] Your runtime: 0.088099
+[Eval] Your normalized cost = 0.25*(A-minA)/(maxA-minA) + 0.75*(WL-minWL)/(maxWL-minWL) = 0.116352
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 9.4669411*0.8 + 7.560169*0.2
-             = 9.08558
+             = 9.4594318*0.8 + 7.491227*0.2
+             = 9.06580
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/xerox.block ./input/xerox.nets ./output/xerox.output 0.25
 
 Checking Report...
-cost:       actual  6217978.500000/reported 6217980.000000
-wirelength: actual  584212.000000/reported 584212.000000
-area:       actual  23119278.000000/reported 23119278.000000
-width:      outline 6937/actual 5523/reported 5523.000000
+cost:       actual  5806243.000000/reported 5806240.000000
+wirelength: actual  513830.500000/reported 513830.000000
+area:       actual  21683480.000000/reported 21683480.000000
+width:      outline 6937/actual 5180/reported 5180.000000
 height:     outline 5379/actual 4186/reported 4186.000000
-runtime: 0.139488
+runtime: 0.143886
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 23119278.000000 & 584212.000000
-[Eval] Your runtime: 0.139488
-[Eval] Your normalized cost = 0.25*(A-minA)/(maxA-minA) + 0.75*(WL-minWL)/(maxWL-minWL) = 0.242465
+[Eval] Your area & wirelength: 21683480.000000 & 513830.500000
+[Eval] Your runtime: 0.143886
+[Eval] Your normalized cost = 0.25*(A-minA)/(maxA-minA) + 0.75*(WL-minWL)/(maxWL-minWL) = 0.0908685
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 5.6698309*0.8 + 7.5728754*0.2
-             = 6.05044
+             = 8.2582852*0.8 + 7.5536778*0.2
+             = 8.11737
 alpha = 0.5
+Chip width: 1260 chip height: 1050 total wirelength: 101530 final cost: 712265
 
 ==================== Summary ====================
  Total block number: 33
  Total terminal number: 40
  Total net number:  121
- Final cost: 717855
- Total wirelength: 109966
- Chip area: 1325744
- Chip width: 1246
- Chip height: 1064
- Total runtime: 1.12289
+ Final cost: 712265
+ Total wirelength: 101530
+ Chip area: 1323000
+ Chip width: 1260
+ Chip height: 1050
+ Total runtime: 1.06241
 =================================================
 
+Chip width: 7042 chip height: 8610 total wirelength: 1.89747e+06 final cost: 3.12645e+07
+Chip width: 5684 chip height: 7364 total wirelength: 1.55044e+06 final cost: 2.17037e+07
+Chip width: 5684 chip height: 7014 total wirelength: 1.16251e+06 final cost: 2.0515e+07
+Chip width: 5334 chip height: 7448 total wirelength: 1.15636e+06 final cost: 2.0442e+07
 
 ==================== Summary ====================
  Total block number: 49
  Total terminal number: 22
  Total net number:  396
- Final cost: 2.05607e+07
- Total wirelength: 1.32553e+06
- Chip area: 39795840
- Chip width: 5264
- Chip height: 7560
- Total runtime: 9.37824
+ Final cost: 2.0442e+07
+ Total wirelength: 1.15636e+06
+ Chip area: 39727632
+ Chip width: 5334
+ Chip height: 7448
+ Total runtime: 17.551
 =================================================
 
+Chip width: 12950 chip height: 3664 total wirelength: 1.00608e+06 final cost: 2.42274e+07
+Chip width: 9438 chip height: 5490 total wirelength: 758029 final cost: 2.62863e+07
 
 ==================== Summary ====================
  Total block number: 9
  Total terminal number: 73
  Total net number:  96
- Final cost: 2.65191e+07
- Total wirelength: 784355
- Chip area: 52253820
- Chip width: 9518
+ Final cost: 2.62863e+07
+ Total wirelength: 758029
+ Chip area: 51814620
+ Chip width: 9438
  Chip height: 5490
- Total runtime: 0.126922
+ Total runtime: 0.132675
 =================================================
 
+Chip width: 3430 chip height: 2730 total wirelength: 298283 final cost: 4.83109e+06
 
 ==================== Summary ====================
  Total block number: 11
  Total terminal number: 45
  Total net number:  70
- Final cost: 5.00194e+06
- Total wirelength: 287762
- Chip area: 9716112
- Chip width: 4284
- Chip height: 2268
- Total runtime: 0.071022
+ Final cost: 4.83109e+06
+ Total wirelength: 298283
+ Chip area: 9363900
+ Chip width: 3430
+ Chip height: 2730
+ Total runtime: 0.068665
 =================================================
 
+Chip width: 4634 chip height: 4676 total wirelength: 555942 final cost: 1.11123e+07
 
 ==================== Summary ====================
  Total block number: 10
  Total terminal number: 2
  Total net number:  182
- Final cost: 1.08378e+07
- Total wirelength: 548799
- Chip area: 21126742
- Chip width: 5047
- Chip height: 4186
- Total runtime: 0.126846
+ Final cost: 1.11123e+07
+ Total wirelength: 555942
+ Chip area: 21668584
+ Chip width: 4634
+ Chip height: 4676
+ Total runtime: 0.121772
 =================================================
 
 [Eval] Run cmd: ./evaluator/checker ./input/ami33.block ./input/ami33.nets ./output/ami33.output 0.5
 
 Checking Report...
-cost:       actual  717855.250000/reported 717855.000000
-wirelength: actual  109966.500000/reported 109966.000000
-area:       actual  1325744.000000/reported 1325744.000000
-width:      outline 1326/actual 1246/reported 1246.000000
-height:     outline 1205/actual 1064/reported 1064.000000
-runtime: 1.122890
+cost:       actual  712264.750000/reported 712265.000000
+wirelength: actual  101529.500000/reported 101530.000000
+area:       actual  1323000.000000/reported 1323000.000000
+width:      outline 1326/actual 1260/reported 1260.000000
+height:     outline 1205/actual 1050/reported 1050.000000
+runtime: 1.062410
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 1325744.000000 & 109966.500000
-[Eval] Your runtime: 1.122890
-[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.414917
+[Eval] Your area & wirelength: 1323000.000000 & 101529.500000
+[Eval] Your runtime: 1.062410
+[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.35814
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 2.07817*0.8 + 6.876286*0.2
-             = 3.03780
+             = 2.52478*0.8 + 6.9110411*0.2
+             = 3.40203
 [Eval] Run cmd: ./evaluator/checker ./input/ami49.block ./input/ami49.nets ./output/ami49.output 0.5
 
 Checking Report...
-cost:       actual  20560684.000000/reported 20560700.000000
-wirelength: actual  1325527.000000/reported 1325530.000000
-area:       actual  39795840.000000/reported 39795840.000000
-width:      outline 5336/actual 5264/reported 5264.000000
-height:     outline 7673/actual 7560/reported 7560.000000
-runtime: 9.378240
+cost:       actual  20441996.000000/reported 20442000.000000
+wirelength: actual  1156358.000000/reported 1156360.000000
+area:       actual  39727632.000000/reported 39727632.000000
+width:      outline 5336/actual 5334/reported 5334.000000
+height:     outline 7673/actual 7448/reported 7448.000000
+runtime: 17.551001
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 39795840.000000 & 1325527.000000
-[Eval] Your runtime: 9.378240
-[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.100163
+[Eval] Your area & wirelength: 39727632.000000 & 1156358.000000
+[Eval] Your runtime: 17.551001
+[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.068514
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 7.7395679*0.8 + 5.188974*0.2
-             = 7.22944
+             = 8.121965*0.8 + 4.933399*0.2
+             = 7.48425
 [Eval] Run cmd: ./evaluator/checker ./input/apte.block ./input/apte.nets ./output/apte.output 0.5
 
 Checking Report...
-cost:       actual  26519088.000000/reported 26519100.000000
-wirelength: actual  784355.000000/reported 784355.000000
-area:       actual  52253820.000000/reported 52253820.000000
-width:      outline 11894/actual 9518/reported 9518.000000
+cost:       actual  26286324.000000/reported 26286300.000000
+wirelength: actual  758029.000000/reported 758029.000000
+area:       actual  51814620.000000/reported 51814620.000000
+width:      outline 11894/actual 9438/reported 9438.000000
 height:     outline 6314/actual 5490/reported 5490.000000
-runtime: 0.126922
+runtime: 0.132675
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 52253820.000000 & 784355.000000
-[Eval] Your runtime: 0.126922
-[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.234072
+[Eval] Your area & wirelength: 51814620.000000 & 758029.000000
+[Eval] Your runtime: 0.132675
+[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.19404
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 7.5337469*0.8 + 7.123836*0.2
-             = 7.45177
+             = 8.53831005*0.8 + 7.116572*0.2
+             = 8.25396
 [Eval] Run cmd: ./evaluator/checker ./input/hp.block ./input/hp.nets ./output/hp.output 0.5
 
 Checking Report...
-cost:       actual  5001937.000000/reported 5001940.000000
-wirelength: actual  287762.000000/reported 287762.000000
-area:       actual  9716112.000000/reported 9716112.000000
-width:      outline 5412/actual 4284/reported 4284.000000
-height:     outline 3704/actual 2268/reported 2268.000000
-runtime: 0.071022
+cost:       actual  4831091.500000/reported 4831090.000000
+wirelength: actual  298283.000000/reported 298283.000000
+area:       actual  9363900.000000/reported 9363900.000000
+width:      outline 5412/actual 3430/reported 3430.000000
+height:     outline 3704/actual 2730/reported 2730.000000
+runtime: 0.068665
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 9716112.000000 & 287762.000000
-[Eval] Your runtime: 0.071022
-[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.227701
+[Eval] Your area & wirelength: 9363900.000000 & 298283.000000
+[Eval] Your runtime: 0.068665
+[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.256023
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 9.4206079*0.8 + 7.5898596*0.2
-             = 9.05446
+             = 9.410733*0.8 + 7.5965591*0.2
+             = 9.04790
 [Eval] Run cmd: ./evaluator/checker ./input/xerox.block ./input/xerox.nets ./output/xerox.output 0.5
 
 Checking Report...
-cost:       actual  10837770.000000/reported 10837800.000000
-wirelength: actual  548799.000000/reported 548799.000000
-area:       actual  21126742.000000/reported 21126742.000000
-width:      outline 6937/actual 5047/reported 5047.000000
-height:     outline 5379/actual 4186/reported 4186.000000
-runtime: 0.126846
+cost:       actual  11112263.000000/reported 11112300.000000
+wirelength: actual  555942.500000/reported 555942.000000
+area:       actual  21668584.000000/reported 21668584.000000
+width:      outline 6937/actual 4634/reported 4634.000000
+height:     outline 5379/actual 4676/reported 4676.000000
+runtime: 0.121772
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 21126742.000000 & 548799.000000
-[Eval] Your runtime: 0.126846
-[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.129272
+[Eval] Your area & wirelength: 21668584.000000 & 555942.500000
+[Eval] Your runtime: 0.121772
+[Eval] Your normalized cost = 0.5*(A-minA)/(maxA-minA) + 0.5*(WL-minWL)/(maxWL-minWL) = 0.160227
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 6.7861099*0.8 + 7.6280586*0.2
-             = 6.95450
+             = 6.2909026*0.8 + 7.650207*0.2
+             = 6.56276
 alpha = 0.75
+Chip width: 1288 chip height: 1008 total wirelength: 97694 final cost: 998152
 
 ==================== Summary ====================
  Total block number: 33
  Total terminal number: 40
  Total net number:  121
- Final cost: 1.03175e+06
- Total wirelength: 100676
- Chip area: 1342110
- Chip width: 1162
- Chip height: 1155
- Total runtime: 1.15587
+ Final cost: 998152
+ Total wirelength: 97694
+ Chip area: 1298304
+ Chip width: 1288
+ Chip height: 1008
+ Total runtime: 1.09285
 =================================================
 
+Chip width: 4970 chip height: 8218 total wirelength: 1.12482e+06 final cost: 3.09138e+07
+Chip width: 5684 chip height: 6860 total wirelength: 1.07718e+06 final cost: 2.95135e+07
+Chip width: 5684 chip height: 6860 total wirelength: 1.07718e+06 final cost: 2.95135e+07
+Chip width: 5488 chip height: 7056 total wirelength: 1.16027e+06 final cost: 2.93326e+07
+Chip width: 5488 chip height: 7056 total wirelength: 1.16027e+06 final cost: 2.93326e+07
+Chip width: 5488 chip height: 7056 total wirelength: 1.16027e+06 final cost: 2.93326e+07
+Chip width: 5488 chip height: 7056 total wirelength: 1.16027e+06 final cost: 2.93326e+07
+Chip width: 5222 chip height: 7364 total wirelength: 1.25597e+06 final cost: 2.91551e+07
 
 ==================== Summary ====================
  Total block number: 49
  Total terminal number: 22
  Total net number:  396
- Final cost: 2.95264e+07
- Total wirelength: 1.1783e+06
- Chip area: 38975776
- Chip width: 5194
- Chip height: 7504
- Total runtime: 43.2849
+ Final cost: 2.91551e+07
+ Total wirelength: 1.25597e+06
+ Chip area: 38454808
+ Chip width: 5222
+ Chip height: 7364
+ Total runtime: 35.2321
 =================================================
 
+Chip width: 12950 chip height: 3664 total wirelength: 1.00608e+06 final cost: 3.58381e+07
+Chip width: 9478 chip height: 5496 total wirelength: 785935 final cost: 3.92648e+07
 
 ==================== Summary ====================
  Total block number: 9
  Total terminal number: 73
  Total net number:  96
- Final cost: 3.92663e+07
- Total wirelength: 791857
+ Final cost: 3.92648e+07
+ Total wirelength: 785935
  Chip area: 52091088
  Chip width: 9478
  Chip height: 5496
- Total runtime: 0.278277
+ Total runtime: 0.133518
 =================================================
 
+Chip width: 6384 chip height: 1512 total wirelength: 301618 final cost: 7.31486e+06
+Chip width: 6384 chip height: 1512 total wirelength: 301618 final cost: 7.31486e+06
+Chip width: 8344 chip height: 1176 total wirelength: 356484 final cost: 7.44853e+06
+Chip width: 3430 chip height: 2730 total wirelength: 274834 final cost: 7.09163e+06
 
 ==================== Summary ====================
  Total block number: 11
  Total terminal number: 45
  Total net number:  70
- Final cost: 7.15319e+06
- Total wirelength: 291724
- Chip area: 9440340
- Chip width: 3458
+ Final cost: 7.09163e+06
+ Total wirelength: 274834
+ Chip area: 9363900
+ Chip width: 3430
  Chip height: 2730
- Total runtime: 0.162041
+ Total runtime: 0.292551
 =================================================
 
+Chip width: 4641 chip height: 4648 total wirelength: 581825 final cost: 1.6324e+07
 
 ==================== Summary ====================
  Total block number: 10
  Total terminal number: 2
  Total net number:  182
- Final cost: 1.64179e+07
- Total wirelength: 567780
- Chip area: 21701316
+ Final cost: 1.6324e+07
+ Total wirelength: 581825
+ Chip area: 21571368
  Chip width: 4641
- Chip height: 4676
- Total runtime: 0.172124
+ Chip height: 4648
+ Total runtime: 0.124258
 =================================================
 
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/ami33.block ./input/ami33.nets ./output/ami33.output 0.75
 
 Checking Report...
-cost:       actual  1031751.500000/reported 1031750.000000
-wirelength: actual  100676.000000/reported 100676.000000
-area:       actual  1342110.000000/reported 1342110.000000
-width:      outline 1326/actual 1162/reported 1162.000000
-height:     outline 1205/actual 1155/reported 1155.000000
-runtime: 1.155870
+cost:       actual  998151.500000/reported 998152.000000
+wirelength: actual  97694.000000/reported 97694.000000
+area:       actual  1298304.000000/reported 1298304.000000
+width:      outline 1326/actual 1288/reported 1288.000000
+height:     outline 1205/actual 1008/reported 1008.000000
+runtime: 1.092850
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 1342110.000000 & 100676.000000
-[Eval] Your runtime: 1.155870
-[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.383429
+[Eval] Your area & wirelength: 1298304.000000 & 97694.000000
+[Eval] Your runtime: 1.092850
+[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.287937
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 2.32586*0.8 + 6.8447619*0.2
-             = 3.22964
+             = 3.077013*0.8 + 6.8945693*0.2
+             = 3.84052
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/ami49.block ./input/ami49.nets ./output/ami49.output 0.75
 
 Checking Report...
-cost:       actual  29526406.000000/reported 29526400.000000
-wirelength: actual  1178296.000000/reported 1178300.000000
-area:       actual  38975776.000000/reported 38975776.000000
-width:      outline 5336/actual 5194/reported 5194.000000
-height:     outline 7673/actual 7504/reported 7504.000000
-runtime: 43.284901
+cost:       actual  29155098.000000/reported 29155100.000000
+wirelength: actual  1255968.000000/reported 1255970.000000
+area:       actual  38454808.000000/reported 38454808.000000
+width:      outline 5336/actual 5222/reported 5222.000000
+height:     outline 7673/actual 7364/reported 7364.000000
+runtime: 35.232101
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 38975776.000000 & 1178296.000000
-[Eval] Your runtime: 43.284901
-[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.0459901
+[Eval] Your area & wirelength: 38454808.000000 & 1255968.000000
+[Eval] Your runtime: 35.232101
+[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.0500589
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 8.9384011*0.8 + 4.8761548*0.2
-             = 8.125951
+             = 8.6706568*0.8 + 4.894068*0.2
+             = 7.915344
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/apte.block ./input/apte.nets ./output/apte.output 0.75
 
 Checking Report...
-cost:       actual  39266280.000000/reported 39266300.000000
-wirelength: actual  791857.000000/reported 791857.000000
+cost:       actual  39264800.000000/reported 39264800.000000
+wirelength: actual  785935.000000/reported 785935.000000
 area:       actual  52091088.000000/reported 52091088.000000
 width:      outline 11894/actual 9478/reported 9478.000000
 height:     outline 6314/actual 5496/reported 5496.000000
-runtime: 0.278277
+runtime: 0.133518
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 52091088.000000 & 791857.000000
-[Eval] Your runtime: 0.278277
-[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.218334
+[Eval] Your area & wirelength: 52091088.000000 & 785935.000000
+[Eval] Your runtime: 0.133518
+[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.214851
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 7.7663356*0.8 + 6.8325041*0.2
-             = 7.57957
+             = 7.8394383*0.8 + 7.115508*0.2
+             = 7.69465
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/hp.block ./input/hp.nets ./output/hp.output 0.75
 
 Checking Report...
-cost:       actual  7153186.000000/reported 7153190.000000
-wirelength: actual  291724.000000/reported 291724.000000
-area:       actual  9440340.000000/reported 9440340.000000
-width:      outline 5412/actual 3458/reported 3458.000000
+cost:       actual  7091633.500000/reported 7091630.000000
+wirelength: actual  274834.000000/reported 274834.000000
+area:       actual  9363900.000000/reported 9363900.000000
+width:      outline 5412/actual 3430/reported 3430.000000
 height:     outline 3704/actual 2730/reported 2730.000000
-runtime: 0.162041
+runtime: 0.292551
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 9440340.000000 & 291724.000000
-[Eval] Your runtime: 0.162041
-[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.142039
+[Eval] Your area & wirelength: 9363900.000000 & 274834.000000
+[Eval] Your runtime: 0.292551
+[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.0977715
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 9.4504756*0.8 + 7.062091*0.2
-             = 8.97280
+             = 9.4659102*0.8 + 6.749140*0.2
+             = 8.92256
 [Eval] Warning: Only sopprot alpha=0.5 for public evaluation. The temporary score would not be correct!
 [Eval] Run cmd: ./evaluator/checker ./input/xerox.block ./input/xerox.nets ./output/xerox.output 0.75
 
 Checking Report...
-cost:       actual  16417932.000000/reported 16417900.000000
-wirelength: actual  567779.500000/reported 567780.000000
-area:       actual  21701316.000000/reported 21701316.000000
+cost:       actual  16323982.000000/reported 16324000.000000
+wirelength: actual  581825.000000/reported 581825.000000
+area:       actual  21571368.000000/reported 21571368.000000
 width:      outline 6937/actual 4641/reported 4641.000000
-height:     outline 5379/actual 4676/reported 4676.000000
-runtime: 0.172124
+height:     outline 5379/actual 4648/reported 4648.000000
+runtime: 0.124258
 
 Congradulations, your results are correct
 
-[Eval] Your area & wirelength: 21701316.000000 & 567779.500000
-[Eval] Your runtime: 0.172124
-[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.166087
+[Eval] Your area & wirelength: 21571368.000000 & 581825.000000
+[Eval] Your runtime: 0.124258
+[Eval] Your normalized cost = 0.75*(A-minA)/(maxA-minA) + 0.25*(WL-minWL)/(maxWL-minWL) = 0.165988
 [Eval] SCORE = QUALITY_SCORE*0.8 + RUNTIME_SCORE*0.2
-             = 6.254436*0.8 + 7.3596566*0.2
-             = 6.47548
+             = 6.2546849*0.8 + 7.639355*0.2
+             = 6.53162

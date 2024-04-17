@@ -41,19 +41,21 @@ public:
   void insertNode(TreeNode *insertedNode);                       // insert the block in the modified B* tree
 
   // floorplanning
-  void floorplan();                                              // floorplanning
-  void initContourLine();                                        // initialize the contour line
-  void calculateNorm();                                          // calculate the norm of the floorplan
-  void SA(double initTemp, double coolingRate, double stopTemp); // run simulated annealing
-  void fastSA(int iterNum, double constP, int constK, int constC);            // run fast simulated annealing
-  void writeBestCoordinateToBlock(TreeNode *currNode);           // write the best coordinate to the blocks
-  void calculateOutput();                                        // calculate the output value
+  void floorplan();                                                // floorplanning
+  void initContourLine();                                          // initialize the contour line
+  void calculateNorm();                                            // calculate the norm of the floorplan
+  void SA(double initTemp, double coolingRate, double stopTemp);   // run simulated annealing
+  void fastSA(int iterNum, double constP, int constK, int constC); // run fast simulated annealing
+  void writeBestCoordinateToBlock(TreeNode *currNode);             // write the best coordinate to the blocks
+  void calculateOutput();                                          // calculate the output value
 
-  // calculate output value
+  // calculate value
   size_t calculateChipWidth();                                                                    // calculate the width of the chip by the height map
   size_t calculateChipHeight();                                                                   // calculate the height of the chip by the height map
   double calculateWirelength(unordered_map<string, TreeNode *> blockName2TreeNode);               // calculate the wirelength by B*-tree
   double calculateCost(TreeNode *currRoot, unordered_map<string, TreeNode *> blockName2TreeNode); // calculate the cost of the floorplan by B*-tree
+  size_t calculateOutBoundArea(unordered_map<string, TreeNode *> blockName2TreeNode);             // calculate the out of outline area by B*-tree
+  double calculateToCenterLength(unordered_map<string, TreeNode *> blockName2TreeNode);           // calculate the distance to the center by B*-tree
 
   // member functions about reporting
   void printSummary() const;                     // print the summary of the floorplanner

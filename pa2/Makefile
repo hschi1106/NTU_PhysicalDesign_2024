@@ -3,7 +3,7 @@ LDFLAGS=-std=c++11 -O3 -lm
 SOURCES=src/floorplanner.cpp src/main.cpp
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=fp
-INCLUDES=src/module.h src/Bstar.h src/floorplanner.h
+INCLUDES=src/module.h src/floorplanner.h
 
 all: $(SOURCES) bin/$(EXECUTABLE)
 
