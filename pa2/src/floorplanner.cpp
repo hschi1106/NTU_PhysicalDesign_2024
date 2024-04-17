@@ -417,11 +417,14 @@ double Floorplanner::calculateToCenterLength(unordered_map<string, TreeNode *> b
     TreeNode *node = blockName2TreeNode[_blockArray[i]->getName()];
     size_t x1 = node->getX1(), x2 = node->getX2();
     size_t y1 = node->getY1(), y2 = node->getY2();
-    size_t centerX = (x1 + x2) / 2;
-    size_t centerY = (y1 + y2) / 2;
-    size_t distanceX = abs((int)centerX - (int)_outlineWidth / 2);
-    size_t distanceY = abs((int)centerY - (int)_outlineHeight / 2);
-    toCenterLength += distanceX + distanceY;
+    if (x2 > _outlineWidth || y2 > _outlineHeight)
+    {
+      size_t centerX = (x1 + x2) / 2;
+      size_t centerY = (y1 + y2) / 2;
+      size_t distanceX = abs((int)centerX - (int)_outlineWidth / 2);
+      size_t distanceY = abs((int)centerY - (int)_outlineHeight / 2);
+      toCenterLength += distanceX + distanceY;
+    }
   }
 
   return toCenterLength;
@@ -453,16 +456,30 @@ double Floorplanner::calculateCost(TreeNode *currRoot, unordered_map<string, Tre
   // calculate the aspect ratio cost
   double desiredAspectRatio = (double)_outlineHeight / _outlineWidth;
   double aspectRatio = (double)chipHeight / chipWidth;
-  double aspectRatioCost = (1 - _alpha - _beta) * (desiredAspectRatio - aspectRatio) * (desiredAspectRatio - aspectRatio) / 3;
+  double aspectRatioCost = (1 - _alpha - _beta) * (desiredAspectRatio - aspectRatio) * (desiredAspectRatio - aspectRatio);
 
   // calculate out of outline area cost
-  double outBoundAreaCost = (1 - _alpha - _beta) * outBoundArea / _averageArea / 3;
+  double outBoundAreaCost = (1 - _alpha - _beta) * outBoundArea / _averageArea;
 
   // calculate distance to center cost
-  double toCenterCost = (1 - _alpha - _beta) * toCenterLength / _averageWirelength / 3;
+  double toCenterCost = (_beta)*toCenterLength / _averageWirelength;
 
   // calculate cost with area, wirelength, and aspect ratio
-  double cost = areaCost + wirelengthCost + aspectRatioCost + outBoundAreaCost + toCenterCost;
+  // double cost = areaCost + wirelengthCost + toCenterCost + aspectRatioCost / 2 + outBoundAreaCost / 2;
+  double cost;
+
+  if ((double)_outlineHeight / _outlineWidth > 1.5 || (double)_outlineWidth / _outlineHeight > 1.5)
+  {
+    cost = areaCost + wirelengthCost + aspectRatioCost * 1.5;
+  }
+  else if ((double)_netNum / _blockNum > 15)
+  {
+    cost = areaCost + wirelengthCost * 2 + toCenterCost * 0.5;
+  }
+  else
+  {
+    cost = areaCost + wirelengthCost + toCenterCost + aspectRatioCost / 2 + outBoundAreaCost / 2;
+  }
 
   return cost;
 }
@@ -773,6 +790,7 @@ void Floorplanner::fastSA(int iterNum, double constP, int constK, int constC)
 {
   double T, T1;
   double totalDeltaCost; // for calculating deltaCostAvg
+  int perturbTimes;
 
   // Fast Simulated Annealing starts
   for (int r = 1; r <= iterNum; ++r)
@@ -781,14 +799,17 @@ void Floorplanner::fastSA(int iterNum, double constP, int constK, int constC)
     {
       T = _deltaAvg / abs(log(constP));
       T1 = T;
+      perturbTimes = 1;
     }
     else if (T <= constK)
     {
       T = T1 * totalDeltaCost / (2 * _blockNum + 20) / r / r / constC;
+      perturbTimes = 1;
     }
     else
     {
       T = T1 * totalDeltaCost / (2 * _blockNum + 20) / r / r;
+      perturbTimes = 1;
     }
 
     for (int i = 0; i < 2 * _blockNum + 20; ++i)
@@ -800,7 +821,10 @@ void Floorplanner::fastSA(int iterNum, double constP, int constK, int constC)
       _modifiedTreeRoot = this->replicateBStarTree(_treeRoot, nullptr);
 
       // randomly perturb modified tree
-      this->perturb();
+      for (int j = 0; j < perturbTimes; ++j)
+      {
+        this->perturb();
+      }
 
       // calculate the cost of the modified tree
       double newCost = this->calculateCost(_modifiedTreeRoot, _blockName2ModifiedTreeNode);

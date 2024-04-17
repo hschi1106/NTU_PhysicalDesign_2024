@@ -13,3 +13,22 @@
 ./evaluator/evaluator.sh ./input/apte.block ./input/apte.nets ./output/apte.output 0.5
 ./evaluator/evaluator.sh ./input/hp.block ./input/hp.nets ./output/hp.output 0.5
 ./evaluator/evaluator.sh ./input/xerox.block ./input/xerox.nets ./output/xerox.output 0.5
+
+./bin/fp 0.25 ./input/apte.block ./input/apte.nets ./output/apte.output
+./evaluator/evaluator.sh ./input/apte.block ./input/apte.nets ./output/apte.output 0.25
+
+./bin/fp 0.5 ./input/apte.block ./input/apte.nets ./output/apte.output
+./evaluator/evaluator.sh ./input/apte.block ./input/apte.nets ./output/apte.output 0.5
+
+./bin/fp 0.75 ./input/apte.block ./input/apte.nets ./output/apte.output
+./evaluator/evaluator.sh ./input/apte.block ./input/apte.nets ./output/apte.output 0.75
+
+
+./bin/fp 0.25 ./input/xerox.block ./input/xerox.nets ./output/xerox.output
+./evaluator/evaluator.sh ./input/xerox.block ./input/xerox.nets ./output/xerox.output 0.25
+
+./bin/fp 0.5 ./input/xerox.block ./input/xerox.nets ./output/xerox.output
+./evaluator/evaluator.sh ./input/xerox.block ./input/xerox.nets ./output/xerox.output 0.5
+
+./bin/fp 0.75 ./input/xerox.block ./input/xerox.nets ./output/xerox.output
+./evaluator/evaluator.sh ./input/xerox.block ./input/xerox.nets ./output/xerox.output 0.75
