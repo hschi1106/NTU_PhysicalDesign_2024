@@ -936,10 +936,11 @@ void Floorplanner::calculateOutput()
 {
   _chipHeight = 0;
   _chipWidth = 0;
+  _totalWirelength = 0;
   for (int i = 0; i < _netNum; ++i)
   {
     vector<Terminal *> terminalList = _netArray[i]->getTermList();
-    double minX = _outlineWidth, minY = _outlineHeight, maxX = 0, maxY = 0;
+    double minX = SIZE_MAX, minY = SIZE_MAX, maxX = 0, maxY = 0;
     for (int j = 0; j < terminalList.size(); ++j)
     {
       double midX, midY;
@@ -959,7 +960,7 @@ void Floorplanner::calculateOutput()
       maxX = max(maxX, midX);
       maxY = max(maxY, midY);
     }
-    _totalWirelength += (maxX - minX) + (maxY - minY);
+    _totalWirelength += abs(maxX - minX) + abs(maxY - minY);
   }
 
   for (int i = 0; i < _blockNum; ++i)
