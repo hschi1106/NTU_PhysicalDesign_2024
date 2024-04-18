@@ -1,4 +1,4 @@
-# Physical Design for Nanometer ICs
+# Programming Assignments Physical Design for Nanometer ICs
 - **Term**: Spring 2024
 - **Lecturer**: [Prof. Yao-Wen Chang](http://cc.ee.ntu.edu.tw/~ywchang/)
 
@@ -11,5 +11,5 @@ This is the GitHub repo of all programming assignments of the class. This repo i
 - **pa3**: 
 
 ## 溫馨提醒
-可以參考，但別用抄的...
+可以參考，但別用抄的...  
 程式作業若被認定為抄襲將會獲得零分，比較對象包含所有過去修課學生的的作業。
