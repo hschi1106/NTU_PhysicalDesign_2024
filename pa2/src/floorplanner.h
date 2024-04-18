@@ -55,7 +55,7 @@ public:
   double calculateWirelength(unordered_map<string, TreeNode *> blockName2TreeNode);               // calculate the wirelength by B*-tree
   double calculateCost(TreeNode *currRoot, unordered_map<string, TreeNode *> blockName2TreeNode); // calculate the cost of the floorplan by B*-tree
   size_t calculateOutBoundArea(unordered_map<string, TreeNode *> blockName2TreeNode);             // calculate the out of outline area by B*-tree
-  double calculateToCenterLength(unordered_map<string, TreeNode *> blockName2TreeNode);           // calculate the distance to the center by B*-tree
+  double calculateOutBoundToCenterLength(unordered_map<string, TreeNode *> blockName2TreeNode);           // calculate the distance to the center by B*-tree
 
   // member functions about reporting
   void printSummary() const;                     // print the summary of the floorplanner

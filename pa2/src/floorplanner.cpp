@@ -407,11 +407,11 @@ size_t Floorplanner::calculateOutBoundArea(unordered_map<string, TreeNode *> blo
   return outBoundArea;
 }
 
-double Floorplanner::calculateToCenterLength(unordered_map<string, TreeNode *> blockName2TreeNode)
+double Floorplanner::calculateOutBoundToCenterLength(unordered_map<string, TreeNode *> blockName2TreeNode)
 {
   double toCenterLength = 0;
 
-  // calculate the distance to the center
+  // calculate the distance to the center of blocks out of the outline
   for (int i = 0; i < _blockNum; ++i)
   {
     TreeNode *node = blockName2TreeNode[_blockArray[i]->getName()];
@@ -447,7 +447,7 @@ double Floorplanner::calculateCost(TreeNode *currRoot, unordered_map<string, Tre
   size_t outBoundArea = this->calculateOutBoundArea(blockName2TreeNode);
 
   // calculate the distance to the center
-  double toCenterLength = this->calculateToCenterLength(blockName2TreeNode);
+  double toCenterLength = this->calculateOutBoundToCenterLength(blockName2TreeNode);
 
   // calculate the area cost and wirelength cost
   double areaCost = (_alpha) * (chipWidth * chipHeight) / _averageArea;
@@ -465,19 +465,22 @@ double Floorplanner::calculateCost(TreeNode *currRoot, unordered_map<string, Tre
   double toCenterCost = (_beta)*toCenterLength / _averageWirelength;
 
   // calculate cost with area, wirelength, and aspect ratio
-  // double cost = areaCost + wirelengthCost + toCenterCost + aspectRatioCost / 2 + outBoundAreaCost / 2;
   double cost;
 
+  // for different cases, calculate the cost
   if ((double)_outlineHeight / _outlineWidth > 1.5 || (double)_outlineWidth / _outlineHeight > 1.5)
   {
+    // if the outline is too long
     cost = areaCost + wirelengthCost + aspectRatioCost * 1.5;
   }
   else if ((double)_netNum / _blockNum > 15)
   {
+    // if the net number is too large
     cost = areaCost + wirelengthCost * 2 + toCenterCost * 0.5;
   }
   else
   {
+    // normal case
     cost = areaCost + wirelengthCost + toCenterCost + aspectRatioCost / 2 + outBoundAreaCost / 2;
   }
 
@@ -710,87 +713,10 @@ void Floorplanner::perturb()
   }
 }
 
-void Floorplanner::SA(double initTemp, double coolingRate, double stopTemp)
-{
-  srand(time(NULL));
-
-  // Simulated Annealing starts
-  for (double T = initTemp; T > stopTemp; T *= coolingRate)
-  {
-    int iterNum;
-    if (T > 100)
-    {
-      iterNum = 500;
-    }
-    else if (T > 30)
-    {
-      iterNum = 1000;
-    }
-    else
-    {
-      iterNum = 500;
-    }
-    for (int i = 0; i < iterNum; ++i)
-    {
-      double oldCost = this->calculateCost(_treeRoot, _blockName2TreeNode);
-
-      _modifiedTreeRoot = this->replicateBStarTree(_treeRoot, nullptr);
-
-      // randomly perturb modified tree
-      for (int i = 0; i < 2 * _blockNum + 20; ++i)
-      {
-        this->perturb();
-      }
-
-      double newCost = this->calculateCost(_modifiedTreeRoot, _blockName2ModifiedTreeNode);
-      double prob = (double)rand() / (RAND_MAX);
-      double deltaCost = newCost - oldCost;
-      // cout << "deltaCost: " << deltaCost << endl;
-      if (deltaCost <= 0)
-      {
-        // cout << "better and accept" << endl;
-        // cout << "deltaCost: " << deltaCost << endl;
-        // cout << "=============================" << endl;
-        // accept the new status and update best
-        this->deleteTree(_treeRoot);
-        _treeRoot = _modifiedTreeRoot;
-        _blockName2TreeNode = _blockName2ModifiedTreeNode;
-        _blockName2ModifiedTreeNode.clear();
-        if (newCost < _bestCost)
-        {
-          // cout << "update" << endl;
-          // cout << "cost: " << newCost << endl;
-          // cout << "=============================" << endl;
-          _bestCost = newCost;
-          this->writeBestCoordinateToBlock(_treeRoot);
-        }
-      }
-      else if (1 - prob < exp((-deltaCost) / T))
-      {
-        // cout << "not better but accept" << endl;
-        // cout << "deltaCost: " << deltaCost << endl;
-        // cout << "=============================" << endl;
-        // accept the new status but no update best
-        this->deleteTree(_treeRoot);
-        _treeRoot = _modifiedTreeRoot;
-        _blockName2TreeNode = _blockName2ModifiedTreeNode;
-        _blockName2ModifiedTreeNode.clear();
-      }
-      else
-      {
-        // restore the original status
-        this->deleteTree(_modifiedTreeRoot);
-        _blockName2ModifiedTreeNode.clear();
-      }
-    }
-  }
-}
-
 void Floorplanner::fastSA(int iterNum, double constP, int constK, int constC)
 {
   double T, T1;
   double totalDeltaCost; // for calculating deltaCostAvg
-  int perturbTimes;
 
   // Fast Simulated Annealing starts
   for (int r = 1; r <= iterNum; ++r)
@@ -799,17 +725,14 @@ void Floorplanner::fastSA(int iterNum, double constP, int constK, int constC)
     {
       T = _deltaAvg / abs(log(constP));
       T1 = T;
-      perturbTimes = 1;
     }
     else if (T <= constK)
     {
       T = T1 * totalDeltaCost / (2 * _blockNum + 20) / r / r / constC;
-      perturbTimes = 1;
     }
     else
     {
       T = T1 * totalDeltaCost / (2 * _blockNum + 20) / r / r;
-      perturbTimes = 1;
     }
 
     for (int i = 0; i < 2 * _blockNum + 20; ++i)
@@ -821,10 +744,7 @@ void Floorplanner::fastSA(int iterNum, double constP, int constK, int constC)
       _modifiedTreeRoot = this->replicateBStarTree(_treeRoot, nullptr);
 
       // randomly perturb modified tree
-      for (int j = 0; j < perturbTimes; ++j)
-      {
-        this->perturb();
-      }
+      this->perturb();
 
       // calculate the cost of the modified tree
       double newCost = this->calculateCost(_modifiedTreeRoot, _blockName2ModifiedTreeNode);
@@ -949,9 +869,6 @@ void Floorplanner::floorplan()
     // calculate the output
     this->calculateOutput();
 
-    // report the module information
-    cout << "Chip width: " << _chipWidth << " chip height: " << _chipHeight << " total wirelength: " << _totalWirelength << " final cost: " << _finalCost << endl;
-
     // clear the tree
     this->deleteTree(_treeRoot);
   }
@@ -980,34 +897,6 @@ void Floorplanner::writeBestCoordinateToBlock(TreeNode *currNode)
     this->writeBestCoordinateToBlock(currNode->getRight());
   }
 
-  return;
-}
-
-void Floorplanner::reportBlockName2TreeNode() const
-{
-  cout << "Report block name to tree node..." << endl;
-  for (auto it = _blockName2TreeNode.begin(); it != _blockName2TreeNode.end(); ++it)
-  {
-    cout << "Block name: " << it->first << " ";
-    cout << "Node name: " << it->second->getName() << " ";
-    cout << "Block id: " << it->second->getBlockId() << " ";
-    cout << "Block width: " << it->second->getWidth() << " ";
-    cout << "Block height: " << it->second->getHeight() << endl;
-  }
-  return;
-}
-
-void Floorplanner::reportBlockName2ModifiedTreeNode() const
-{
-  cout << "Report block name to modified tree node..." << endl;
-  for (auto it = _blockName2ModifiedTreeNode.begin(); it != _blockName2ModifiedTreeNode.end(); ++it)
-  {
-    cout << "Block name: " << it->first << " ";
-    cout << "Node name: " << it->second->getName() << " ";
-    cout << "Block id: " << it->second->getBlockId() << " ";
-    cout << "Block width: " << it->second->getWidth() << " ";
-    cout << "Block height: " << it->second->getHeight() << endl;
-  }
   return;
 }
 
@@ -1052,75 +941,6 @@ void Floorplanner::calculateOutput()
 
   _finalCost = _alpha * (_chipWidth * _chipHeight) + (1 - _alpha) * _totalWirelength;
 
-  return;
-}
-
-void Floorplanner::reportModule() const
-{
-  cout << "Report module information..." << endl;
-  cout << "Outline width: " << _outlineWidth << endl;
-  cout << "Outline height: " << _outlineHeight << endl;
-
-  // print the block information
-  cout << "Number of blocks: " << _blockNum << endl;
-  for (int i = 0; i < _blockNum; ++i)
-  {
-    cout << "Block " << i << ": " << _blockArray[i]->getName() << " " << _blockArray[i]->getWidth() << " " << _blockArray[i]->getHeight() << endl;
-  }
-
-  // print the terminal information
-  cout << "Number of terminals: " << _terminalNum << endl;
-  for (int i = 0; i < _terminalNum; ++i)
-  {
-    cout << "Terminal " << i << ": " << _terminalArray[i]->getName() << " " << _terminalArray[i]->getX1() << " " << _terminalArray[i]->getX2() << " " << _terminalArray[i]->getY1() << " " << _terminalArray[i]->getY2() << endl;
-  }
-
-  // print the net information
-  cout << "Number of nets: " << _netNum << endl;
-  for (int i = 0; i < _netNum; ++i)
-  {
-    cout << "Net " << i << ": ";
-    vector<Terminal *> terminalList = _netArray[i]->getTermList();
-    for (size_t j = 0; j < terminalList.size(); ++j)
-    {
-      cout << terminalList[j]->getName() << " ";
-    }
-    cout << endl;
-  }
-
-  // print the total area
-  cout << "Total area: " << _totalArea << endl;
-
-  return;
-}
-
-void Floorplanner::reportBStarTree(TreeNode *node) const
-{
-  if (node == nullptr)
-  {
-    cout << "NULL" << endl;
-    return;
-  }
-
-  cout << "Block: " << _blockArray[node->getBlockId()]->getName() << " x1: " << node->getX1() << " y1: " << node->getY1() << " x2: " << node->getX2() << " y2: " << node->getY2() << endl;
-
-  cout << "Left child: " << endl;
-  reportBStarTree(node->getLeft());
-  cout << "Right child: " << endl;
-  reportBStarTree(node->getRight());
-
-  return;
-}
-
-void Floorplanner::reportContourLine() const
-{
-  ContourLineNode *currNode = _start;
-  while (currNode != nullptr)
-  {
-    cout << "x: " << currNode->getX() << " y: " << currNode->getY() << endl;
-    currNode = currNode->getNext();
-  }
-  cout << endl;
   return;
 }
 
