@@ -1,4 +1,4 @@
-# Programming Assignments Physical Design for Nanometer ICs
+# Programming Assignments of Physical Design for Nanometer ICs
 - **Term**: Spring 2024
 - **Lecturer**: [Prof. Yao-Wen Chang](http://cc.ee.ntu.edu.tw/~ywchang/)
 
