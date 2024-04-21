@@ -44,7 +44,6 @@ public:
   void floorplan();                                                // floorplanning
   void initContourLine();                                          // initialize the contour line
   void calculateNorm();                                            // calculate the norm of the floorplan
-  void SA(double initTemp, double coolingRate, double stopTemp);   // run simulated annealing
   void fastSA(int iterNum, double constP, int constK, int constC); // run fast simulated annealing
   void writeBestCoordinateToBlock(TreeNode *currNode);             // write the best coordinate to the blocks
   void calculateOutput();                                          // calculate the output value
@@ -59,11 +58,6 @@ public:
 
   // member functions about reporting
   void printSummary() const;                     // print the summary of the floorplanner
-  void reportModule() const;                     // report the module information for debugging
-  void reportBStarTree(TreeNode *node) const;    // report the B* tree for debugging
-  void reportContourLine() const;                // report the contour line for debugging
-  void reportBlockName2TreeNode() const;         // report the block name to tree node for debugging
-  void reportBlockName2ModifiedTreeNode() const; // report the block name to modified tree node for debugging
   void writeResult(fstream &outFile);            // write the result to the output file
 
 private:
