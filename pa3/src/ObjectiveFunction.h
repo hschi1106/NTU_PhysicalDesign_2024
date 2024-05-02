@@ -1,4 +1,4 @@
-#define _GLIBCXX_USE_CXX11_ABI 0  // Align the ABI version to avoid compatibility issues with `Placment.h`
+#define _GLIBCXX_USE_CXX11_ABI 0 // Align the ABI version to avoid compatibility issues with `Placment.h`
 #ifndef OBJECTIVEFUNCTION_H
 #define OBJECTIVEFUNCTION_H
 
@@ -10,10 +10,11 @@
 /**
  * @brief Base class for objective functions
  */
-class BaseFunction {
-   public:
+class BaseFunction
+{
+public:
     /////////////////////////////////
-    // Conssutructors
+    // Consutructors
     /////////////////////////////////
 
     BaseFunction(const size_t &input_size) : grad_(input_size) {}
@@ -35,13 +36,13 @@ class BaseFunction {
     // Backward pass, compute the gradient of the function
     virtual const std::vector<Point2<double>> &Backward() = 0;
 
-   protected:
+protected:
     /////////////////////////////////
     // Data members
     /////////////////////////////////
 
-    std::vector<Point2<double>> grad_;  // Gradient of the function
-    double value_;                      // Value of the function
+    std::vector<Point2<double>> grad_; // Gradient of the function
+    double value_;                     // Value of the function
 };
 
 /**
@@ -50,8 +51,9 @@ class BaseFunction {
  * This is a simple example function for optimization. The function is defined as:
  *      f(t) = 3*t.x^2 + 2*t.x*t.y + 2*t.y^2 + 7
  */
-class ExampleFunction : public BaseFunction {
-   public:
+class ExampleFunction : public BaseFunction
+{
+public:
     /////////////////////////////////
     // Constructors
     /////////////////////////////////
@@ -65,47 +67,88 @@ class ExampleFunction : public BaseFunction {
     const double &operator()(const std::vector<Point2<double>> &input) override;
     const std::vector<Point2<double>> &Backward() override;
 
-   private:
+private:
     /////////////////////////////////
     // Data members
     /////////////////////////////////
 
-    std::vector<Point2<double>> input_;  // Cache the input for backward pass
+    std::vector<Point2<double>> input_; // Cache the input for backward pass
     Placement &placement_;
 };
 
 /**
  * @brief Wirelength function
  */
-class Wirelength : public BaseFunction {
+class Wirelength : public BaseFunction
+{
     // TODO: Implement the wirelength function, add necessary data members for caching
-   public:
+public:
+    /////////////////////////////////
+    // Constructors
+    /////////////////////////////////
+
+    Wirelength(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement){};
+
     /////////////////////////////////
     // Methods
     /////////////////////////////////
 
     const double &operator()(const std::vector<Point2<double>> &input) override;
     const std::vector<Point2<double>> &Backward() override;
+
+private:
+    /////////////////////////////////
+    // Data members
+    /////////////////////////////////
+
+    std::vector<Point2<double>> input_; // Cache the input for backward pass
+    std::vector<Point2<double>> posExpValue_;
+    std::vector<Point2<double>> negExpValue_;
+    Placement &placement_;
 };
 
 /**
  * @brief Density function
  */
-class Density : public BaseFunction {
+class Density : public BaseFunction
+{
     // TODO: Implement the density function, add necessary data members for caching
-   public:
+public:
+    /////////////////////////////////
+    // Constructors
+    /////////////////////////////////
+
+    Density(Placement &placement, int binNumPerEdge);
+
     /////////////////////////////////
     // Methods
     /////////////////////////////////
 
     const double &operator()(const std::vector<Point2<double>> &input) override;
     const std::vector<Point2<double>> &Backward() override;
+
+    const double getOverflowRatio() const { return overflowRatio_; }
+
+private:
+    /////////////////////////////////
+    // Data members
+    /////////////////////////////////
+
+    std::vector<Point2<double>> input_; // Cache the input for backward pass
+    Placement &placement_;
+    double constA_;     // constant A
+    double mb_;         // max density of the bin
+    double overflowRatio_; // overflow ratio
+    int binNumPerEdge_; // number of bins per edge
+    vector<vector<double>> binDensity_;
+    vector<vector<double>> binDensityGrad_;
 };
 
 /**
  * @brief Objective function for global placement
  */
-class ObjectiveFunction : public BaseFunction {
+class ObjectiveFunction : public BaseFunction
+{
     // TODO: Implement the objective function for global placement, add necessary data
     // members for caching
     //
@@ -113,7 +156,15 @@ class ObjectiveFunction : public BaseFunction {
     //       f(t) = wirelength(t) + lambda * density(t),
     // where t is the positions of the modules, and lambda is the penalty weight.
     // You may need an interface to update the penalty weight (lambda) dynamically.
-   public:
+public:
+    /////////////////////////////////
+    // Constructors
+    /////////////////////////////////
+    ObjectiveFunction(Placement &placement)
+        : BaseFunction(placement.numModules()), placement_(placement), iterNum_(0), wirelength_(placement), density_(placement, max(placement.boundryRight() - placement.boundryLeft(), placement.boundryTop() - placement.boundryBottom()) / 10)
+    {
+    }
+
     /////////////////////////////////
     // Methods
     /////////////////////////////////
@@ -121,9 +172,19 @@ class ObjectiveFunction : public BaseFunction {
     const double &operator()(const std::vector<Point2<double>> &input) override;
     const std::vector<Point2<double>> &Backward() override;
 
-   private:
+    const double getOverflowRatio() const { return density_.getOverflowRatio(); }
+
+private:
+    /////////////////////////////////
+    // Data members
+    /////////////////////////////////
+
+    std::vector<Point2<double>> input_; // Cache the input for backward pass
+    Placement &placement_;
+    int iterNum_;
+    double lambda_;
     Wirelength wirelength_;
     Density density_;
 };
 
-#endif  // OBJECTIVEFUNCTION_H
+#endif // OBJECTIVEFUNCTION_H
