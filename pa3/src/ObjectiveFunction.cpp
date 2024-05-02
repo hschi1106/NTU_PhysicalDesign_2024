@@ -43,12 +43,10 @@ const double &Wirelength::operator()(const std::vector<Point2<double>> &input)
 
     for (int i = 0; i < moduleNum; ++i)
     {
-        double inputX = input[i].x - placement_.boundryLeft();
-        double inputY = input[i].y - placement_.boundryBottom();
-        posExpValue_[i].x = exp(inputX / gamma);
-        posExpValue_[i].y = exp(inputY / gamma);
-        negExpValue_[i].x = exp(-inputX / gamma);
-        negExpValue_[i].y = exp(-inputY / gamma);
+        posExpValue_[i].x = exp(input[i].x / gamma);
+        posExpValue_[i].y = exp(input[i].y / gamma);
+        negExpValue_[i].x = exp(-input[i].x / gamma);
+        negExpValue_[i].y = exp(-input[i].y / gamma);
     }
     for (int i = 0; i < netNum; ++i)
     {
@@ -110,16 +108,20 @@ const std::vector<Point2<double>> &Wirelength::Backward()
     return grad_;
 }
 
-Density::Density(Placement &placement, int binNumPerEdge) : BaseFunction(placement.numModules()), placement_(placement), constA_(1), binNumPerEdge_(binNumPerEdge)
+Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement), binSize_(50)
 {
-    // resize the vector to store the density and gradient
-    binDensity_.resize(binNumPerEdge);
-    binDensityGrad_.resize(binNumPerEdge);
-    for (int i = 0; i < binNumPerEdge; ++i)
+    // resize the vector to widthBinNum_ * heightBinNum_ to store the density and gradient
+    int outLineWidth = placement.boundryRight() - placement.boundryLeft();
+    int outLineHeight = placement.boundryTop() - placement.boundryBottom();
+    widthBinNum_ = outLineWidth / binSize_;
+    heightBinNum_ = outLineHeight / binSize_;
+    binDensity_.resize(widthBinNum_);
+    binDensityGrad_.resize(widthBinNum_);
+    for (int i = 0; i < widthBinNum_; ++i)
     {
-        binDensity_[i].resize(binNumPerEdge);
-        binDensityGrad_[i].resize(binNumPerEdge);
-        for (int j = 0; j < binNumPerEdge; ++j)
+        binDensity_[i].resize(heightBinNum_);
+        binDensityGrad_[i].resize(heightBinNum_);
+        for (int j = 0; j < heightBinNum_; ++j)
         {
             binDensity_[i][j] = 0;
             binDensityGrad_[i][j] = 0;
@@ -132,12 +134,7 @@ Density::Density(Placement &placement, int binNumPerEdge) : BaseFunction(placeme
     {
         totalArea += placement.module(i).width() * placement.module(i).height();
     }
-    mb_ = (double)totalArea / ((placement.boundryRight() - placement.boundryLeft()) * (placement.boundryTop() - placement.boundryBottom()));
-}
-
-double sigmoid(int l, int x, int u)
-{
-    return 1 / (1 + exp(-(x - l))) / (1 + exp(-(u - x)));
+    mb_ = (double)totalArea / (outLineWidth * outLineHeight);
 }
 
 const double &Density::operator()(const std::vector<Point2<double>> &input)
@@ -145,64 +142,81 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
     // Compute the value of the density function
 
     // Initialize the value of the density function
+    cout << "start" << endl;
+
     value_ = 0;
     overflowRatio_ = 0;
-    for (int i = 0; i < binNumPerEdge_; ++i)
+    for (int i = 0; i < widthBinNum_; ++i)
     {
-        for (int j = 0; j < binNumPerEdge_; ++j)
+        for (int j = 0; j < heightBinNum_; ++j)
         {
             binDensity_[i][j] = 0;
         }
     }
     int moduleNum = placement_.numModules();
-    double binWidth = (placement_.boundryRight() - placement_.boundryLeft()) / binNumPerEdge_;
-    double binHeight = (placement_.boundryTop() - placement_.boundryBottom()) / binNumPerEdge_;
     for (int i = 0; i < moduleNum; ++i)
     {
-        int startBinX = (input[i].x - placement_.boundryLeft()) / binWidth < 0 ? 0 : (input[i].x - placement_.boundryLeft()) / binWidth;
-        int endBinX = (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binWidth >= binNumPerEdge_ ? binNumPerEdge_ - 1 : (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binWidth;
-        int startBinY = (input[i].y - placement_.boundryBottom()) / binHeight < 0 ? 0 : (input[i].y - placement_.boundryBottom()) / binHeight;
-        int endBinY = (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binHeight >= binNumPerEdge_ ? binNumPerEdge_ - 1 : (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binHeight; 
+        int startBinX = (input[i].x - placement_.boundryLeft()) / binSize_ < 0 ? 0 : (input[i].x - placement_.boundryLeft()) / binSize_;
+        int endBinX = (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ >= widthBinNum_ ? widthBinNum_ - 1 : (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_;
+        int startBinY = (input[i].y - placement_.boundryBottom()) / binSize_ < 0 ? 0 : (input[i].y - placement_.boundryBottom()) / binSize_;
+        int endBinY = (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ >= heightBinNum_ ? heightBinNum_ - 1 : (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_;
         double moduleWidth = placement_.module(i).width(), moduleHeight = placement_.module(i).height();
         for (int j = startBinX; j <= endBinX; ++j)
         {
             for (int k = startBinY; k <= endBinY; ++k)
             {
-                double inputX = input[i].x - placement_.boundryLeft() + moduleWidth - j * binWidth;
-                double inputY = input[i].y - placement_.boundryBottom() + moduleHeight - k * binHeight;
-                // assert j, k in the range
-                assert(j >= 0 && j < binNumPerEdge_);
-                assert(k >= 0 && k < binNumPerEdge_);
-                binDensity_[j][k] += sigmoid(-moduleWidth, inputX, moduleWidth) * sigmoid(-moduleHeight, inputY, moduleHeight);
+                double inputX = input[i].x - placement_.boundryLeft() + moduleWidth - j * binSize_;
+                double inputY = input[i].y - placement_.boundryBottom() + moduleHeight - k * binSize_;
+                double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
+                double ay = 4 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2 / binSize_ / (moduleHeight + 4 * binSize_);
+                double Px, Py;
+
+                // calculate Px
+                if (abs(inputX) >= 0 && abs(inputX) <= binSize_ + moduleWidth / 2)
+                {
+                    Px = 1 - ax * inputX * inputX;
+                }
+                else if (abs(inputX) > binSize_ + moduleWidth / 2 && abs(inputX) <= 2 * binSize_ + moduleWidth / 2)
+                {
+                    Px = bx * (abs(inputX) - moduleWidth / 2 - 2 * binSize_) * (abs(inputX) - moduleWidth / 2 - 2 * binSize_);
+                }
+                else
+                {
+                    Px = 0;
+                }
+
+                // calculate Py
+                if (abs(inputY) >= 0 && abs(inputY) <= binSize_ + moduleHeight / 2)
+                {
+                    Py = 1 - ay * inputY * inputY;
+                }
+                else if (abs(inputY) > binSize_ + moduleHeight / 2 && abs(inputY) <= 2 * binSize_ + moduleHeight / 2)
+                {
+                    Py = by * (abs(inputY) - moduleHeight / 2 - 2 * binSize_) * (abs(inputY) - moduleHeight / 2 - 2 * binSize_);
+                }
+                else
+                {
+                    Py = 0;
+                }
+
+                binDensity_[j][k] += Px * Py;
             }
         }
     }
 
-    for (int i = 0; i < binNumPerEdge_; ++i)
+    for (int i = 0; i < widthBinNum_; ++i)
     {
-        for (int j = 0; j < binNumPerEdge_; ++j)
+        for (int j = 0; j < heightBinNum_; ++j)
         {
             value_ += (binDensity_[i][j] - mb_) * (binDensity_[i][j] - mb_);
             overflowRatio_ += binDensity_[i][j] > mb_ ? binDensity_[i][j] - mb_ : 0;
         }
     }
 
-    overflowRatio_ /= binNumPerEdge_ * binNumPerEdge_;
+    overflowRatio_ /= widthBinNum_ * heightBinNum_;
 
     input_ = input;
-
     return value_;
-}
-
-double sigmoidDrivative(int l, int x, int u)
-{
-    if (abs(x - l) > 500 && abs(u - x) > 500)
-    {
-        return 0;
-    }
-    double exp1 = exp(-(x - l));
-    double exp2 = exp(-(u - x));
-    return (exp1 - exp2) / (1 + exp1) / (1 + exp2) / (1 + exp1) / (1 + exp2);
 }
 
 const std::vector<Point2<double>> &Density::Backward()
@@ -218,27 +232,95 @@ const std::vector<Point2<double>> &Density::Backward()
 
     // calculate the gradient
     int moduleNum = placement_.numModules();
-    double binWidth = (placement_.boundryRight() - placement_.boundryLeft()) / binNumPerEdge_;
-    double binHeight = (placement_.boundryTop() - placement_.boundryBottom()) / binNumPerEdge_;
     for (int i = 0; i < moduleNum; ++i)
     {
-        int startBinX = (input_[i].x - placement_.boundryLeft()) / binWidth < 0 ? 0 : (input_[i].x - placement_.boundryLeft()) / binWidth;
-        int endBinX = (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binWidth >= binNumPerEdge_ ? binNumPerEdge_ - 1 : (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binWidth;
-        int startBinY = (input_[i].y - placement_.boundryBottom()) / binHeight < 0 ? 0 : (input_[i].y - placement_.boundryBottom()) / binHeight;
-        int endBinY = (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binHeight >= binNumPerEdge_ ? binNumPerEdge_ - 1 : (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binHeight; 
+        int startBinX = (input_[i].x - placement_.boundryLeft()) / binSize_ < 0 ? 0 : (input_[i].x - placement_.boundryLeft()) / binSize_;
+        int endBinX = (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ >= widthBinNum_ ? widthBinNum_ - 1 : (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_;
+        int startBinY = (input_[i].y - placement_.boundryBottom()) / binSize_ < 0 ? 0 : (input_[i].y - placement_.boundryBottom()) / binSize_;
+        int endBinY = (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ >= heightBinNum_ ? heightBinNum_ - 1 : (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_;
         double moduleWidth = placement_.module(i).width(), moduleHeight = placement_.module(i).height();
         for (int j = startBinX; j <= endBinX; ++j)
         {
             for (int k = startBinY; k <= endBinY; ++k)
             {
-                double inputX = input_[i].x - placement_.boundryLeft() + moduleWidth - j * binWidth;
-                double inputY = input_[i].y - placement_.boundryBottom() + moduleHeight - k * binHeight;
-                double sigmoidX = sigmoid(-moduleWidth, inputX, moduleWidth);
-                double sigmoidY = sigmoid(-moduleHeight, inputY, moduleHeight);
-                double sigmoidXDrivative = sigmoidDrivative(-moduleWidth, inputX, moduleWidth);
-                double sigmoidYDrivative = sigmoidDrivative(-moduleHeight, inputY, moduleHeight);
-                grad_[i].x += 2 * (binDensity_[j][k] - mb_) * sigmoidXDrivative * sigmoidY;
-                grad_[i].y += 2 * (binDensity_[j][k] - mb_) * sigmoidX * sigmoidYDrivative;
+                double inputX = input_[i].x - placement_.boundryLeft() + moduleWidth - j * binSize_;
+                double inputY = input_[i].y - placement_.boundryBottom() + moduleHeight - k * binSize_;
+                double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
+                double ay = 4 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2 / binSize_ / (moduleHeight + 4 * binSize_);
+                double Px, Py, dPx, dPy;
+
+                // calculate Px
+                if (abs(inputX) >= 0 && abs(inputX) <= binSize_ + moduleWidth / 2)
+                {
+                    Px = 1 - ax * inputX * inputX;
+                }
+                else if (abs(inputX) > binSize_ + moduleWidth / 2 && abs(inputX) <= 2 * binSize_ + moduleWidth / 2)
+                {
+                    Px = bx * (abs(inputX) - moduleWidth / 2 - 2 * binSize_) * (abs(inputX) - moduleWidth / 2 - 2 * binSize_);
+                }
+                else
+                {
+                    Px = 0;
+                }
+
+                // calculate Py
+                if (abs(inputY) >= 0 && abs(inputY) <= binSize_ + moduleHeight / 2)
+                {
+                    Py = 1 - ay * inputY * inputY;
+                }
+                else if (abs(inputY) > binSize_ + moduleHeight / 2 && abs(inputY) <= 2 * binSize_ + moduleHeight / 2)
+                {
+                    Py = by * (abs(inputY) - moduleHeight / 2 - 2 * binSize_) * (abs(inputY) - moduleHeight / 2 - 2 * binSize_);
+                }
+                else
+                {
+                    Py = 0;
+                }
+
+                // calculate dPx
+                if (abs(inputX) >= 0 && abs(inputX) <= binSize_ + moduleWidth / 2)
+                {
+                    dPx = -2 * ax * inputX;
+                }
+                else if (abs(inputX) > binSize_ + moduleWidth / 2 && abs(inputX) <= 2 * binSize_ + moduleWidth / 2)
+                {
+                    if (inputX > 0)
+                    {
+                        dPx = 2 * bx * (inputX - moduleWidth / 2 - 2 * binSize_);
+                    }
+                    else
+                    {
+                        dPx = 2 * bx * (-inputX - moduleWidth / 2 - 2 * binSize_);
+                    }
+                }
+                else
+                {
+                    dPx = 0;
+                }
+
+                // calculate dPy
+                if (abs(inputY) >= 0 && abs(inputY) <= binSize_ + moduleHeight / 2)
+                {
+                    dPy = -2 * ay * inputY;
+                }
+                else if (abs(inputY) > binSize_ + moduleHeight / 2 && abs(inputY) <= 2 * binSize_ + moduleHeight / 2)
+                {
+                    if (inputY > 0)
+                    {
+                        dPy = 2 * by * (inputY - moduleHeight / 2 - 2 * binSize_);
+                    }
+                    else
+                    {
+                        dPy = 2 * by * (-inputY - moduleHeight / 2 - 2 * binSize_);
+                    }
+                }
+                else
+                {
+                    dPy = 0;
+                }
+
+                grad_[i].x += 2 * (binDensity_[j][k] - mb_) * dPx * Py;
+                grad_[i].y += 2 * (binDensity_[j][k] - mb_) * Px * dPy;
             }
         }
     }
@@ -262,13 +344,13 @@ const double &ObjectiveFunction::operator()(const std::vector<Point2<double>> &i
 const std::vector<Point2<double>> &ObjectiveFunction::Backward()
 {
     // Compute the gradient of the function
-    iterNum_++;
+
     vector<Point2<double>> wirelengthGrad, densityGrad;
     wirelengthGrad = wirelength_.Backward();
     densityGrad = density_.Backward();
     int moduleNum = placement_.numModules();
 
-    if (iterNum_ == 1)
+    if (iterNum_ == 0)
     {
         double wirelengthGradNorm = 0, densityGradNorm = 0;
         for (int i = 0; i < moduleNum; ++i)
@@ -277,12 +359,12 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
             densityGradNorm += sqrt(densityGrad[i].x * densityGrad[i].x + densityGrad[i].y * densityGrad[i].y);
         }
         lambda_ = wirelengthGradNorm / densityGradNorm;
-        cout << "calculate lambda: " << lambda_ << endl;
     }
     else
     {
         lambda_ *= 2;
     }
+
     cout << "lambda: " << lambda_ << endl;
 
     for (int i = 0; i < moduleNum; ++i)
@@ -293,6 +375,8 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
 
     cout << "wirelengthGrad: " << wirelengthGrad[0].x << " " << wirelengthGrad[0].y << endl;
     cout << "densityGrad: " << lambda_ * densityGrad[0].x << " " << lambda_ * densityGrad[0].y << endl;
+
+    iterNum_++;
 
     return grad_;
 }

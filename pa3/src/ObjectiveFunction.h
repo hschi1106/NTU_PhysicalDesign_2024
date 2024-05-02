@@ -118,7 +118,7 @@ public:
     // Constructors
     /////////////////////////////////
 
-    Density(Placement &placement, int binNumPerEdge);
+    Density(Placement &placement);
 
     /////////////////////////////////
     // Methods
@@ -136,10 +136,11 @@ private:
 
     std::vector<Point2<double>> input_; // Cache the input for backward pass
     Placement &placement_;
-    double constA_;     // constant A
     double mb_;         // max density of the bin
     double overflowRatio_; // overflow ratio
-    int binNumPerEdge_; // number of bins per edge
+    int binSize_;
+    int widthBinNum_;
+    int heightBinNum_;
     vector<vector<double>> binDensity_;
     vector<vector<double>> binDensityGrad_;
 };
@@ -161,7 +162,7 @@ public:
     // Constructors
     /////////////////////////////////
     ObjectiveFunction(Placement &placement)
-        : BaseFunction(placement.numModules()), placement_(placement), iterNum_(0), wirelength_(placement), density_(placement, max(placement.boundryRight() - placement.boundryLeft(), placement.boundryTop() - placement.boundryBottom()) / 10)
+        : BaseFunction(placement.numModules()), placement_(placement), iterNum_(0), wirelength_(placement), density_(placement)
     {
     }
 

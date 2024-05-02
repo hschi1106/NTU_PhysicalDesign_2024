@@ -30,8 +30,9 @@ void GlobalPlacer::place()
     // Set initial point
     for (int i = 0; i < moduleNum; ++i)
     {
-        t[i].x = (_placement.boundryRight() - _placement.boundryLeft()) / 2;
-        t[i].y = (_placement.boundryTop() - _placement.boundryBottom()) / 2;
+        // randomly place at -100 ~ 100
+        t[i].x = rand() % 200 - 100;
+        t[i].y = rand() % 200 - 100;
     }
 
     // Initialize the optimizer
@@ -39,7 +40,7 @@ void GlobalPlacer::place()
 
     // Perform optimization, the termination condition is that the number of iterations reaches 100
     // TODO: You may need to change the termination condition, which is determined by the overflow ratio.
-    for (size_t i = 0; i < 5; ++i)
+    for (size_t i = 0; i < 30; ++i)
     {
         optimizer.Step();
         printf("iter = %3lu, f = %9.4f\n", i, foo(t));
@@ -55,9 +56,26 @@ void GlobalPlacer::place()
     std::vector<Point2<double>> positions(num_modules); // Optimization variables (positions of modules). You may modify this line.
     for (size_t i = 0; i < num_modules; ++i)
     {
-        positions[i].x = t[i].x + _placement.boundryLeft();
-        positions[i].y = t[i].y + _placement.boundryBottom();
-        // cout << "Module " << i << " is placed at (" << positions[i].x << ", " << positions[i].y << ")." << endl;
+        if (t[i].x < _placement.boundryLeft())
+        {
+            t[i].x = _placement.boundryLeft();
+        }
+        else if (t[i].x > _placement.boundryRight() - _placement.module(i).width())
+        {
+            t[i].x = _placement.boundryRight() - _placement.module(i).width();
+        }
+
+        if (t[i].y < _placement.boundryBottom())
+        {
+            t[i].y = _placement.boundryBottom();
+        }
+        else if (t[i].y > _placement.boundryTop() - _placement.module(i).height())
+        {
+            t[i].y = _placement.boundryTop() - _placement.module(i).height();
+        }
+
+        positions[i].x = t[i].x;
+        positions[i].y = t[i].y;
     }
 
     ////////////////////////////////////////////////////////////////////
