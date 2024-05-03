@@ -32,7 +32,7 @@ const std::vector<Point2<double>> &ExampleFunction::Backward()
 
 Wirelength::Wirelength(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
 {
-    gamma_ = max(placement_.boundryRight() - placement_.boundryLeft(), placement_.boundryTop() - placement_.boundryBottom()) * 0.005;
+    gamma_ = max(placement_.boundryRight() - placement_.boundryLeft(), placement_.boundryTop() - placement_.boundryBottom()) * 0.0025;
 }
 
 const double &Wirelength::operator()(const std::vector<Point2<double>> &input)
@@ -47,14 +47,20 @@ const double &Wirelength::operator()(const std::vector<Point2<double>> &input)
         int pinNum = net.numPins();
 
         // set xMax, yMax
-        int xMax = INT_MIN, yMax = INT_MIN;
+        int xMax = INT_MIN, yMax = INT_MIN, xMin = INT_MAX, yMin = INT_MAX;
         for (int j = 0; j < pinNum; ++j)
         {
             Pin pin = net.pin(j);
             int id = pin.moduleId();
             xMax = max(xMax, int(input[id].x));
             yMax = max(yMax, int(input[id].y));
+            xMin = min(xMin, int(input[id].x));
+            yMin = min(yMin, int(input[id].y));
         }
+        xMax -= 200;
+        yMax -= 200;
+        xMin += 200;
+        yMin += 200;
 
         // count the exp value
         double expWeightedMaxX = 0, expWeightedMinX = 0, expWeightedMaxY = 0, expWeightedMinY = 0;
@@ -64,19 +70,18 @@ const double &Wirelength::operator()(const std::vector<Point2<double>> &input)
             Pin pin = net.pin(j);
             int id = pin.moduleId();
             expWeightedMaxX += exp((input[id].x - xMax) / gamma_) * input[id].x;
-            expWeightedMinX += exp(-(input[id].x - xMax) / gamma_) * input[id].x;
+            expWeightedMinX += exp((-input[id].x + xMin) / gamma_) * input[id].x;
             expWeightedMaxY += exp((input[id].y - yMax) / gamma_) * input[id].y;
-            expWeightedMinY += exp(-(input[id].y - yMax) / gamma_) * input[id].y;
+            expWeightedMinY += exp((-input[id].y + yMin) / gamma_) * input[id].y;
             expMaxX += exp((input[id].x - xMax) / gamma_);
-            expMinX += exp(-(input[id].x - xMax) / gamma_);
+            expMinX += exp((-input[id].x + xMin) / gamma_);
             expMaxY += exp((input[id].y - yMax) / gamma_);
-            expMinY += exp(-(input[id].y - yMax) / gamma_);
+            expMinY += exp((-input[id].y + yMin) / gamma_);
         }
         value_ += expWeightedMaxX / expMaxX - expWeightedMinX / expMinX + expWeightedMaxY / expMaxY - expWeightedMinY / expMinY;
     }
 
     input_ = input;
-
     return value_;
 }
 
@@ -99,14 +104,20 @@ const std::vector<Point2<double>> &Wirelength::Backward()
         int pinNum = net.numPins();
 
         // set xMax, yMax
-        int xMax = INT_MIN, yMax = INT_MIN;
+        int xMax = INT_MIN, yMax = INT_MIN, xMin = INT_MAX, yMin = INT_MAX;
         for (int j = 0; j < pinNum; ++j)
         {
             Pin pin = net.pin(j);
             int id = pin.moduleId();
             xMax = max(xMax, int(input_[id].x));
             yMax = max(yMax, int(input_[id].y));
+            xMin = min(xMin, int(input_[id].x));
+            yMin = min(yMin, int(input_[id].y));
         }
+        xMax -= 200;
+        yMax -= 200;
+        xMin += 200;
+        yMin += 200;
 
         // count the exp value
         double expWeightedMaxX = 0, expWeightedMinX = 0, expWeightedMaxY = 0, expWeightedMinY = 0;
@@ -116,13 +127,13 @@ const std::vector<Point2<double>> &Wirelength::Backward()
             Pin pin = net.pin(j);
             int id = pin.moduleId();
             expWeightedMaxX += exp((input_[id].x - xMax) / gamma_) * input_[id].x;
-            expWeightedMinX += exp(-(input_[id].x - xMax) / gamma_) * input_[id].x;
+            expWeightedMinX += exp((-input_[id].x + xMin) / gamma_) * input_[id].x;
             expWeightedMaxY += exp((input_[id].y - yMax) / gamma_) * input_[id].y;
-            expWeightedMinY += exp(-(input_[id].y - yMax) / gamma_) * input_[id].y;
+            expWeightedMinY += exp((-input_[id].y + yMin) / gamma_) * input_[id].y;
             expMaxX += exp((input_[id].x - xMax) / gamma_);
-            expMinX += exp(-(input_[id].x - xMax) / gamma_);
+            expMinX += exp((-input_[id].x + xMin)/ gamma_);
             expMaxY += exp((input_[id].y - yMax) / gamma_);
-            expMinY += exp(-(input_[id].y - yMax) / gamma_);
+            expMinY += exp((-input_[id].y + yMin) / gamma_);
         }
 
         // calculate the gradient
@@ -131,9 +142,9 @@ const std::vector<Point2<double>> &Wirelength::Backward()
             Pin pin = net.pin(j);
             int id = pin.moduleId();
             double xMaxGrad = ((1 + input_[id].x / gamma_) * exp((input_[id].x - xMax) / gamma_) * expMaxX - expWeightedMaxX / gamma_ * exp((input_[id].x - xMax) / gamma_)) / expMaxX / expMaxX;
-            double xMinGrad = ((1 - input_[id].x / gamma_) * exp(-(input_[id].x - xMax) / gamma_) * expMinX + expWeightedMinX / gamma_ * exp(-(input_[id].x - xMax) / gamma_)) / expMinX / expMinX;
+            double xMinGrad = ((1 - input_[id].x / gamma_) * exp((-input_[id].x + xMin) / gamma_) * expMinX + expWeightedMinX / gamma_ * exp((-input_[id].x + xMin) / gamma_)) / expMinX / expMinX;
             double yMaxGrad = ((1 + input_[id].y / gamma_) * exp((input_[id].y - yMax) / gamma_) * expMaxY - expWeightedMaxY / gamma_ * exp((input_[id].y - yMax) / gamma_)) / expMaxY / expMaxY;
-            double yMinGrad = ((1 - input_[id].y / gamma_) * exp(-(input_[id].y - yMax) / gamma_) * expMinY + expWeightedMinY / gamma_ * exp(-(input_[id].y - yMax) / gamma_)) / expMinY / expMinY;
+            double yMinGrad = ((1 - input_[id].y / gamma_) * exp((-input_[id].y + yMin) / gamma_) * expMinY + expWeightedMinY / gamma_ * exp((-input_[id].y + yMin) / gamma_)) / expMinY / expMinY;
             grad_[id].x += xMaxGrad - xMinGrad;
             grad_[id].y += yMaxGrad - yMinGrad;
         }
@@ -142,11 +153,12 @@ const std::vector<Point2<double>> &Wirelength::Backward()
     return grad_;
 }
 
-Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement), binSize_(100)
+Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
 {
     // resize the vector to widthBinNum_ * heightBinNum_ to store the density and gradient
     int outLineWidth = placement.boundryRight() - placement.boundryLeft();
     int outLineHeight = placement.boundryTop() - placement.boundryBottom();
+    binSize_ = min(outLineWidth, outLineHeight) / 1000;
     widthBinNum_ = outLineWidth / binSize_;
     heightBinNum_ = outLineHeight / binSize_;
     binDensity_.resize(widthBinNum_);
@@ -164,17 +176,17 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
 
     // calculate the target density of the bin
     int moduleNum = placement.numModules();
+    mb_ = 0;
     for (int i = 0; i < moduleNum; ++i)
     {
-        mb_ += placement.module(i).width() * placement.module(i).height() / (outLineWidth * outLineHeight);
+        mb_ += placement.module(i).width() * placement.module(i).height() / outLineWidth / outLineHeight;
     }
-    mb_ = 2;
+    mb_ *= 2;
 }
 
 const double &Density::operator()(const std::vector<Point2<double>> &input)
 {
     // Compute the value of the density function
-
     // Initialize the value of the density function
     value_ = 0;
     overflowRatio_ = 0;
@@ -185,6 +197,7 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
             binDensity_[i][j] = 0;
         }
     }
+
     int moduleNum = placement_.numModules();
     for (int i = 0; i < moduleNum; ++i)
     {
@@ -197,8 +210,6 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
         {
             for (int k = startBinY; k <= endBinY; ++k)
             {
-                // double inputX = input[i].x - placement_.boundryLeft() + moduleWidth - j * binSize_;
-                // double inputY = input[i].y - placement_.boundryBottom() + moduleHeight - k * binSize_;
                 double inputX = abs((input[i].x - placement_.boundryLeft() + moduleWidth / 2) - (j * binSize_ + binSize_ / 2));
                 double inputY = abs((input[i].y - placement_.boundryBottom() + moduleHeight / 2) - (k * binSize_ + binSize_ / 2));
                 double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
@@ -246,7 +257,6 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
             overflowRatio_ += max(0.0, binDensity_[i][j] - mb_);
         }
     }
-
     overflowRatio_ /= widthBinNum_ * heightBinNum_;
 
     input_ = input;
@@ -277,8 +287,6 @@ const std::vector<Point2<double>> &Density::Backward()
         {
             for (int k = startBinY; k <= endBinY; ++k)
             {
-                // double inputX = input_[i].x - placement_.boundryLeft() + moduleWidth - j * binSize_;
-                // double inputY = input_[i].y - placement_.boundryBottom() + moduleHeight - k * binSize_;
                 double inputX = (input_[i].x - placement_.boundryLeft() + moduleWidth / 2) - (j * binSize_ + binSize_ / 2);
                 double inputY = (input_[i].y - placement_.boundryBottom() + moduleHeight / 2) - (k * binSize_ + binSize_ / 2);
                 double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
@@ -370,7 +378,6 @@ const double &ObjectiveFunction::operator()(const std::vector<Point2<double>> &i
     double wirelengthCost, densityCost;
     wirelengthCost = wirelength_(input);
     densityCost = density_(input);
-    cout << "wirelengthCost: " << wirelengthCost << " densityCost: " << densityCost << endl;
     value_ = wirelengthCost + lambda_ * densityCost;
     input_ = input;
 
@@ -380,7 +387,6 @@ const double &ObjectiveFunction::operator()(const std::vector<Point2<double>> &i
 const std::vector<Point2<double>> &ObjectiveFunction::Backward()
 {
     // Compute the gradient of the function
-
     vector<Point2<double>> wirelengthGrad, densityGrad;
     wirelengthGrad = wirelength_.Backward();
     densityGrad = density_.Backward();
@@ -394,14 +400,21 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
             wirelengthGradNorm += sqrt(wirelengthGrad[i].x * wirelengthGrad[i].x + wirelengthGrad[i].y * wirelengthGrad[i].y);
             densityGradNorm += sqrt(densityGrad[i].x * densityGrad[i].x + densityGrad[i].y * densityGrad[i].y);
         }
-        lambda_ = wirelengthGradNorm / densityGradNorm * 0.9;
+        lambda_ = wirelengthGradNorm / densityGradNorm * 0.8;
     }
     else
     {
-        lambda_ *= 2;
+        lambda_ *= 1.1;
     }
 
-    cout << "lambda: " << lambda_ << endl;
+    // double wirelengthGradNorm = 0, densityGradNorm = 0;
+    // for (int i = 0; i < moduleNum; ++i)
+    // {
+    //     wirelengthGradNorm += sqrt(wirelengthGrad[i].x * wirelengthGrad[i].x + wirelengthGrad[i].y * wirelengthGrad[i].y);
+    //     densityGradNorm += sqrt(densityGrad[i].x * densityGrad[i].x + densityGrad[i].y * densityGrad[i].y);
+    // }
+    // lambda_ = wirelengthGradNorm / densityGradNorm * 0.9 * pow(2, iterNum_);
+    // cout << "lambda: " << lambda_ << endl;
 
     for (int i = 0; i < moduleNum; ++i)
     {
@@ -409,8 +422,11 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
         grad_[i].y = wirelengthGrad[i].y + lambda_ * densityGrad[i].y;
     }
 
-    cout << "wirelengthGrad: " << wirelengthGrad[0].x << " " << wirelengthGrad[0].y << endl;
-    cout << "densityGrad: " << lambda_ * densityGrad[0].x << " " << lambda_ * densityGrad[0].y << endl;
+    // if (iterNum_ % 50 == 0 && iterNum_ != 0)
+    // {
+    //     this->setGamma(this->getGamma() * 2);
+    // }
+    // cout << "Gamma: " << this->getGamma() << endl;
 
     iterNum_++;
 

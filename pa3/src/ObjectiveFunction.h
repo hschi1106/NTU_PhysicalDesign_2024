@@ -96,6 +96,10 @@ public:
     const double &operator()(const std::vector<Point2<double>> &input) override;
     const std::vector<Point2<double>> &Backward() override;
 
+    const double getGamma() const { return gamma_; }
+
+    void setGamma(double gamma) { gamma_ = gamma; }
+
 private:
     /////////////////////////////////
     // Data members
@@ -127,6 +131,8 @@ public:
     const std::vector<Point2<double>> &Backward() override;
 
     const double getOverflowRatio() const { return overflowRatio_; }
+    const double getMb() const { return mb_; }
+    const int getBinSize() const { return binSize_; }
 
 private:
     /////////////////////////////////
@@ -173,6 +179,11 @@ public:
     const std::vector<Point2<double>> &Backward() override;
 
     const double getOverflowRatio() const { return density_.getOverflowRatio(); }
+    const double getMb() const { return density_.getMb(); }
+    const double getGamma() const { return wirelength_.getGamma(); }
+    const int getBinSize() const { return density_.getBinSize(); }
+
+    void setGamma(double gamma) { wirelength_.setGamma(gamma); }
 
 private:
     /////////////////////////////////

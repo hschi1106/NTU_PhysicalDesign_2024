@@ -1,0 +1,651 @@
+Benchmark: ibm01-cu85
+HPWL: 5899472
+Memory usage: 8.3 MB
+Core region: (-33330,-33208)-(33396,33320)
+
+////// Global Placement ///////
+388.74 -423.28
+xMaxGrad: 1.01197 xMinGrad: -0.0119725 yMaxGrad: -0.081518 yMinGrad: 1.08152
+413.74 -593
+exp((-input_[id].x - xMin) / gamma_): 2.92883 expMinX: 1228.58 expWeightedMinX: -725921
+Gamma: 166.815
+iter = 1, f = 3129.7 -2307.98
+9.11522e+07 , overflow ratio = 0.606964
+3129.7 -2307.98
+xMaxGrad: -0.0854709 xMinGrad: 1.08547 yMaxGrad: 1 yMinGrad: -3.63262e-10
+-2526.21 -2526
+exp((-input_[id].x - xMin) / gamma_): 1.42289e+13 expMinX: 1.634e+13 expWeightedMinX: -4.06064e+16
+Gamma: 166.815
+iter = 2, f = 3956.7 913.975
+4.8937e+07 , overflow ratio = 0.581211
+3956.7 913.975
+xMaxGrad: 1 xMinGrad: -5.75818e-12 yMaxGrad: 0.48981 yMinGrad: 0.51019
+70.8038 -4803
+exp((-input_[id].x - xMin) / gamma_): 2.08947e+12 expMinX: 1.02403e+25 expWeightedMinX: -4.91905e+28
+Gamma: 166.815
+iter = 3, f = 640.801 1178.07
+8.0008e+07 , overflow ratio = 0.591511
+640.801 1178.07
+xMaxGrad: -0.000233724 xMinGrad: 1.00023 yMaxGrad: 0.169481 yMinGrad: 0.830519
+-3250.45 -3250
+exp((-input_[id].x - xMin) / gamma_): 8.38667e+16 expMinX: 8.38687e+16 expWeightedMinX: -2.72607e+20
+Gamma: 166.815
+iter = 4, f = 3049.9 -1115.65
+5.30778e+07 , overflow ratio = 0.583923
+3049.9 -1115.65
+xMaxGrad: 1 xMinGrad: -2.83791e-09 yMaxGrad: 1 yMinGrad: -1.38855e-08
+-484.333 -4281
+exp((-input_[id].x - xMin) / gamma_): 2.54862e+12 expMinX: 1.95421e+22 expWeightedMinX: -8.36616e+25
+Gamma: 166.815
+iter = 5, f = 32.8634 285.205
+7.69808e+07 , overflow ratio = 0.585679
+32.8634 285.205
+xMaxGrad: -0.0108279 xMinGrad: 1.01083 yMaxGrad: -0.00931832 yMinGrad: 1.00932
+-2952.77 -2952
+exp((-input_[id].x - xMin) / gamma_): 2.35928e+15 expMinX: 2.36426e+15 expWeightedMinX: -6.976e+18
+Gamma: 166.815
+iter = 6, f = -378.576 -3015.65
+5.5942e+07 , overflow ratio = 0.582816
+-378.576 -3015.65
+xMaxGrad: 1 xMinGrad: -1.6854e-08 yMaxGrad: 1 yMinGrad: -2.35694e-09
+-708.806 -4193
+exp((-input_[id].x - xMin) / gamma_): 5.77573e+12 expMinX: 6.81574e+21 expWeightedMinX: -2.8581e+25
+Gamma: 166.815
+iter = 7, f = -446.91 310.046
+7.53989e+07 , overflow ratio = 0.581523
+-446.91 310.046
+xMaxGrad: -0.00117856 xMinGrad: 1.00118 yMaxGrad: -0.0671281 yMinGrad: 1.06713
+-3307.57 -3307
+exp((-input_[id].x - xMin) / gamma_): 1.66226e+17 expMinX: 1.66251e+17 expWeightedMinX: -5.49851e+20
+Gamma: 166.815
+iter = 8, f = 2799.25 1036.25
+5.82112e+07 , overflow ratio = 0.580632
+2799.25 1036.25
+xMaxGrad: 1 xMinGrad: -6.73689e-08 yMaxGrad: 1 yMinGrad: -5.51886e-10
+-1104.77 -4345
+exp((-input_[id].x - xMin) / gamma_): 1.5424e+14 expMinX: 4.21881e+22 expWeightedMinX: -1.83327e+26
+Gamma: 166.815
+iter = 9, f = -526.271 1112.65
+7.44895e+07 , overflow ratio = 0.579554
+-526.271 1112.65
+xMaxGrad: -0.000534604 xMinGrad: 1.00053 yMaxGrad: -0.0954902 yMinGrad: 1.09549
+-3610.88 -3610
+exp((-input_[id].x - xMin) / gamma_): 6.29793e+18 expMinX: 6.29832e+18 expWeightedMinX: -2.27418e+22
+Gamma: 166.815
+iter = 10, f = 2777.02 721.208
+5.9829e+07 , overflow ratio = 0.579323
+2777.02 721.208
+xMaxGrad: 1 xMinGrad: -4.78919e-06 yMaxGrad: 1 yMinGrad: -9.94545e-12
+-1493.85 -3975
+exp((-input_[id].x - xMin) / gamma_): 1.72928e+14 expMinX: 5.01163e+20 expWeightedMinX: -1.99262e+24
+Gamma: 166.815
+iter = 11, f = -546.257 577.026
+7.37856e+07 , overflow ratio = 0.578191
+-546.257 577.026
+xMaxGrad: -1.38389e-05 xMinGrad: 1.00001 yMaxGrad: 0.888128 yMinGrad: 0.111872
+-3914.13 -3914
+exp((-input_[id].x - xMin) / gamma_): 2.39958e+20 expMinX: 2.39958e+20 expWeightedMinX: -9.39224e+23
+Gamma: 166.815
+iter = 12, f = 2701.35 1296.76
+6.16365e+07 , overflow ratio = 0.578434
+2701.35 1296.76
+xMaxGrad: 1 xMinGrad: -2.56395e-07 yMaxGrad: -1.76111e-09 yMinGrad: 1
+-1295.77 -4300
+exp((-input_[id].x - xMin) / gamma_): 3.70096e+14 expMinX: 2.45538e+22 expWeightedMinX: -1.05585e+26
+Gamma: 166.815
+iter = 13, f = 141.73 -827.696
+7.32792e+07 , overflow ratio = 0.57608
+141.73 -827.696
+xMaxGrad: -0.000170819 xMinGrad: 1.00017 yMaxGrad: 1.0493 yMinGrad: -0.049298
+-3784.26 -3784
+exp((-input_[id].x - xMin) / gamma_): 5.05344e+19 expMinX: 5.05353e+19 expWeightedMinX: -1.91237e+23
+Gamma: 166.815
+iter = 14, f = -924.548 2323.17
+6.35259e+07 , overflow ratio = 0.573818
+-924.548 2323.17
+xMaxGrad: 1 xMinGrad: -7.73612e-07 yMaxGrad: -5.65039e-10 yMinGrad: 1
+-1545.92 -4354
+exp((-input_[id].x - xMin) / gamma_): 2.29163e+15 expMinX: 4.69053e+22 expWeightedMinX: -2.04232e+26
+Gamma: 166.815
+iter = 15, f = 2329.9 3011.29
+7.33262e+07 , overflow ratio = 0.572563
+2329.9 3011.29
+xMaxGrad: -9.74269e-05 xMinGrad: 1.0001 yMaxGrad: 1.06978 yMinGrad: -0.069777
+-3948.27 -3948
+exp((-input_[id].x - xMin) / gamma_): 3.61021e+20 expMinX: 3.61024e+20 expWeightedMinX: -1.42541e+24
+Gamma: 166.815
+iter = 16, f = 2588.74 -305.021
+6.49501e+07 , overflow ratio = 0.572124
+2588.74 -305.021
+xMaxGrad: 1.00001 xMinGrad: -5.32113e-06 yMaxGrad: -8.61668e-11 yMinGrad: 1
+-1769.63 -4232
+exp((-input_[id].x - xMin) / gamma_): 4.21652e+15 expMinX: 1.09083e+22 expWeightedMinX: -4.61731e+25
+Gamma: 166.815
+iter = 17, f = 5089.63 -2498.3
+7.32162e+07 , overflow ratio = 0.570851
+5089.63 -2498.3
+xMaxGrad: -5.86147e-06 xMinGrad: 1.00001 yMaxGrad: 0.700279 yMinGrad: 0.299721
+-4351.24 -4351
+exp((-input_[id].x - xMin) / gamma_): 4.52744e+22 expMinX: 4.52744e+22 expWeightedMinX: -1.97e+26
+Gamma: 166.815
+iter = 18, f = 2754.6 -129.221
+6.65672e+07 , overflow ratio = 0.570633
+2754.6 -129.221
+xMaxGrad: 1 xMinGrad: -1.23905e-09 yMaxGrad: -0.000673631 yMinGrad: 1.00067
+-1266.42 -5207
+exp((-input_[id].x - xMin) / gamma_): 7.13205e+16 expMinX: 1.30248e+27 expWeightedMinX: -6.78326e+30
+Gamma: 166.815
+iter = 19, f = 6055.91 -537.013
+7.328e+07 , overflow ratio = 0.568219
+6055.91 -537.013
+xMaxGrad: -0.0352255 xMinGrad: 1.03523 yMaxGrad: 1 yMinGrad: -1.3018e-07
+-3641.12 -3641
+exp((-input_[id].x - xMin) / gamma_): 9.09159e+18 expMinX: 9.18244e+18 expWeightedMinX: -3.33646e+22
+Gamma: 166.815
+iter = 20, f = 2731.1 -640.034
+6.80452e+07 , overflow ratio = 0.567219
+2731.1 -640.034
+xMaxGrad: 1 xMinGrad: -2.8028e-10 yMaxGrad: -0.00281939 yMinGrad: 1.00282
+-1184.16 -5384
+exp((-input_[id].x - xMin) / gamma_): 1.25859e+17 expMinX: 1.08583e+28 expWeightedMinX: -5.84688e+31
+Gamma: 166.815
+iter = 21, f = 4889.41 -3171.17
+7.36871e+07 , overflow ratio = 0.566232
+4889.41 -3171.17
+xMaxGrad: -0.0132082 xMinGrad: 1.01321 yMaxGrad: 1 yMinGrad: -8.43312e-07
+-4020.53 -4020
+exp((-input_[id].x - xMin) / gamma_): 8.57275e+20 expMinX: 8.59593e+20 expWeightedMinX: -3.45373e+24
+Gamma: 166.815
+iter = 22, f = 2586.34 -771.007
+6.9481e+07 , overflow ratio = 0.564995
+2586.34 -771.007
+xMaxGrad: 1 xMinGrad: -2.51642e-09 yMaxGrad: -0.000197909 yMinGrad: 1.0002
+-1698.72 -5516
+exp((-input_[id].x - xMin) / gamma_): 6.06953e+18 expMinX: 5.27891e+28 expWeightedMinX: -2.91211e+32
+Gamma: 166.815
+iter = 23, f = 3670.52 -3915.76
+7.40937e+07 , overflow ratio = 0.565058
+3670.52 -3915.76
+xMaxGrad: -0.00307058 xMinGrad: 1.00307 yMaxGrad: 1.00001 yMinGrad: -6.60264e-06
+-4444.84 -4444
+exp((-input_[id].x - xMin) / gamma_): 1.38567e+23 expMinX: 1.3863e+23 expWeightedMinX: -6.16108e+26
+Gamma: 166.815
+iter = 24, f = 2149.6 -957.426
+7.09843e+07 , overflow ratio = 0.562994
+2149.6 -957.426
+xMaxGrad: 1 xMinGrad: -1.34231e-08 yMaxGrad: -2.61704e-05 yMinGrad: 1.00003
+-2059.28 -5583
+exp((-input_[id].x - xMin) / gamma_): 7.87558e+19 expMinX: 1.18097e+29 expWeightedMinX: -6.59433e+32
+Gamma: 166.815
+iter = 25, f = 5317.73 56.4451
+7.44894e+07 , overflow ratio = 0.562151
+5317.73 56.4451
+xMaxGrad: -0.00417146 xMinGrad: 1.00417 yMaxGrad: 1 yMinGrad: -4.66234e-06
+-4440.79 -4440
+exp((-input_[id].x - xMin) / gamma_): 1.32032e+23 expMinX: 1.32119e+23 expWeightedMinX: -5.86605e+26
+Gamma: 166.815
+iter = 26, f = 1994.75 207.248
+7.25356e+07 , overflow ratio = 0.559911
+1994.75 207.248
+xMaxGrad: 1 xMinGrad: -9.33608e-09 yMaxGrad: -3.77211e-05 yMinGrad: 1.00004
+-2067.85 -5656
+exp((-input_[id].x - xMin) / gamma_): 1.28425e+20 expMinX: 2.82136e+29 expWeightedMinX: -1.59579e+33
+Gamma: 166.815
+iter = 27, f = 2388.96 3510.21
+7.55514e+07 , overflow ratio = 0.558317
+2388.96 3510.21
+xMaxGrad: -0.0120091 xMinGrad: 1.01201 yMaxGrad: 1 yMinGrad: -1.41595e-06
+-4309.7 -4309
+exp((-input_[id].x - xMin) / gamma_): 2.74375e+22 expMinX: 2.75033e+22 expWeightedMinX: -1.18465e+26
+Gamma: 166.815
+iter = 28, f = 2539.33 187.206
+7.39476e+07 , overflow ratio = 0.557389
+2539.33 187.206
+xMaxGrad: 1 xMinGrad: -1.76789e-09 yMaxGrad: -0.000188614 yMinGrad: 1.00019
+-1917.9 -5797
+exp((-input_[id].x - xMin) / gamma_): 1.21719e+20 expMinX: 1.53234e+30 expWeightedMinX: -8.88353e+33
+Gamma: 166.815
+iter = 29, f = 5261.71 2098.63
+7.64209e+07 , overflow ratio = 0.556094
+5261.71 2098.63
+xMaxGrad: -0.0532884 xMinGrad: 1.05329 yMaxGrad: 1 yMinGrad: -2.06494e-07
+-4113.68 -4113
+exp((-input_[id].x - xMin) / gamma_): 2.61674e+21 expMinX: 2.66558e+21 expWeightedMinX: -1.09329e+25
+Gamma: 166.815
+iter = 30, f = 1948.71 2396.91
+7.60796e+07 , overflow ratio = 0.554868
+1948.71 2396.91
+xMaxGrad: 1 xMinGrad: -2.78957e-10 yMaxGrad: -0.00103226 yMinGrad: 1.00103
+-1724.16 -5925
+exp((-input_[id].x - xMin) / gamma_): 8.2076e+19 expMinX: 7.11603e+30 expWeightedMinX: -4.21662e+34
+Gamma: 166.815
+iter = 31, f = 4591.67 377.086
+7.74634e+07 , overflow ratio = 0.553023
+4591.67 377.086
+xMaxGrad: 0.293662 xMinGrad: 0.706338 yMaxGrad: 1 yMinGrad: -1.08707e-08
+-3601.01 -3601
+exp((-input_[id].x - xMin) / gamma_): 5.62417e+18 expMinX: 9.30055e+18 expWeightedMinX: -3.32306e+22
+Gamma: 166.815
+iter = 32, f = 2696.36 3110.71
+7.74789e+07 , overflow ratio = 0.548908
+2696.36 3110.71
+xMaxGrad: 1.00027 xMinGrad: -0.000266269 yMaxGrad: -7.88612e-07 yMinGrad: 1
+-3002.95 -4751
+exp((-input_[id].x - xMin) / gamma_): 1.53821e+20 expMinX: 5.47641e+24 expWeightedMinX: -2.60192e+28
+Gamma: 166.815
+iter = 33, f = 4966.71 679.573
+7.88539e+07 , overflow ratio = 0.54768
+4966.71 679.573
+xMaxGrad: -4.75835e-07 xMinGrad: 1 yMaxGrad: 1.00014 yMinGrad: -0.000135441
+-5644.64 -5644
+exp((-input_[id].x - xMin) / gamma_): 2.45133e+29 expMinX: 2.45133e+29 expWeightedMinX: -1.38369e+33
+Gamma: 166.815
+iter = 34, f = 5744.97 3913.65
+7.88813e+07 , overflow ratio = 0.546139
+5744.97 3913.65
+xMaxGrad: 1.00004 xMinGrad: -4.31614e-05 yMaxGrad: -3.73503e-06 yMinGrad: 1
+-3264.62 -5348
+exp((-input_[id].x - xMin) / gamma_): 2.64559e+22 expMinX: 7.04416e+27 expWeightedMinX: -3.76757e+31
+Gamma: 166.815
+iter = 35, f = 2445.62 3490.31
+8.03003e+07 , overflow ratio = 0.543819
+2445.62 3490.31
+xMaxGrad: -2.94626e-06 xMinGrad: 1 yMaxGrad: 1.00002 yMinGrad: -1.98158e-05
+-5538.97 -5538
+exp((-input_[id].x - xMin) / gamma_): 6.89201e+28 expMinX: 6.89202e+28 expWeightedMinX: -3.81747e+32
+Gamma: 166.815
+iter = 36, f = -749.505 2565.04
+8.05021e+07 , overflow ratio = 0.540989
+-749.505 2565.04
+xMaxGrad: 1.00001 xMinGrad: -1.32638e-05 yMaxGrad: -1.8576e-05 yMinGrad: 1.00002
+-3376.69 -5675
+exp((-input_[id].x - xMin) / gamma_): 3.67803e+23 expMinX: 3.54338e+29 expWeightedMinX: -2.0109e+33
+Gamma: 166.815
+iter = 37, f = 2104.39 856.176
+8.17557e+07 , overflow ratio = 0.538431
+2104.39 856.176
+xMaxGrad: -4.58166e-05 xMinGrad: 1.00005 yMaxGrad: 1 yMinGrad: -9.50732e-07
+-5656.05 -5656
+exp((-input_[id].x - xMin) / gamma_): 2.82065e+29 expMinX: 2.82066e+29 expWeightedMinX: -1.59538e+33
+Gamma: 166.815
+iter = 38, f = 5319.59 1709.09
+8.25307e+07 , overflow ratio = 0.53541
+5319.59 1709.09
+xMaxGrad: 1 xMinGrad: -1.19396e-06 yMaxGrad: -0.000180057 yMinGrad: 1.00018
+-3358.62 -6089
+exp((-input_[id].x - xMin) / gamma_): 3.94835e+24 expMinX: 5.08298e+31 expWeightedMinX: -3.09528e+35
+Gamma: 166.815
+iter = 39, f = 3117.07 -783.673
+8.37451e+07 , overflow ratio = 0.533313
+3117.07 -783.673
+xMaxGrad: -6.89945e-06 xMinGrad: 1.00001 yMaxGrad: 1.00001 yMinGrad: -1.24218e-05
+-6193.63 -6193
+exp((-input_[id].x - xMin) / gamma_): 1.76998e+32 expMinX: 1.76998e+32 expWeightedMinX: -1.09626e+36
+Gamma: 166.815
+iter = 40, f = 1576.95 2164.71
+8.44206e+07 , overflow ratio = 0.529075
+1576.95 2164.71
+xMaxGrad: 1.00003 xMinGrad: -2.50901e-05 yMaxGrad: -4.5737e-06 yMinGrad: 1
+-3805.27 -5988
+exp((-input_[id].x - xMin) / gamma_): 3.13528e+25 expMinX: 1.51015e+31 expWeightedMinX: -9.04283e+34
+Gamma: 166.815
+iter = 41, f = 2127.31 5445.27
+8.58354e+07 , overflow ratio = 0.527645
+2127.31 5445.27
+xMaxGrad: -1.06053e-05 xMinGrad: 1.00001 yMaxGrad: 1.00002 yMinGrad: -2.26812e-05
+-6549.64 -6549
+exp((-input_[id].x - xMin) / gamma_): 1.26369e+34 expMinX: 1.26369e+34 expWeightedMinX: -8.27674e+37
+Gamma: 166.815
+iter = 42, f = 3296.6 2331.15
+8.68658e+07 , overflow ratio = 0.523476
+3296.6 2331.15
+xMaxGrad: 1.00001 xMinGrad: -1.34585e-05 yMaxGrad: -2.91745e-06 yMinGrad: 1
+-4259.38 -6555
+exp((-input_[id].x - xMin) / gamma_): 1.42793e+28 expMinX: 1.35408e+34 expWeightedMinX: -8.87622e+37
+Gamma: 166.815
+iter = 43, f = 6439.62 1241.96
+8.82221e+07 , overflow ratio = 0.519797
+6439.62 1241.96
+xMaxGrad: -3.5296e-06 xMinGrad: 1 yMaxGrad: 1.00007 yMinGrad: -7.18674e-05
+-6782.22 -6782
+exp((-input_[id].x - xMin) / gamma_): 2.05958e+35 expMinX: 2.05958e+35 expWeightedMinX: -1.39685e+39
+Gamma: 166.815
+iter = 44, f = 4646.07 4043.41
+8.95807e+07 , overflow ratio = 0.51799
+4646.07 4043.41
+xMaxGrad: 1.00012 xMinGrad: -0.000121008 yMaxGrad: -3.25292e-07 yMinGrad: 1
+-4679.57 -6574
+exp((-input_[id].x - xMin) / gamma_): 1.98661e+29 expMinX: 1.70036e+34 expWeightedMinX: -1.11784e+38
+Gamma: 166.815
+iter = 45, f = 4149.61 7332.55
+9.09272e+07 , overflow ratio = 0.513146
+4149.61 7332.55
+xMaxGrad: -8.27551e-08 xMinGrad: 1 yMaxGrad: 1.01078 yMinGrad: -0.0107751
+-7699.54 -7699
+exp((-input_[id].x - xMin) / gamma_): 1.22838e+40 expMinX: 1.22838e+40 expWeightedMinX: -9.458e+43
+Gamma: 166.815
+iter = 46, f = 5398.04 4249.31
+9.22956e+07 , overflow ratio = 0.510067
+5398.04 4249.31
+xMaxGrad: 1.00147 xMinGrad: -0.00146519 yMaxGrad: -3.77323e-09 yMinGrad: 1
+-5424.85 -6850
+exp((-input_[id].x - xMin) / gamma_): 9.05628e+31 expMinX: 4.66339e+35 expWeightedMinX: -3.19453e+39
+Gamma: 166.815
+iter = 47, f = 5542.56 7572.57
+9.4591e+07 , overflow ratio = 0.505977
+5542.56 7572.57
+xMaxGrad: -1.34999e-07 xMinGrad: 1 yMaxGrad: 1.01041 yMinGrad: -0.0104084
+-8007.86 -8007
+exp((-input_[id].x - xMin) / gamma_): 4.94175e+41 expMinX: 4.94175e+41 expWeightedMinX: -3.95729e+45
+Gamma: 166.815
+iter = 48, f = 5132.45 4271.55
+9.5357e+07 , overflow ratio = 0.501279
+5132.45 4271.55
+xMaxGrad: 1.00024 xMinGrad: -0.000243402 yMaxGrad: -2.07489e-08 yMinGrad: 1
+-5754.19 -7519
+exp((-input_[id].x - xMin) / gamma_): 3.59823e+34 expMinX: 1.41625e+39 expWeightedMinX: -1.06489e+43
+Gamma: 166.815
+iter = 49, f = 7125.04 6935.1
+9.81042e+07 , overflow ratio = 0.497422
+7125.04 6935.1
+xMaxGrad: -1.03032e-08 xMinGrad: 1 yMaxGrad: 1.08451 yMinGrad: -0.0845066
+-8352.17 -8352
+exp((-input_[id].x - xMin) / gamma_): 3.07941e+43 expMinX: 3.07941e+43 expWeightedMinX: -2.57197e+47
+Gamma: 166.815
+iter = 50, f = 4434.33 4979.34
+9.94599e+07 , overflow ratio = 0.493445
+4434.33 4979.34
+xMaxGrad: 1.01436 xMinGrad: -0.0143619 yMaxGrad: -1.27641e-10 yMinGrad: 1
+-6182 -7150
+exp((-input_[id].x - xMin) / gamma_): 5.11918e+34 expMinX: 1.70704e+37 expWeightedMinX: -1.22014e+41
+Gamma: 166.815
+iter = 51, f = 7157.01 6890.35
+1.01866e+08 , overflow ratio = 0.489166
+7157.01 6890.35
+xMaxGrad: -2.93085e-12 xMinGrad: 1 yMaxGrad: -0.00126468 yMinGrad: 1.00126
+-9019.57 -9019
+exp((-input_[id].x - xMin) / gamma_): 9.17301e+46 expMinX: 9.17301e+46 expWeightedMinX: -8.27366e+50
+Gamma: 166.815
+iter = 52, f = 4105.34 8214.07
+1.04959e+08 , overflow ratio = 0.484784
+4105.34 8214.07
+xMaxGrad: -2.71696e-05 xMinGrad: 1.00003 yMaxGrad: 1 yMinGrad: -2.17906e-10
+-6732.35 -6732
+exp((-input_[id].x - xMin) / gamma_): 1.13175e+35 expMinX: 1.13175e+35 expWeightedMinX: -7.61935e+38
+Gamma: 166.815
+iter = 53, f = 6047.1 5513.24
+1.07885e+08 , overflow ratio = 0.480108
+6047.1 5513.24
+xMaxGrad: 1 xMinGrad: -3.76412e-07 yMaxGrad: 0.433852 yMinGrad: 0.566148
+-4185.38 -7121
+exp((-input_[id].x - xMin) / gamma_): 2.7264e+29 expMinX: 1.20251e+37 expWeightedMinX: -8.56391e+40
+Gamma: 166.815
+iter = 54, f = 4214.05 8289
+1.10518e+08 , overflow ratio = 0.476428
+4214.05 8289
+xMaxGrad: -0.0669876 xMinGrad: 1.06699 yMaxGrad: 1 yMinGrad: -3.16127e-13
+-5274.67 -5274
+exp((-input_[id].x - xMin) / gamma_): 2.90361e+27 expMinX: 2.98378e+27 expWeightedMinX: -1.56905e+31
+Gamma: 166.815
+iter = 55, f = 4636.65 4989.56
+1.1432e+08 , overflow ratio = 0.46916
+4636.65 4989.56
+xMaxGrad: -0.0460448 xMinGrad: 1.04604 yMaxGrad: 1 yMinGrad: -4.39674e-16
+-8590.43 -8590
+exp((-input_[id].x - xMin) / gamma_): 5.35048e+44 expMinX: 5.42987e+44 expWeightedMinX: -4.65892e+48
+Gamma: 166.815
+iter = 56, f = 7139.35 7180.78
+1.17056e+08 , overflow ratio = 0.465531
+7139.35 7180.78
+xMaxGrad: 1 xMinGrad: -6.65441e-10 yMaxGrad: 1.00015 yMinGrad: -0.000152659
+-6259.82 -10309
+exp((-input_[id].x - xMin) / gamma_): 1.36805e+43 expMinX: 4.78562e+53 expWeightedMinX: -4.93387e+57
+Gamma: 166.815
+iter = 57, f = 10153.9 5774.48
+1.21014e+08 , overflow ratio = 0.460869
+10153.9 5774.48
+xMaxGrad: -0.00143401 xMinGrad: 1.00143 yMaxGrad: -0.0176889 yMinGrad: 1.01769
+-9576.96 -9576
+exp((-input_[id].x - xMin) / gamma_): 7.30741e+49 expMinX: 7.3088e+49 expWeightedMinX: -6.99941e+53
+Gamma: 166.815
+iter = 58, f = 9960.91 2453.68
+1.2528e+08 , overflow ratio = 0.454301
+9960.91 2453.68
+xMaxGrad: 1 xMinGrad: -8.21774e-09 yMaxGrad: 1.00001 yMinGrad: -6.02654e-06
+-7818.64 -11429
+exp((-input_[id].x - xMin) / gamma_): 1.28902e+50 expMinX: 3.23824e+59 expWeightedMinX: -3.70106e+63
+Gamma: 166.815
+iter = 59, f = 8436.98 5410.47
+1.29706e+08 , overflow ratio = 0.449455
+8436.98 5410.47
+xMaxGrad: -0.027327 xMinGrad: 1.02733 yMaxGrad: -8.7065e-06 yMinGrad: 1.00001
+-10469 -10468
+exp((-input_[id].x - xMin) / gamma_): 3.22383e+54 expMinX: 3.24642e+54 expWeightedMinX: -3.3968e+58
+Gamma: 166.815
+iter = 60, f = 7035.2 2393.85
+1.3487e+08 , overflow ratio = 0.443581
+7035.2 2393.85
+xMaxGrad: 1 xMinGrad: -2.39727e-09 yMaxGrad: 1.00001 yMinGrad: -8.73403e-06
+-8058.29 -11884
+exp((-input_[id].x - xMin) / gamma_): 8.29364e+51 expMinX: 7.58942e+61 expWeightedMinX: -9.01968e+65
+Gamma: 166.815
+iter = 61, f = 7585.62 -886.695
+1.40033e+08 , overflow ratio = 0.437805
+7585.62 -886.695
+xMaxGrad: 1.00021 xMinGrad: -0.000211443 yMaxGrad: -1.25013e-09 yMinGrad: 1
+-8836.45 -10627
+exp((-input_[id].x - xMin) / gamma_): 4.70009e+50 expMinX: 2.16446e+55 expWeightedMinX: -2.3003e+59
+Gamma: 166.815
+iter = 62, f = 9121.63 -3837.22
+1.45413e+08 , overflow ratio = 0.43297
+9121.63 -3837.22
+xMaxGrad: -1.56936e-08 xMinGrad: 1 yMaxGrad: -0.0603206 yMinGrad: 1.06032
+-12093.4 -12093
+exp((-input_[id].x - xMin) / gamma_): 9.29235e+62 expMinX: 9.29235e+62 expWeightedMinX: -1.12376e+67
+Gamma: 166.815
+iter = 63, f = 10529 -6851.25
+1.5103e+08 , overflow ratio = 0.425546
+10529 -6851.25
+xMaxGrad: -0.0229019 xMinGrad: 1.0229 yMaxGrad: 1 yMinGrad: -1.75293e-13
+-10674.4 -10674
+exp((-input_[id].x - xMin) / gamma_): 3.79834e+55 expMinX: 3.81931e+55 expWeightedMinX: -4.07508e+59
+Gamma: 166.815
+iter = 64, f = 7370.16 -7893.78
+1.56352e+08 , overflow ratio = 0.419201
+7370.16 -7893.78
+xMaxGrad: 1.00001 xMinGrad: -6.95007e-06 yMaxGrad: 1.07181 yMinGrad: -0.0718056
+-7754.56 -10169
+exp((-input_[id].x - xMin) / gamma_): 4.60351e+46 expMinX: 8.92726e+52 expWeightedMinX: -9.07873e+56
+Gamma: 166.815
+iter = 65, f = 9235 -5139.27
+1.63171e+08 , overflow ratio = 0.410493
+9235 -5139.27
+xMaxGrad: -9.71233e-08 xMinGrad: 1 yMaxGrad: -0.00326829 yMinGrad: 1.00327
+-10064.7 -10064
+exp((-input_[id].x - xMin) / gamma_): 2.53492e+52 expMinX: 2.53492e+52 expWeightedMinX: -2.55131e+56
+Gamma: 166.815
+iter = 66, f = 7248.72 -2471.01
+1.69993e+08 , overflow ratio = 0.402668
+7248.72 -2471.01
+xMaxGrad: 1.00806 xMinGrad: -0.00805554 yMaxGrad: 1 yMinGrad: -4.46188e-08
+-8755.84 -9844
+exp((-input_[id].x - xMin) / gamma_): 2.65306e+48 expMinX: 1.8175e+51 expWeightedMinX: -1.789e+55
+Gamma: 166.815
+iter = 67, f = 5187.72 139.971
+1.76594e+08 , overflow ratio = 0.396436
+5187.72 139.971
+xMaxGrad: -1.73608e-10 xMinGrad: 1 yMaxGrad: 1 yMinGrad: -6.96433e-08
+-11413.6 -11413
+exp((-input_[id].x - xMin) / gamma_): 2.67865e+59 expMinX: 2.67865e+59 expWeightedMinX: -3.0573e+63
+Gamma: 166.815
+iter = 68, f = 7564.98 2466.68
+1.83175e+08 , overflow ratio = 0.389528
+7564.98 2466.68
+xMaxGrad: 1.00001 xMinGrad: -1.17323e-05 yMaxGrad: 1 yMinGrad: -1.63637e-07
+-8102.4 -10423
+exp((-input_[id].x - xMin) / gamma_): 1.698e+48 expMinX: 1.86862e+54 expWeightedMinX: -1.94766e+58
+Gamma: 166.815
+iter = 69, f = 6343.11 5560.54
+1.91367e+08 , overflow ratio = 0.381833
+6343.11 5560.54
+xMaxGrad: -5.32121e-10 xMinGrad: 1 yMaxGrad: 1 yMinGrad: -6.60802e-12
+-11338.8 -11338
+exp((-input_[id].x - xMin) / gamma_): 1.09114e+59 expMinX: 1.09114e+59 expWeightedMinX: -1.23722e+63
+Gamma: 166.815
+iter = 70, f = 3262.38 4305.95
+2.00037e+08 , overflow ratio = 0.37588
+3262.38 4305.95
+xMaxGrad: -0.00945364 xMinGrad: 1.00945 yMaxGrad: 1 yMinGrad: -4.72323e-25
+-11064.8 -11064
+exp((-input_[id].x - xMin) / gamma_): 4.08594e+57 expMinX: 4.09322e+57 expWeightedMinX: -4.52831e+61
+Gamma: 166.815
+iter = 71, f = 1293.11 1625.11
+2.08152e+08 , overflow ratio = 0.366165
+1293.11 1625.11
+xMaxGrad: 1 xMinGrad: -4.62139e-12 yMaxGrad: 1 yMinGrad: -1.42594e-17
+-8036.52 -12948
+exp((-input_[id].x - xMin) / gamma_): 4.28679e+54 expMinX: 2.63887e+67 expWeightedMinX: -3.41707e+71
+Gamma: 166.815
+iter = 72, f = 3208.83 -1094.25
+2.17637e+08 , overflow ratio = 0.360003
+3208.83 -1094.25
+xMaxGrad: 1 xMinGrad: -1.30928e-08 yMaxGrad: 1 yMinGrad: -1.61062e-16
+-9660.62 -13189
+exp((-input_[id].x - xMin) / gamma_): 3.07502e+59 expMinX: 4.73359e+68 expWeightedMinX: -6.24338e+72
+Gamma: 166.815
+iter = 73, f = 1438.01 -3910.13
+2.2865e+08 , overflow ratio = 0.352898
+1438.01 -3910.13
+xMaxGrad: 1.06974 xMinGrad: -0.069744 yMaxGrad: 1 yMinGrad: -2.20264e-14
+-11945.8 -12532
+exp((-input_[id].x - xMin) / gamma_): 5.33037e+63 expMinX: 1.84404e+65 expWeightedMinX: -2.30784e+69
+Gamma: 166.815
+iter = 74, f = 1742.71 -7222.54
+2.39233e+08 , overflow ratio = 0.344078
+1742.71 -7222.54
+xMaxGrad: 1.08089 xMinGrad: -0.0808887 yMaxGrad: 1 yMinGrad: -1.88509e-14
+-13522.9 -14058
+exp((-input_[id].x - xMin) / gamma_): 6.38956e+71 expMinX: 1.64759e+73 expWeightedMinX: -2.31283e+77
+Gamma: 166.815
+iter = 75, f = -703.352 -9476.81
+2.50445e+08 , overflow ratio = 0.337072
+-703.352 -9476.81
+xMaxGrad: -8.96239e-05 xMinGrad: 1.00009 yMaxGrad: 1.09502 yMinGrad: -0.0950183
+-13409.3 -13409
+exp((-input_[id].x - xMin) / gamma_): 6.60664e+69 expMinX: 6.6067e+69 expWeightedMinX: -8.85908e+73
+Gamma: 166.815
+iter = 76, f = -3255.2 -7343.04
+2.63208e+08 , overflow ratio = 0.329639
+-3255.2 -7343.04
+xMaxGrad: -0.000258623 xMinGrad: 1.00026 yMaxGrad: -1.83028e-12 yMinGrad: 1
+-15154.6 -15154
+exp((-input_[id].x - xMin) / gamma_): 8.0724e+78 expMinX: 8.07262e+78 expWeightedMinX: -1.22337e+83
+Gamma: 166.815
+iter = 77, f = -5871.35 -9397.47
+2.73776e+08 , overflow ratio = 0.320624
+-5871.35 -9397.47
+xMaxGrad: 1.0341 xMinGrad: -0.0340968 yMaxGrad: -3.92778e-11 yMinGrad: 1
+-14968.5 -15211
+exp((-input_[id].x - xMin) / gamma_): 3.7226e+78 expMinX: 1.96813e+79 expWeightedMinX: -2.98475e+83
+Gamma: 166.815
+iter = 78, f = -7413.96 -6450.38
+2.86716e+08 , overflow ratio = 0.311137
+-7413.96 -6450.38
+xMaxGrad: -0.000114445 xMinGrad: 1.00011 yMaxGrad: 1.00026 yMinGrad: -0.000257202
+-16044.2 -16044
+exp((-input_[id].x - xMin) / gamma_): 3.4674e+83 expMinX: 3.46744e+83 expWeightedMinX: -5.56322e+87
+Gamma: 166.815
+iter = 79, f = -8664.05 -9532.95
+3.00436e+08 , overflow ratio = 0.305128
+-8664.05 -9532.95
+xMaxGrad: -2.15774e-07 xMinGrad: 1 yMaxGrad: -0.000942606 yMinGrad: 1.00094
+-19295.6 -19295
+exp((-input_[id].x - xMin) / gamma_): 2.94155e+100 expMinX: 2.94155e+100 expWeightedMinX: -5.67588e+104
+Gamma: 166.815
+iter = 80, f = -6795.41 -6781.01
+3.14856e+08 , overflow ratio = 0.294136
+-6795.41 -6781.01
+xMaxGrad: -1.37615e-07 xMinGrad: 1 yMaxGrad: -0.0030512 yMinGrad: 1.00305
+-22472.2 -22472
+exp((-input_[id].x - xMin) / gamma_): 1.02343e+117 expMinX: 1.02343e+117 expWeightedMinX: -2.29988e+121
+Gamma: 166.815
+iter = 81, f = -9014.07 -9259.42
+3.30413e+08 , overflow ratio = 0.286641
+-9014.07 -9259.42
+xMaxGrad: 1 xMinGrad: -5.93746e-08 yMaxGrad: -6.4691e-07 yMinGrad: 1
+-19411.3 -22674
+exp((-input_[id].x - xMin) / gamma_): 3.69052e+109 expMinX: 1.15365e+118 expWeightedMinX: -2.61582e+122
+Gamma: 166.815
+iter = 82, f = -6612.52 -6957.79
+3.46238e+08 , overflow ratio = 0.277456
+-6612.52 -6957.79
+xMaxGrad: -4.2047e-05 xMinGrad: 1.00004 yMaxGrad: 1.01256 yMinGrad: -0.0125575
+-22363.1 -22363
+exp((-input_[id].x - xMin) / gamma_): 2.76721e+116 expMinX: 2.76722e+116 expWeightedMinX: -6.18834e+120
+Gamma: 166.815
+iter = 83, f = -9700.98 -8193.25
+3.63222e+08 , overflow ratio = 0.265789
+-9700.98 -8193.25
+xMaxGrad: 1 xMinGrad: -2.8595e-09 yMaxGrad: -0.00863953 yMinGrad: 1.00864
+-19037.1 -22832
+exp((-input_[id].x - xMin) / gamma_): 1.00951e+109 expMinX: 7.67938e+118 expWeightedMinX: -1.7534e+123
+Gamma: 166.815
+iter = 84, f = -6480.48 -7360.58
+3.79631e+08 , overflow ratio = 0.256746
+-6480.48 -7360.58
+xMaxGrad: -2.24088e-05 xMinGrad: 1.00002 yMaxGrad: 1.00603 yMinGrad: -0.00603386
+-21719.2 -21719
+exp((-input_[id].x - xMin) / gamma_): 1.22809e+113 expMinX: 1.22809e+113 expWeightedMinX: -2.66732e+117
+Gamma: 166.815
+iter = 85, f = -3162.46 -7124.66
+3.97804e+08 , overflow ratio = 0.248638
+-3162.46 -7124.66
+xMaxGrad: -2.73844e-21 xMinGrad: 1 yMaxGrad: -0.0490356 yMinGrad: 1.04904
+-25000.5 -25000
+exp((-input_[id].x - xMin) / gamma_): 1.49206e+130 expMinX: 1.49206e+130 expWeightedMinX: -3.73021e+134
+Gamma: 166.815
+iter = 86, f = -3529.18 -10430.8
+4.1842e+08 , overflow ratio = 0.24073
+-3529.18 -10430.8
+xMaxGrad: -6.15537e-05 xMinGrad: 1.00006 yMaxGrad: -0.00041042 yMinGrad: 1.00041
+-21675.6 -21675
+exp((-input_[id].x - xMin) / gamma_): 7.26429e+112 expMinX: 7.26433e+112 expWeightedMinX: -1.57459e+117
+Gamma: 166.815
+iter = 87, f = -1146.96 -12752.4
+4.37733e+08 , overflow ratio = 0.229792
+-1146.96 -12752.4
+xMaxGrad: -5.27264e-21 xMinGrad: 1 yMaxGrad: -0.0831985 yMinGrad: 1.0832
+-24773.5 -24773
+exp((-input_[id].x - xMin) / gamma_): 9.81278e+128 expMinX: 9.81278e+128 expWeightedMinX: -2.43097e+133
+Gamma: 166.815
+iter = 88, f = -1701.03 -9472.48
+4.61648e+08 , overflow ratio = 0.223823
+-1701.03 -9472.48
+xMaxGrad: -5.02481e-21 xMinGrad: 1 yMaxGrad: -0.0872519 yMinGrad: 1.08725
+-27370.6 -27370
+exp((-input_[id].x - xMin) / gamma_): 3.26919e+142 expMinX: 3.26919e+142 expWeightedMinX: -8.94796e+146
+Gamma: 166.815
+iter = 89, f = 626.33 -7095.86
+4.84692e+08 , overflow ratio = 0.214514
+626.33 -7095.86
+xMaxGrad: -6.57633e-17 xMinGrad: 1 yMaxGrad: 1 yMinGrad: -1.86412e-08
+-24159.9 -24159
+exp((-input_[id].x - xMin) / gamma_): 6.25066e+125 expMinX: 6.25066e+125 expWeightedMinX: -1.51015e+130
+Gamma: 166.815
+iter = 90, f = 3687.68 -5794.68
+5.08972e+08 , overflow ratio = 0.207708
+3687.68 -5794.68
+xMaxGrad: -1.61425e-24 xMinGrad: 1 yMaxGrad: 1 yMinGrad: -3.05204e-14
+-27329.2 -27329
+exp((-input_[id].x - xMin) / gamma_): 1.99453e+142 expMinX: 1.99453e+142 expWeightedMinX: -5.4509e+146
+Gamma: 166.815
+iter = 91, f = 3671.29 -9121.04
+5.36541e+08 , overflow ratio = 0.199482
+3671.29 -9121.04
+xMaxGrad: -4.55908e-31 xMinGrad: -nan yMaxGrad: 1 yMinGrad: -1.49207e-06
+-30652.2 -30652
+exp((-input_[id].x - xMin) / gamma_): 4.00351e+159 expMinX: 4.00351e+159 expWeightedMinX: -1.22717e+164
+Gamma: 166.815
+iter = 92, f = -nan -nan
+i: 0
+j: -2147483648 k: -2147483648
