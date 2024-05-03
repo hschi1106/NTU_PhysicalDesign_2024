@@ -7,6 +7,10 @@ Optimizer.cpp
 Optimizer.h
 Point.h -> 應該不用動
 gradient descent
+
 ./bin/place -aux ./benchmark/ibm01/ibm01-cu85.aux
+./bin/place -aux ./benchmark/ibm05/ibm05.aux
 perl check_density_target.pl ./benchmark/ibm01/ibm01.nodes ibm01-cu85.gp.pl ./benchmark/ibm01/ibm01-cu85.scl
 python plot.py ./benchmark/ibm01/ibm01.nodes ./ibm01-cu85.gp.pl
+python plot.py ./benchmark/ibm05/ibm05.nodes ./ibm05.gp.pl
+bash evaluator/evaluator.sh ./benchmark/ibm01/ibm01-cu85.aux 

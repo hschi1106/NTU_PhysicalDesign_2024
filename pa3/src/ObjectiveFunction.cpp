@@ -108,7 +108,7 @@ const std::vector<Point2<double>> &Wirelength::Backward()
     return grad_;
 }
 
-Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement), binSize_(50)
+Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement), binSize_(100)
 {
     // resize the vector to widthBinNum_ * heightBinNum_ to store the density and gradient
     int outLineWidth = placement.boundryRight() - placement.boundryLeft();
@@ -129,12 +129,12 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
     }
 
     // calculate the target density of the bin
-    int totalArea = 0, moduleNum = placement.numModules();
+    int moduleNum = placement.numModules();
     for (int i = 0; i < moduleNum; ++i)
     {
-        totalArea += placement.module(i).width() * placement.module(i).height();
+        mb_ += placement.module(i).width() * placement.module(i).height() / (outLineWidth * outLineHeight);
     }
-    mb_ = (double)totalArea / (outLineWidth * outLineHeight);
+    mb_ = 2;
 }
 
 const double &Density::operator()(const std::vector<Point2<double>> &input)
@@ -142,8 +142,6 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
     // Compute the value of the density function
 
     // Initialize the value of the density function
-    cout << "start" << endl;
-
     value_ = 0;
     overflowRatio_ = 0;
     for (int i = 0; i < widthBinNum_; ++i)
@@ -165,8 +163,10 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
         {
             for (int k = startBinY; k <= endBinY; ++k)
             {
-                double inputX = input[i].x - placement_.boundryLeft() + moduleWidth - j * binSize_;
-                double inputY = input[i].y - placement_.boundryBottom() + moduleHeight - k * binSize_;
+                // double inputX = input[i].x - placement_.boundryLeft() + moduleWidth - j * binSize_;
+                // double inputY = input[i].y - placement_.boundryBottom() + moduleHeight - k * binSize_;
+                double inputX = abs((input[i].x - placement_.boundryLeft() + moduleWidth / 2) - (j * binSize_ + binSize_ / 2));
+                double inputY = abs((input[i].y - placement_.boundryBottom() + moduleHeight / 2) - (k * binSize_ + binSize_ / 2));
                 double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
                 double ay = 4 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2 / binSize_ / (moduleHeight + 4 * binSize_);
                 double Px, Py;
@@ -209,7 +209,7 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
         for (int j = 0; j < heightBinNum_; ++j)
         {
             value_ += (binDensity_[i][j] - mb_) * (binDensity_[i][j] - mb_);
-            overflowRatio_ += binDensity_[i][j] > mb_ ? binDensity_[i][j] - mb_ : 0;
+            overflowRatio_ += max(0.0, binDensity_[i][j] - mb_);
         }
     }
 
@@ -243,8 +243,10 @@ const std::vector<Point2<double>> &Density::Backward()
         {
             for (int k = startBinY; k <= endBinY; ++k)
             {
-                double inputX = input_[i].x - placement_.boundryLeft() + moduleWidth - j * binSize_;
-                double inputY = input_[i].y - placement_.boundryBottom() + moduleHeight - k * binSize_;
+                // double inputX = input_[i].x - placement_.boundryLeft() + moduleWidth - j * binSize_;
+                // double inputY = input_[i].y - placement_.boundryBottom() + moduleHeight - k * binSize_;
+                double inputX = (input_[i].x - placement_.boundryLeft() + moduleWidth / 2) - (j * binSize_ + binSize_ / 2);
+                double inputY = (input_[i].y - placement_.boundryBottom() + moduleHeight / 2) - (k * binSize_ + binSize_ / 2);
                 double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
                 double ay = 4 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2 / binSize_ / (moduleHeight + 4 * binSize_);
                 double Px, Py, dPx, dPy;
@@ -290,7 +292,7 @@ const std::vector<Point2<double>> &Density::Backward()
                     }
                     else
                     {
-                        dPx = 2 * bx * (-inputX - moduleWidth / 2 - 2 * binSize_);
+                        dPx = -2 * bx * (inputX - moduleWidth / 2 - 2 * binSize_);
                     }
                 }
                 else
@@ -311,7 +313,7 @@ const std::vector<Point2<double>> &Density::Backward()
                     }
                     else
                     {
-                        dPy = 2 * by * (-inputY - moduleHeight / 2 - 2 * binSize_);
+                        dPy = -2 * by * (inputY - moduleHeight / 2 - 2 * binSize_);
                     }
                 }
                 else
@@ -358,7 +360,7 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
             wirelengthGradNorm += sqrt(wirelengthGrad[i].x * wirelengthGrad[i].x + wirelengthGrad[i].y * wirelengthGrad[i].y);
             densityGradNorm += sqrt(densityGrad[i].x * densityGrad[i].x + densityGrad[i].y * densityGrad[i].y);
         }
-        lambda_ = wirelengthGradNorm / densityGradNorm;
+        lambda_ = wirelengthGradNorm / densityGradNorm * 0.9;
     }
     else
     {

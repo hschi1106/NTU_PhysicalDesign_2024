@@ -72,3 +72,16 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     main(args.node_file, args.pl_file)
+
+
+# import matplotlib.pyplot as plt
+# import numpy as np
+
+# t = np.linspace(0, 2*np.pi, 100)
+# x = 16 * np.sin(t)**3
+# y = 13 * np.cos(t) - 5 * np.cos(2*t) - 2 * np.cos(3*t) - np.cos(4*t)
+
+# plt.fill(x, y, 'red')
+# plt.axis('equal')
+# plt.show()
+

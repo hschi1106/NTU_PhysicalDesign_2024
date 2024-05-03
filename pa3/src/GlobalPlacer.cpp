@@ -40,11 +40,40 @@ void GlobalPlacer::place()
 
     // Perform optimization, the termination condition is that the number of iterations reaches 100
     // TODO: You may need to change the termination condition, which is determined by the overflow ratio.
-    for (size_t i = 0; i < 30; ++i)
+    for (size_t i = 0; i < 50; ++i)
     {
         optimizer.Step();
         printf("iter = %3lu, f = %9.4f\n", i, foo(t));
         cout << "overflow ratio = " << foo.getOverflowRatio() << endl;
+
+        // deal with out of bound blocks
+        int outLineWidth = _placement.boundryRight() - _placement.boundryLeft(), outLineHeight = _placement.boundryTop() - _placement.boundryBottom();
+        for (int j = 0; j < moduleNum; ++j)
+        {
+            if (t[j].x < _placement.boundryLeft())
+            {
+                t[j].x = _placement.boundryLeft() + (rand() % (int)(outLineWidth * 0.1));
+            }
+            else if (t[j].x > _placement.boundryRight() - _placement.module(j).width())
+            {
+                t[j].x = _placement.boundryRight() - _placement.module(j).width() - (rand() % (int)(outLineWidth * 0.1));
+            }
+
+            if (t[j].y < _placement.boundryBottom())
+            {
+                t[j].y = _placement.boundryBottom() + (rand() % (int)(outLineHeight * 0.1));
+            }
+            else if (t[j].y > _placement.boundryTop() - _placement.module(j).height())
+            {
+                t[j].y = _placement.boundryTop() - _placement.module(j).height() - (rand() % (int)(outLineHeight * 0.1));
+            }
+        }
+
+
+        if (foo.getOverflowRatio() <= 0.05)
+        {
+            break;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////
