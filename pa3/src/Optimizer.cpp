@@ -58,7 +58,8 @@ void SimpleConjugateGradient::Step() {
     // Update the solution
     // Please be aware of the updating directions, i.e., the sign for each term.
     for (size_t i = 0; i < kNumModule; ++i) {
-        var_[i] = var_[i] + alpha_ * dir[i];
+        double stepSize = alpha_ / Norm2(dir[i]);
+        var_[i] = var_[i] + stepSize * dir[i];
     }
 
     // Update the cache data members

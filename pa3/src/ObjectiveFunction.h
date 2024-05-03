@@ -87,7 +87,7 @@ public:
     // Constructors
     /////////////////////////////////
 
-    Wirelength(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement){};
+    Wirelength(Placement &placement);
 
     /////////////////////////////////
     // Methods
@@ -102,8 +102,7 @@ private:
     /////////////////////////////////
 
     std::vector<Point2<double>> input_; // Cache the input for backward pass
-    std::vector<Point2<double>> posExpValue_;
-    std::vector<Point2<double>> negExpValue_;
+    double gamma_;
     Placement &placement_;
 };
 

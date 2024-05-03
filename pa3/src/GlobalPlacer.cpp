@@ -24,7 +24,7 @@ void GlobalPlacer::place()
     int moduleNum = _placement.numModules();
     std::vector<Point2<double>> t(moduleNum);          // Optimization variables (in this example, there is only one t)
     ObjectiveFunction foo(_placement);                 // Objective function
-    const double kAlpha = 0.01;                        // Constant step size
+    const double kAlpha = 1000;                          // Constant step size
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
 
     // Set initial point
@@ -40,11 +40,12 @@ void GlobalPlacer::place()
 
     // Perform optimization, the termination condition is that the number of iterations reaches 100
     // TODO: You may need to change the termination condition, which is determined by the overflow ratio.
-    for (size_t i = 0; i < 50; ++i)
+    int iterNum = 0;
+    while(true)
     {
+        iterNum++;
         optimizer.Step();
-        printf("iter = %3lu, f = %9.4f\n", i, foo(t));
-        cout << "overflow ratio = " << foo.getOverflowRatio() << endl;
+        cout << "iter = " << iterNum << ", f = " << foo(t) << " overflow ratio = " << foo.getOverflowRatio() << endl;
 
         // deal with out of bound blocks
         int outLineWidth = _placement.boundryRight() - _placement.boundryLeft(), outLineHeight = _placement.boundryTop() - _placement.boundryBottom();
@@ -68,7 +69,6 @@ void GlobalPlacer::place()
                 t[j].y = _placement.boundryTop() - _placement.module(j).height() - (rand() % (int)(outLineHeight * 0.1));
             }
         }
-
 
         if (foo.getOverflowRatio() <= 0.05)
         {

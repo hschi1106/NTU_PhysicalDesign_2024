@@ -2,7 +2,8 @@
 
 #include "cstdio"
 
-#include "cassert"
+#include <cassert>
+#include <climits>
 
 ExampleFunction::ExampleFunction(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
 {
@@ -29,41 +30,51 @@ const std::vector<Point2<double>> &ExampleFunction::Backward()
     return grad_;
 }
 
+Wirelength::Wirelength(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
+{
+    gamma_ = max(placement_.boundryRight() - placement_.boundryLeft(), placement_.boundryTop() - placement_.boundryBottom()) * 0.005;
+}
+
 const double &Wirelength::operator()(const std::vector<Point2<double>> &input)
 {
     // Compute the value of the wirelength function
-    double gamma = max(placement_.boundryRight() - placement_.boundryLeft(), placement_.boundryTop() - placement_.boundryBottom()) / 100;
     value_ = 0; // Initialize the value of the wirelength function
     int netNum = placement_.numNets();
-    int moduleNum = placement_.numModules();
 
-    // resize the vector to store the exp value
-    posExpValue_.resize(input.size());
-    negExpValue_.resize(input.size());
-
-    for (int i = 0; i < moduleNum; ++i)
-    {
-        posExpValue_[i].x = exp(input[i].x / gamma);
-        posExpValue_[i].y = exp(input[i].y / gamma);
-        negExpValue_[i].x = exp(-input[i].x / gamma);
-        negExpValue_[i].y = exp(-input[i].y / gamma);
-    }
     for (int i = 0; i < netNum; ++i)
     {
-        double expMaxX = 0, expMinX = 0, expMaxY = 0, expMinY = 0;
         Net net = placement_.net(i);
         int pinNum = net.numPins();
+
+        // set xMax, yMax
+        int xMax = INT_MIN, yMax = INT_MIN;
         for (int j = 0; j < pinNum; ++j)
         {
             Pin pin = net.pin(j);
             int id = pin.moduleId();
-            expMaxX += posExpValue_[id].x;
-            expMinX += negExpValue_[id].x;
-            expMaxY += posExpValue_[id].y;
-            expMinY += negExpValue_[id].y;
+            xMax = max(xMax, int(input[id].x));
+            yMax = max(yMax, int(input[id].y));
         }
-        value_ += log(expMaxX) + log(expMinX) + log(expMaxY) + log(expMinY);
+
+        // count the exp value
+        double expWeightedMaxX = 0, expWeightedMinX = 0, expWeightedMaxY = 0, expWeightedMinY = 0;
+        double expMaxX = 0, expMinX = 0, expMaxY = 0, expMinY = 0;
+        for (int j = 0; j < pinNum; ++j)
+        {
+            Pin pin = net.pin(j);
+            int id = pin.moduleId();
+            expWeightedMaxX += exp((input[id].x - xMax) / gamma_) * input[id].x;
+            expWeightedMinX += exp(-(input[id].x - xMax) / gamma_) * input[id].x;
+            expWeightedMaxY += exp((input[id].y - yMax) / gamma_) * input[id].y;
+            expWeightedMinY += exp(-(input[id].y - yMax) / gamma_) * input[id].y;
+            expMaxX += exp((input[id].x - xMax) / gamma_);
+            expMinX += exp(-(input[id].x - xMax) / gamma_);
+            expMaxY += exp((input[id].y - yMax) / gamma_);
+            expMinY += exp(-(input[id].y - yMax) / gamma_);
+        }
+        value_ += expWeightedMaxX / expMaxX - expWeightedMinX / expMinX + expWeightedMaxY / expMaxY - expWeightedMinY / expMinY;
     }
+
     input_ = input;
 
     return value_;
@@ -84,24 +95,47 @@ const std::vector<Point2<double>> &Wirelength::Backward()
     // calculate the gradient
     for (int i = 0; i < netNum; ++i)
     {
-        double sigmaPosExpX = 0, sigmaNegExpX = 0, sigmaPosExpY = 0, sigmaNegExpY = 0;
         Net net = placement_.net(i);
         int pinNum = net.numPins();
+
+        // set xMax, yMax
+        int xMax = INT_MIN, yMax = INT_MIN;
         for (int j = 0; j < pinNum; ++j)
         {
             Pin pin = net.pin(j);
             int id = pin.moduleId();
-            sigmaPosExpX += posExpValue_[id].x;
-            sigmaNegExpX += negExpValue_[id].x;
-            sigmaPosExpY += posExpValue_[id].y;
-            sigmaNegExpY += negExpValue_[id].y;
+            xMax = max(xMax, int(input_[id].x));
+            yMax = max(yMax, int(input_[id].y));
         }
+
+        // count the exp value
+        double expWeightedMaxX = 0, expWeightedMinX = 0, expWeightedMaxY = 0, expWeightedMinY = 0;
+        double expMaxX = 0, expMinX = 0, expMaxY = 0, expMinY = 0;
         for (int j = 0; j < pinNum; ++j)
         {
             Pin pin = net.pin(j);
             int id = pin.moduleId();
-            grad_[id].x += posExpValue_[id].x / sigmaPosExpX - negExpValue_[id].x / sigmaNegExpX;
-            grad_[id].y += posExpValue_[id].y / sigmaPosExpY - negExpValue_[id].y / sigmaNegExpY;
+            expWeightedMaxX += exp((input_[id].x - xMax) / gamma_) * input_[id].x;
+            expWeightedMinX += exp(-(input_[id].x - xMax) / gamma_) * input_[id].x;
+            expWeightedMaxY += exp((input_[id].y - yMax) / gamma_) * input_[id].y;
+            expWeightedMinY += exp(-(input_[id].y - yMax) / gamma_) * input_[id].y;
+            expMaxX += exp((input_[id].x - xMax) / gamma_);
+            expMinX += exp(-(input_[id].x - xMax) / gamma_);
+            expMaxY += exp((input_[id].y - yMax) / gamma_);
+            expMinY += exp(-(input_[id].y - yMax) / gamma_);
+        }
+
+        // calculate the gradient
+        for (int j = 0; j < pinNum; ++j)
+        {
+            Pin pin = net.pin(j);
+            int id = pin.moduleId();
+            double xMaxGrad = ((1 + input_[id].x / gamma_) * exp((input_[id].x - xMax) / gamma_) * expMaxX - expWeightedMaxX / gamma_ * exp((input_[id].x - xMax) / gamma_)) / expMaxX / expMaxX;
+            double xMinGrad = ((1 - input_[id].x / gamma_) * exp(-(input_[id].x - xMax) / gamma_) * expMinX + expWeightedMinX / gamma_ * exp(-(input_[id].x - xMax) / gamma_)) / expMinX / expMinX;
+            double yMaxGrad = ((1 + input_[id].y / gamma_) * exp((input_[id].y - yMax) / gamma_) * expMaxY - expWeightedMaxY / gamma_ * exp((input_[id].y - yMax) / gamma_)) / expMaxY / expMaxY;
+            double yMinGrad = ((1 - input_[id].y / gamma_) * exp(-(input_[id].y - yMax) / gamma_) * expMinY + expWeightedMinY / gamma_ * exp(-(input_[id].y - yMax) / gamma_)) / expMinY / expMinY;
+            grad_[id].x += xMaxGrad - xMinGrad;
+            grad_[id].y += yMaxGrad - yMinGrad;
         }
     }
 
