@@ -17,4 +17,4 @@ gradient descent
 perl check_density_target.pl ./benchmark/ibm01/ibm01.nodes ibm01-cu85.gp.pl ./benchmark/ibm01/ibm01-cu85.scl
 python plot_ibm01.py ./benchmark/ibm01/ibm01.nodes ./ibm01-cu85.gp.pl
 python plot_ibm05.py ./benchmark/ibm05/ibm05.nodes ./ibm05.gp.pl
-bash evaluator/evaluator.sh ./benchmark/ibm01/ibm01-cu85.aux 
+bash evaluator/evaluator.sh ./benchmark/ibm01/ibm01-cu85.aux

@@ -22,21 +22,37 @@ void GlobalPlacer::place()
     // If you use other methods, you can skip and delete it directly.
     ////////////////////////////////////////////////////////////////////
     int moduleNum = _placement.numModules();
-    int outLineWidth = _placement.boundryRight() - _placement.boundryLeft();
-    int outLineHeight = _placement.boundryTop() - _placement.boundryBottom();
     std::vector<Point2<double>> t(moduleNum);          // Optimization variables (in this example, there is only one t)
     ObjectiveFunction foo(_placement);                 // Objective function
-    const double kAlpha = foo.getBinSize() * 5;        // Constant step size
+    const double kAlpha = foo.getBinSize() * 10;       // Constant step size
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
+
+    // find the median of pinNum
+    vector<int> pinNum;
+    for (int i = 0; i < moduleNum; ++i)
+    {
+        pinNum.push_back(_placement.module(i).numPins());
+    }
+    sort(pinNum.begin(), pinNum.end());
+    int medianPinNum = pinNum[pinNum.size() / 2];
 
     // Set initial point
     for (int i = 0; i < moduleNum; ++i)
     {
-        // randomly place at +-1 percent of the center
+        // if pinNum < median,  place at -2.5 ~ -7.5 of the center
+        // if pinNum > median,  place at 2.5 ~ 7.5 of the center
         double midX = (_placement.boundryLeft() + _placement.boundryRight()) / 2;
         double midY = (_placement.boundryBottom() + _placement.boundryTop()) / 2;
-        t[i].x = midX + (rand() % (int)(outLineWidth * 0.02)) - outLineWidth * 0.01;
-        t[i].y = midY + (rand() % (int)(outLineHeight * 0.02)) - outLineHeight * 0.01;
+        if (int(_placement.module(i).numPins()) < medianPinNum)
+        {
+            t[i].x = midX + double(rand()) / RAND_MAX * 5 - 7.5;
+            t[i].y = midY + double(rand()) / RAND_MAX * 5 - 7.5;
+        }
+        else
+        {
+            t[i].x = midX + double(rand()) / RAND_MAX * 5 + 2.5;
+            t[i].y = midY + double(rand()) / RAND_MAX * 5 + 2.5;
+        }
     }
 
     // Initialize the optimizer
@@ -51,30 +67,7 @@ void GlobalPlacer::place()
         optimizer.Step();
         cout << "iter = " << iterNum << ", f = " << foo(t) << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
-        // deal with out of bound blocks
-        // int outLineWidth = _placement.boundryRight() - _placement.boundryLeft(), outLineHeight = _placement.boundryTop() - _placement.boundryBottom();
-        // for (int j = 0; j < moduleNum; ++j)
-        // {
-        //     if (t[j].x < _placement.boundryLeft())
-        //     {
-        //         t[j].x = _placement.boundryLeft() + (rand() % (int)(outLineWidth * 0.1));
-        //     }
-        //     else if (t[j].x > _placement.boundryRight() - _placement.module(j).width())
-        //     {
-        //         t[j].x = _placement.boundryRight() - _placement.module(j).width() - (rand() % (int)(outLineWidth * 0.1));
-        //     }
-
-        //     if (t[j].y < _placement.boundryBottom())
-        //     {
-        //         t[j].y = _placement.boundryBottom() + (rand() % (int)(outLineHeight * 0.1));
-        //     }
-        //     else if (t[j].y > _placement.boundryTop() - _placement.module(j).height())
-        //     {
-        //         t[j].y = _placement.boundryTop() - _placement.module(j).height() - (rand() % (int)(outLineHeight * 0.1));
-        //     }
-        // }
-
-        if (foo.getOverflowRatio() <= 0.03)
+        if (foo.getOverflowRatio() <= 0.015 || iterNum > 1500)
         {
             break;
         }
@@ -87,6 +80,8 @@ void GlobalPlacer::place()
     // TODO: Implement your global placement algorithm here.
     const size_t num_modules = _placement.numModules(); // You may modify this line.
     std::vector<Point2<double>> positions(num_modules); // Optimization variables (positions of modules). You may modify this line.
+
+    // deal with out of bound blocks
     for (size_t i = 0; i < num_modules; ++i)
     {
         if (t[i].x < _placement.boundryLeft())

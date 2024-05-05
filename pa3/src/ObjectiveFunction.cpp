@@ -181,7 +181,8 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
     {
         mb_ += placement.module(i).width() * placement.module(i).height() / outLineWidth / outLineHeight;
     }
-    mb_ *= 2;
+    mb_ *= 2.7;
+    cout << "mb: " << mb_ << endl;
 }
 
 const double &Density::operator()(const std::vector<Point2<double>> &input)
