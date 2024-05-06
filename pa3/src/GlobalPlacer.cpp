@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <vector>
+#include <map>
 
 #include "ObjectiveFunction.h"
 #include "Optimizer.h"
@@ -24,26 +25,41 @@ void GlobalPlacer::place()
     int moduleNum = _placement.numModules();
     std::vector<Point2<double>> t(moduleNum);          // Optimization variables (in this example, there is only one t)
     ObjectiveFunction foo(_placement);                 // Objective function
-    const double kAlpha = foo.getBinSize() * 10;       // Constant step size
+    const double kAlpha = foo.getBinSize() * 8;        // Constant step size
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
 
-    // find the median of pinNum
-    vector<int> pinNum;
-    for (int i = 0; i < moduleNum; ++i)
+    // traverse all nets to determine the initial partition
+    vector<int> initPlacePart(_placement.numModules(), 0);
+    int netNum = _placement.numNets(), countAtOne = 0;
+    for (int i = 0; i < netNum; ++i)
     {
-        pinNum.push_back(_placement.module(i).numPins());
-    }
-    sort(pinNum.begin(), pinNum.end());
-    int medianPinNum = pinNum[pinNum.size() / 2];
+        Net &net = _placement.net(i);
+        int pinNum = net.numPins();
+        // traverse all pins in the net
+        for (int j = 0; j < pinNum; ++j)
+        {
+            Pin &pin = net.pin(j);
+            int moduleId = pin.moduleId();
+            if (initPlacePart[moduleId] == 0)
+            {
+                countAtOne++;
+            }
+            initPlacePart[moduleId] = 1;
+        }
 
-    // Set initial point
+        // if the number of modules in partition 1 is greater than half of the total number of modules, then break
+        if (countAtOne >= moduleNum / 2)
+        {
+            break;
+        }
+    }
+
+    // Set initial positions
     for (int i = 0; i < moduleNum; ++i)
     {
-        // if pinNum < median,  place at -2.5 ~ -7.5 of the center
-        // if pinNum > median,  place at 2.5 ~ 7.5 of the center
         double midX = (_placement.boundryLeft() + _placement.boundryRight()) / 2;
         double midY = (_placement.boundryBottom() + _placement.boundryTop()) / 2;
-        if (int(_placement.module(i).numPins()) < medianPinNum)
+        if (initPlacePart[i] == 0)
         {
             t[i].x = midX + double(rand()) / RAND_MAX * 5 - 7.5;
             t[i].y = midY + double(rand()) / RAND_MAX * 5 - 7.5;
@@ -61,15 +77,27 @@ void GlobalPlacer::place()
     // Perform optimization, the termination condition is that the number of iterations reaches 100
     // TODO: You may need to change the termination condition, which is determined by the overflow ratio.
     int iterNum = 0;
+    double lastOverflowRatio = 100;
     while (true)
     {
         iterNum++;
         optimizer.Step();
-        cout << "iter = " << iterNum << ", f = " << foo(t) << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
+        // cout << "iter = " << iterNum << ", f = " << foo(t) << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
-        if (foo.getOverflowRatio() <= 0.015 || iterNum > 1500)
+        // Termination condition
+        if (foo.getOverflowRatio() <= 0.015 || iterNum >= 3000)
         {
             break;
+        }
+
+        // If the overflow ratio does not decrease, the optimization will be terminated
+        if (iterNum % 100 == 0)
+        {
+            if (lastOverflowRatio - foo.getOverflowRatio() < 0.001 || lastOverflowRatio < foo.getOverflowRatio())
+            {
+                break;
+            }
+            lastOverflowRatio = foo.getOverflowRatio();
         }
     }
 

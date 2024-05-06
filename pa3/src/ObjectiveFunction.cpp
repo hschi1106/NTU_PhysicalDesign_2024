@@ -131,7 +131,7 @@ const std::vector<Point2<double>> &Wirelength::Backward()
             expWeightedMaxY += exp((input_[id].y - yMax) / gamma_) * input_[id].y;
             expWeightedMinY += exp((-input_[id].y + yMin) / gamma_) * input_[id].y;
             expMaxX += exp((input_[id].x - xMax) / gamma_);
-            expMinX += exp((-input_[id].x + xMin)/ gamma_);
+            expMinX += exp((-input_[id].x + xMin) / gamma_);
             expMaxY += exp((input_[id].y - yMax) / gamma_);
             expMinY += exp((-input_[id].y + yMin) / gamma_);
         }
@@ -393,6 +393,11 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
     densityGrad = density_.Backward();
     int moduleNum = placement_.numModules();
 
+    if (this->getOverflowRatio() < 0.2)
+    {
+        spreadEnough_ = true;
+    }
+
     if (iterNum_ == 0)
     {
         double wirelengthGradNorm = 0, densityGradNorm = 0;
@@ -403,7 +408,7 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
         }
         lambda_ = wirelengthGradNorm / densityGradNorm * 0.8;
     }
-    else
+    else if (!spreadEnough_)
     {
         lambda_ *= 1.1;
     }

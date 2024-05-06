@@ -167,7 +167,7 @@ public:
     // Constructors
     /////////////////////////////////
     ObjectiveFunction(Placement &placement)
-        : BaseFunction(placement.numModules()), placement_(placement), iterNum_(0), wirelength_(placement), density_(placement)
+        : BaseFunction(placement.numModules()), placement_(placement), iterNum_(0), wirelength_(placement), density_(placement), spreadEnough_(false)
     {
     }
 
@@ -196,6 +196,7 @@ private:
     double lambda_;
     Wirelength wirelength_;
     Density density_;
+    bool spreadEnough_;
 };
 
 #endif // OBJECTIVEFUNCTION_H
