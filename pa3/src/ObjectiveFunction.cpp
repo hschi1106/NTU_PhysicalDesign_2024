@@ -5,40 +5,16 @@
 #include <cassert>
 #include <climits>
 
-ExampleFunction::ExampleFunction(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
-{
-    printf("Fetch the information you need from placement database.\n");
-    printf("For example:\n");
-    printf("    Placement boundary: (%.f,%.f)-(%.f,%.f)\n", placement_.boundryLeft(), placement_.boundryBottom(),
-           placement_.boundryRight(), placement_.boundryTop());
-}
-
-const double &ExampleFunction::operator()(const std::vector<Point2<double>> &input)
-{
-    // Compute the value of the function
-    value_ = 3. * input[0].x * input[0].x + 2. * input[0].x * input[0].y +
-             2. * input[0].y * input[0].y + 7.;
-    input_ = input;
-    return value_;
-}
-
-const std::vector<Point2<double>> &ExampleFunction::Backward()
-{
-    // Compute the gradient of the function
-    grad_[0].x = 6. * input_[0].x + 2. * input_[0].y;
-    grad_[0].y = 2. * input_[0].x + 4. * input_[0].y;
-    return grad_;
-}
-
 Wirelength::Wirelength(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
 {
+    // Initialize the gamma value
     gamma_ = max(placement_.boundryRight() - placement_.boundryLeft(), placement_.boundryTop() - placement_.boundryBottom()) * 0.0025;
 }
 
 const double &Wirelength::operator()(const std::vector<Point2<double>> &input)
 {
     // Compute the value of the wirelength function
-    value_ = 0; // Initialize the value of the wirelength function
+    value_ = 0;
     int netNum = placement_.numNets();
 
     for (int i = 0; i < netNum; ++i)
@@ -57,6 +33,8 @@ const double &Wirelength::operator()(const std::vector<Point2<double>> &input)
             xMin = min(xMin, int(input[id].x));
             yMin = min(yMin, int(input[id].y));
         }
+
+        // minus or add 200 for precision
         xMax -= 200;
         yMax -= 200;
         xMin += 200;
@@ -78,10 +56,14 @@ const double &Wirelength::operator()(const std::vector<Point2<double>> &input)
             expMaxY += exp((input[id].y - yMax) / gamma_);
             expMinY += exp((-input[id].y + yMin) / gamma_);
         }
+
+        // calculate the wirelength
         value_ += expWeightedMaxX / expMaxX - expWeightedMinX / expMinX + expWeightedMaxY / expMaxY - expWeightedMinY / expMinY;
     }
 
+    // store the input
     input_ = input;
+
     return value_;
 }
 
@@ -90,14 +72,14 @@ const std::vector<Point2<double>> &Wirelength::Backward()
     // Compute the gradient of the function
     int netNum = placement_.numNets();
 
-    // initialize the gradient
+    // initialize the wirelength gradient
     for (size_t i = 0; i < grad_.size(); ++i)
     {
         grad_[i].x = 0;
         grad_[i].y = 0;
     }
 
-    // calculate the gradient
+    // calculate the wirelength gradient
     for (int i = 0; i < netNum; ++i)
     {
         Net net = placement_.net(i);
@@ -114,6 +96,8 @@ const std::vector<Point2<double>> &Wirelength::Backward()
             xMin = min(xMin, int(input_[id].x));
             yMin = min(yMin, int(input_[id].y));
         }
+
+        // minus or add 200 for precision
         xMax -= 200;
         yMax -= 200;
         xMin += 200;
@@ -155,12 +139,14 @@ const std::vector<Point2<double>> &Wirelength::Backward()
 
 Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
 {
-    // resize the vector to widthBinNum_ * heightBinNum_ to store the density and gradient
+    // Initialize the bin size and the number of bins
     int outLineWidth = placement.boundryRight() - placement.boundryLeft();
     int outLineHeight = placement.boundryTop() - placement.boundryBottom();
     binSize_ = min(outLineWidth, outLineHeight) / 1000;
     widthBinNum_ = outLineWidth / binSize_;
     heightBinNum_ = outLineHeight / binSize_;
+
+    // resize the vector to widthBinNum_ * heightBinNum_ to store the density and gradient
     binDensity_.resize(widthBinNum_);
     binDensityGrad_.resize(widthBinNum_);
     for (int i = 0; i < widthBinNum_; ++i)
@@ -181,14 +167,14 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
     {
         mb_ += placement.module(i).width() * placement.module(i).height() / outLineWidth / outLineHeight;
     }
-    mb_ *= 2.7;
-    cout << "mb: " << mb_ << endl;
+    mb_ *= 2.7; // 2.7 is a magic number
 }
 
 const double &Density::operator()(const std::vector<Point2<double>> &input)
 {
     // Compute the value of the density function
-    // Initialize the value of the density function
+
+    // Initialize the value and overflow ratio
     value_ = 0;
     overflowRatio_ = 0;
     for (int i = 0; i < widthBinNum_; ++i)
@@ -199,6 +185,7 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
         }
     }
 
+    // calculate the density
     int moduleNum = placement_.numModules();
     for (int i = 0; i < moduleNum; ++i)
     {
@@ -250,6 +237,7 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
         }
     }
 
+    // calculate the overflow ratio
     for (int i = 0; i < widthBinNum_; ++i)
     {
         for (int j = 0; j < heightBinNum_; ++j)
@@ -260,7 +248,9 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
     }
     overflowRatio_ /= widthBinNum_ * heightBinNum_;
 
+    // store the input
     input_ = input;
+
     return value_;
 }
 
@@ -268,14 +258,14 @@ const std::vector<Point2<double>> &Density::Backward()
 {
     // Compute the gradient of the function
 
-    // Initialize the gradient
+    // Initialize the density gradient
     for (size_t i = 0; i < grad_.size(); ++i)
     {
         grad_[i].x = 0;
         grad_[i].y = 0;
     }
 
-    // calculate the gradient
+    // calculate the density gradient
     int moduleNum = placement_.numModules();
     for (int i = 0; i < moduleNum; ++i)
     {
@@ -376,10 +366,9 @@ const std::vector<Point2<double>> &Density::Backward()
 const double &ObjectiveFunction::operator()(const std::vector<Point2<double>> &input)
 {
     // Compute the value of the objective function
-    double wirelengthCost, densityCost;
-    wirelengthCost = wirelength_(input);
-    densityCost = density_(input);
-    value_ = wirelengthCost + lambda_ * densityCost;
+    value_ = wirelength_(input) + lambda_ * density_(input);
+
+    // store the input
     input_ = input;
 
     return value_;
@@ -393,12 +382,14 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
     densityGrad = density_.Backward();
     int moduleNum = placement_.numModules();
 
+    // spread enough if the overflow ratio is less than 0.2
     if (this->getOverflowRatio() < 0.2)
     {
         spreadEnough_ = true;
     }
 
-    if (iterNum_ == 0)
+    // update lambda, before 200 iterations, lambda is 0, after 200 iterations and not spread enough, lambda *= 1.1
+    if (iterNum_ == 200)
     {
         double wirelengthGradNorm = 0, densityGradNorm = 0;
         for (int i = 0; i < moduleNum; ++i)
@@ -413,26 +404,12 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
         lambda_ *= 1.1;
     }
 
-    // double wirelengthGradNorm = 0, densityGradNorm = 0;
-    // for (int i = 0; i < moduleNum; ++i)
-    // {
-    //     wirelengthGradNorm += sqrt(wirelengthGrad[i].x * wirelengthGrad[i].x + wirelengthGrad[i].y * wirelengthGrad[i].y);
-    //     densityGradNorm += sqrt(densityGrad[i].x * densityGrad[i].x + densityGrad[i].y * densityGrad[i].y);
-    // }
-    // lambda_ = wirelengthGradNorm / densityGradNorm * 0.9 * pow(2, iterNum_);
-    // cout << "lambda: " << lambda_ << endl;
-
+    // calculate the gradient
     for (int i = 0; i < moduleNum; ++i)
     {
         grad_[i].x = wirelengthGrad[i].x + lambda_ * densityGrad[i].x;
         grad_[i].y = wirelengthGrad[i].y + lambda_ * densityGrad[i].y;
     }
-
-    // if (iterNum_ % 50 == 0 && iterNum_ != 0)
-    // {
-    //     this->setGamma(this->getGamma() * 2);
-    // }
-    // cout << "Gamma: " << this->getGamma() << endl;
 
     iterNum_++;
 

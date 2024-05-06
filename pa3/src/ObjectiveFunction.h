@@ -46,37 +46,6 @@ protected:
 };
 
 /**
- * @brief Example function for optimization
- *
- * This is a simple example function for optimization. The function is defined as:
- *      f(t) = 3*t.x^2 + 2*t.x*t.y + 2*t.y^2 + 7
- */
-class ExampleFunction : public BaseFunction
-{
-public:
-    /////////////////////////////////
-    // Constructors
-    /////////////////////////////////
-
-    ExampleFunction(Placement &placement);
-
-    /////////////////////////////////
-    // Methods
-    /////////////////////////////////
-
-    const double &operator()(const std::vector<Point2<double>> &input) override;
-    const std::vector<Point2<double>> &Backward() override;
-
-private:
-    /////////////////////////////////
-    // Data members
-    /////////////////////////////////
-
-    std::vector<Point2<double>> input_; // Cache the input for backward pass
-    Placement &placement_;
-};
-
-/**
  * @brief Wirelength function
  */
 class Wirelength : public BaseFunction
@@ -96,7 +65,15 @@ public:
     const double &operator()(const std::vector<Point2<double>> &input) override;
     const std::vector<Point2<double>> &Backward() override;
 
+    /////////////////////////////////
+    // Get
+    /////////////////////////////////
+
     const double getGamma() const { return gamma_; }
+
+    /////////////////////////////////
+    // Set
+    /////////////////////////////////
 
     void setGamma(double gamma) { gamma_ = gamma; }
 
@@ -106,7 +83,7 @@ private:
     /////////////////////////////////
 
     std::vector<Point2<double>> input_; // Cache the input for backward pass
-    double gamma_;
+    double gamma_;                      // gamma for calculating the wirelength function
     Placement &placement_;
 };
 
@@ -130,6 +107,10 @@ public:
     const double &operator()(const std::vector<Point2<double>> &input) override;
     const std::vector<Point2<double>> &Backward() override;
 
+    /////////////////////////////////
+    // Get
+    /////////////////////////////////
+
     const double getOverflowRatio() const { return overflowRatio_; }
     const double getMb() const { return mb_; }
     const int getBinSize() const { return binSize_; }
@@ -141,13 +122,13 @@ private:
 
     std::vector<Point2<double>> input_; // Cache the input for backward pass
     Placement &placement_;
-    double mb_;         // max density of the bin
-    double overflowRatio_; // overflow ratio
-    int binSize_;
-    int widthBinNum_;
-    int heightBinNum_;
-    vector<vector<double>> binDensity_;
-    vector<vector<double>> binDensityGrad_;
+    double mb_;                             // max density of the bin
+    double overflowRatio_;                  // overflow ratio
+    int binSize_;                           // size of the bin
+    int widthBinNum_;                       // number of bins in width
+    int heightBinNum_;                      // number of bins in height
+    vector<vector<double>> binDensity_;     // density of each bin
+    vector<vector<double>> binDensityGrad_; // gradient of density of each bin
 };
 
 /**
@@ -167,7 +148,8 @@ public:
     // Constructors
     /////////////////////////////////
     ObjectiveFunction(Placement &placement)
-        : BaseFunction(placement.numModules()), placement_(placement), iterNum_(0), wirelength_(placement), density_(placement), spreadEnough_(false)
+        : BaseFunction(placement.numModules()),
+          placement_(placement), wirelength_(placement), density_(placement), lambda_(0), iterNum_(0), spreadEnough_(false)
     {
     }
 
@@ -178,10 +160,18 @@ public:
     const double &operator()(const std::vector<Point2<double>> &input) override;
     const std::vector<Point2<double>> &Backward() override;
 
+    /////////////////////////////////
+    // Get
+    /////////////////////////////////
+
     const double getOverflowRatio() const { return density_.getOverflowRatio(); }
     const double getMb() const { return density_.getMb(); }
     const double getGamma() const { return wirelength_.getGamma(); }
     const int getBinSize() const { return density_.getBinSize(); }
+
+    /////////////////////////////////
+    // Set
+    /////////////////////////////////
 
     void setGamma(double gamma) { wirelength_.setGamma(gamma); }
 
@@ -192,11 +182,11 @@ private:
 
     std::vector<Point2<double>> input_; // Cache the input for backward pass
     Placement &placement_;
-    int iterNum_;
-    double lambda_;
     Wirelength wirelength_;
     Density density_;
-    bool spreadEnough_;
+    double lambda_;     // Penalty weight, cost = wirelengthCost + lambda * densityCost
+    int iterNum_;       // Iteration number
+    bool spreadEnough_; // Whether the cells are spread enough
 };
 
 #endif // OBJECTIVEFUNCTION_H

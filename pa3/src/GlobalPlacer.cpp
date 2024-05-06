@@ -15,13 +15,6 @@ GlobalPlacer::GlobalPlacer(Placement &placement)
 
 void GlobalPlacer::place()
 {
-    ////////////////////////////////////////////////////////////////////
-    // This section is an example for analytical methods.
-    // The objective is to minimize the following function:
-    //      f(x,y) = 3*x^2 + 2*x*y + 2*y^2 + 7
-    //
-    // If you use other methods, you can skip and delete it directly.
-    ////////////////////////////////////////////////////////////////////
     int moduleNum = _placement.numModules();
     std::vector<Point2<double>> t(moduleNum);          // Optimization variables (in this example, there is only one t)
     ObjectiveFunction foo(_placement);                 // Objective function
@@ -57,6 +50,7 @@ void GlobalPlacer::place()
     // Set initial positions
     for (int i = 0; i < moduleNum; ++i)
     {
+        // Initialize the position of the module by its partition
         double midX = (_placement.boundryLeft() + _placement.boundryRight()) / 2;
         double midY = (_placement.boundryBottom() + _placement.boundryTop()) / 2;
         if (initPlacePart[i] == 0)
@@ -77,7 +71,7 @@ void GlobalPlacer::place()
     // Perform optimization, the termination condition is that the number of iterations reaches 100
     // TODO: You may need to change the termination condition, which is determined by the overflow ratio.
     int iterNum = 0;
-    double lastOverflowRatio = 100;
+    double lastOverflowRatio = 100; // The overflow ratio of the last 100 iteration
     while (true)
     {
         iterNum++;
@@ -91,7 +85,7 @@ void GlobalPlacer::place()
         }
 
         // If the overflow ratio does not decrease, the optimization will be terminated
-        if (iterNum % 100 == 0)
+        if (iterNum % 100 == 0 && iterNum > 200)
         {
             if (lastOverflowRatio - foo.getOverflowRatio() < 0.001 || lastOverflowRatio < foo.getOverflowRatio())
             {
@@ -109,7 +103,7 @@ void GlobalPlacer::place()
     const size_t num_modules = _placement.numModules(); // You may modify this line.
     std::vector<Point2<double>> positions(num_modules); // Optimization variables (positions of modules). You may modify this line.
 
-    // deal with out of bound blocks
+    // place modules and deal with out of bound modules
     for (size_t i = 0; i < num_modules; ++i)
     {
         if (t[i].x < _placement.boundryLeft())
