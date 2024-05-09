@@ -189,10 +189,10 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
     int moduleNum = placement_.numModules();
     for (int i = 0; i < moduleNum; ++i)
     {
-        int startBinX = (input[i].x - placement_.boundryLeft()) / binSize_ < 0 ? 0 : (input[i].x - placement_.boundryLeft()) / binSize_;
-        int endBinX = (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ >= widthBinNum_ ? widthBinNum_ - 1 : (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_;
-        int startBinY = (input[i].y - placement_.boundryBottom()) / binSize_ < 0 ? 0 : (input[i].y - placement_.boundryBottom()) / binSize_;
-        int endBinY = (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ >= heightBinNum_ ? heightBinNum_ - 1 : (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_;
+        int startBinX = (input[i].x - placement_.boundryLeft()) / binSize_ - 3 < 0 ? 0 : (input[i].x - placement_.boundryLeft()) / binSize_ - 3;
+        int endBinX = (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ + 3 >= widthBinNum_ ? widthBinNum_ - 1 : (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ + 3;
+        int startBinY = (input[i].y - placement_.boundryBottom()) / binSize_ - 3 < 0 ? 0 : (input[i].y - placement_.boundryBottom()) / binSize_ - 3;
+        int endBinY = (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ + 3 >= heightBinNum_ ? heightBinNum_ - 1 : (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ + 3;
         double moduleWidth = placement_.module(i).width(), moduleHeight = placement_.module(i).height();
         for (int j = startBinX; j <= endBinX; ++j)
         {
@@ -269,10 +269,10 @@ const std::vector<Point2<double>> &Density::Backward()
     int moduleNum = placement_.numModules();
     for (int i = 0; i < moduleNum; ++i)
     {
-        int startBinX = (input_[i].x - placement_.boundryLeft()) / binSize_ < 0 ? 0 : (input_[i].x - placement_.boundryLeft()) / binSize_;
-        int endBinX = (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ >= widthBinNum_ ? widthBinNum_ - 1 : (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_;
-        int startBinY = (input_[i].y - placement_.boundryBottom()) / binSize_ < 0 ? 0 : (input_[i].y - placement_.boundryBottom()) / binSize_;
-        int endBinY = (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ >= heightBinNum_ ? heightBinNum_ - 1 : (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_;
+        int startBinX = (input_[i].x - placement_.boundryLeft()) / binSize_ - 3 < 0 ? 0 : (input_[i].x - placement_.boundryLeft()) / binSize_ - 3;
+        int endBinX = (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ + 3 >= widthBinNum_ ? widthBinNum_ - 1 : (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ + 3;
+        int startBinY = (input_[i].y - placement_.boundryBottom()) / binSize_ - 3 < 0 ? 0 : (input_[i].y - placement_.boundryBottom()) / binSize_ - 3;
+        int endBinY = (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ + 3 >= heightBinNum_ ? heightBinNum_ - 1 : (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ + 3;
         double moduleWidth = placement_.module(i).width(), moduleHeight = placement_.module(i).height();
         for (int j = startBinX; j <= endBinX; ++j)
         {
@@ -383,13 +383,13 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
     int moduleNum = placement_.numModules();
 
     // spread enough if the overflow ratio is less than 0.2
-    if (this->getOverflowRatio() < 0.2)
+    if (this->getOverflowRatio() < 0.05)
     {
         spreadEnough_ = true;
     }
 
-    // update lambda, before 200 iterations, lambda is 0, after 200 iterations and not spread enough, lambda *= 1.1
-    if (iterNum_ == 200)
+    // update lambda, before 10 iterations, lambda is 0, after 200 iterations and not spread enough, lambda *= 1.1
+    if (iterNum_ == 10)
     {
         double wirelengthGradNorm = 0, densityGradNorm = 0;
         for (int i = 0; i < moduleNum; ++i)

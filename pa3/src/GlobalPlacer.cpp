@@ -18,7 +18,7 @@ void GlobalPlacer::place()
     int moduleNum = _placement.numModules();
     std::vector<Point2<double>> t(moduleNum);          // Optimization variables (in this example, there is only one t)
     ObjectiveFunction foo(_placement);                 // Objective function
-    const double kAlpha = foo.getBinSize() * 8;        // Constant step size
+    const double kAlpha = foo.getBinSize() * 5;        // Constant step size
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
 
     // traverse all nets to determine the initial partition
@@ -76,16 +76,16 @@ void GlobalPlacer::place()
     {
         iterNum++;
         optimizer.Step();
-        // cout << "iter = " << iterNum << ", f = " << foo(t) << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
+        cout << "iter = " << iterNum << ", f = " << foo(t) << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
         // Termination condition
-        if (foo.getOverflowRatio() <= 0.015 || iterNum >= 3000)
+        if (foo.getOverflowRatio() <= 0.005 || iterNum >= 3000)
         {
             break;
         }
 
         // If the overflow ratio does not decrease, the optimization will be terminated
-        if (iterNum % 100 == 0 && iterNum > 200)
+        if (iterNum % 100 == 0 && iterNum > 20)
         {
             if (lastOverflowRatio - foo.getOverflowRatio() < 0.001 || lastOverflowRatio < foo.getOverflowRatio())
             {
