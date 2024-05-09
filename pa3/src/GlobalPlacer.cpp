@@ -18,7 +18,7 @@ void GlobalPlacer::place()
     int moduleNum = _placement.numModules();
     std::vector<Point2<double>> t(moduleNum);          // Optimization variables (in this example, there is only one t)
     ObjectiveFunction foo(_placement);                 // Objective function
-    const double kAlpha = foo.getBinSize() * 1;        // Constant step size
+    const double kAlpha = foo.getBinSize() * 2;        // Constant step size
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
 
     // traverse all nets to determine the initial partition
@@ -71,27 +71,72 @@ void GlobalPlacer::place()
     // Perform optimization, the termination condition is that the number of iterations reaches 100
     // TODO: You may need to change the termination condition, which is determined by the overflow ratio.
     int iterNum = 0;
-    double lastOverflowRatio = 100; // The overflow ratio of the last 100 iteration
+    double lastObjectiveFunctionValue = foo(t); // The objective function value of the last iteration
+    double lastOverflowRatio = 100;             // The overflow ratio of the last 100 iteration
     while (true)
     {
         iterNum++;
         optimizer.Step();
+        double objectiveFunctionValue = foo(t);
         cout << "iter = " << iterNum << ", f = " << foo(t) << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
+        if (lastObjectiveFunctionValue <= objectiveFunctionValue)
+        {
+            foo.increaseLambda();
+            lastObjectiveFunctionValue = foo(t);
+        }
+        else
+        {
+            lastObjectiveFunctionValue = objectiveFunctionValue;
+        }
+
         // Termination condition
-        if (foo.getOverflowRatio() <= 0.005)
+        if (foo.getOverflowRatio() <= 0.05 || iterNum >= 3000)
         {
             break;
         }
 
         // If the overflow ratio does not decrease, the optimization will be terminated
-        if (iterNum % 100 == 0 && iterNum > 20)
+        // if (iterNum % 100 == 0 && iterNum > 20)
+        // {
+        //     if (lastOverflowRatio - foo.getOverflowRatio() < 0.001 || lastOverflowRatio < foo.getOverflowRatio())
+        //     {
+        //         break;
+        //     }
+        //     lastOverflowRatio = foo.getOverflowRatio();
+        // }
+
+        // randomly place out of bound modules, and place the fixed modules back to their original positions
+        double outlineWidth = _placement.boundryRight() - _placement.boundryLeft();
+        double outlineHeight = _placement.boundryTop() - _placement.boundryBottom();
+        for (int i = 0; i < moduleNum; ++i)
         {
-            if (lastOverflowRatio - foo.getOverflowRatio() < 0.001 || lastOverflowRatio < foo.getOverflowRatio())
+            if (_placement.module(i).isFixed())
             {
-                break;
+                t[i].x = _placement.module(i).x() + _placement.module(i).width() / 2;
+                t[i].y = _placement.module(i).y() + _placement.module(i).height() / 2;
+                continue;
             }
-            lastOverflowRatio = foo.getOverflowRatio();
+            // out of left bound
+            if (t[i].x < _placement.boundryLeft())
+            {
+                t[i].x = _placement.boundryLeft() + double(rand()) / RAND_MAX * outlineWidth * 0.1;
+            }
+            // out of right bound
+            else if (t[i].x > _placement.boundryRight())
+            {
+                t[i].x = _placement.boundryRight() - double(rand()) / RAND_MAX * outlineWidth * 0.1;
+            }
+            // out of bottom bound
+            if (t[i].y < _placement.boundryBottom())
+            {
+                t[i].y = _placement.boundryBottom() + double(rand()) / RAND_MAX * outlineHeight * 0.1;
+            }
+            // out of top bound
+            else if (t[i].y > _placement.boundryTop())
+            {
+                t[i].y = _placement.boundryTop() - double(rand()) / RAND_MAX * outlineHeight * 0.1;
+            }
         }
     }
 
@@ -106,26 +151,28 @@ void GlobalPlacer::place()
     // place modules and deal with out of bound modules
     for (size_t i = 0; i < num_modules; ++i)
     {
-        if (t[i].x < _placement.boundryLeft())
+        Point2<double> leftBottomPosition;
+        leftBottomPosition.x = t[i].x - _placement.module(i).width() / 2;
+        leftBottomPosition.y = t[i].y - _placement.module(i).height() / 2;
+        if (leftBottomPosition.x < _placement.boundryLeft())
         {
-            t[i].x = _placement.boundryLeft();
+            leftBottomPosition.x = _placement.boundryLeft();
         }
-        else if (t[i].x > _placement.boundryRight() - _placement.module(i).width())
+        else if (leftBottomPosition.x > _placement.boundryRight() - _placement.module(i).width())
         {
-            t[i].x = _placement.boundryRight() - _placement.module(i).width();
-        }
-
-        if (t[i].y < _placement.boundryBottom())
-        {
-            t[i].y = _placement.boundryBottom();
-        }
-        else if (t[i].y > _placement.boundryTop() - _placement.module(i).height())
-        {
-            t[i].y = _placement.boundryTop() - _placement.module(i).height();
+            leftBottomPosition.x = _placement.boundryRight() - _placement.module(i).width();
         }
 
-        positions[i].x = t[i].x;
-        positions[i].y = t[i].y;
+        if (leftBottomPosition.y < _placement.boundryBottom())
+        {
+            leftBottomPosition.y = _placement.boundryBottom();
+        }
+        else if (leftBottomPosition.y > _placement.boundryTop() - _placement.module(i).height())
+        {
+            leftBottomPosition.y = _placement.boundryTop() - _placement.module(i).height();
+        }
+
+        positions[i] = leftBottomPosition;
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -133,7 +180,10 @@ void GlobalPlacer::place()
     ////////////////////////////////////////////////////////////////////
     for (size_t i = 0; i < num_modules; i++)
     {
-        _placement.module(i).setPosition(positions[i].x, positions[i].y);
+        if (!_placement.module(i).isFixed())
+        {
+            _placement.module(i).setPosition(positions[i].x, positions[i].y);
+        }
     }
 }
 

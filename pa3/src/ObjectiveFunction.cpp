@@ -140,6 +140,7 @@ const std::vector<Point2<double>> &Wirelength::Backward()
 Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
 {
     // Initialize the bin size and the number of bins
+    int moduleNum = placement.numModules();
     int outLineWidth = placement.boundryRight() - placement.boundryLeft();
     int outLineHeight = placement.boundryTop() - placement.boundryBottom();
     binSize_ = min(outLineWidth, outLineHeight) / 500;
@@ -161,13 +162,14 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
     }
 
     // calculate the target density of the bin
-    int moduleNum = placement.numModules();
     mb_ = 0;
     for (int i = 0; i < moduleNum; ++i)
     {
         mb_ += placement.module(i).width() * placement.module(i).height() / outLineWidth / outLineHeight;
     }
-    mb_ *= 2.7; // 2.7 is a magic number
+    // mb_ *= 2.7; // 2.7 is a magic number
+    mb_ = 0.9;
+    cout << "mb: " << mb_ << endl;
 }
 
 const double &Density::operator()(const std::vector<Point2<double>> &input)
@@ -237,16 +239,29 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
         }
     }
 
+    // count how many bins are covered by the module
+    int coveredBinNum = 0;
+    for (int i = 0; i < widthBinNum_; ++i)
+    {
+        for (int j = 0; j < heightBinNum_; ++j)
+        {
+            if (binDensity_[i][j] > 0)
+            {
+                coveredBinNum++;
+            }
+        }
+    }
+
     // calculate the overflow ratio
+
     for (int i = 0; i < widthBinNum_; ++i)
     {
         for (int j = 0; j < heightBinNum_; ++j)
         {
             value_ += (binDensity_[i][j] - mb_) * (binDensity_[i][j] - mb_);
-            overflowRatio_ += max(0.0, binDensity_[i][j] - mb_);
+            overflowRatio_ += max(0.0, binDensity_[i][j] - mb_) / widthBinNum_ / heightBinNum_;
         }
     }
-    overflowRatio_ /= widthBinNum_ * heightBinNum_;
 
     // store the input
     input_ = input;
@@ -382,14 +397,8 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
     densityGrad = density_.Backward();
     int moduleNum = placement_.numModules();
 
-    // spread enough if the overflow ratio is less than 0.2
-    if (this->getOverflowRatio() < 0.05)
-    {
-        spreadEnough_ = true;
-    }
-
     // update lambda, before 10 iterations, lambda is 0, after 200 iterations and not spread enough, lambda *= 1.1
-    if (iterNum_ == 10)
+    if (iterNum_ == 0)
     {
         double wirelengthGradNorm = 0, densityGradNorm = 0;
         for (int i = 0; i < moduleNum; ++i)
@@ -398,10 +407,6 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
             densityGradNorm += sqrt(densityGrad[i].x * densityGrad[i].x + densityGrad[i].y * densityGrad[i].y);
         }
         lambda_ = wirelengthGradNorm / densityGradNorm * 0.8;
-    }
-    else if (!spreadEnough_)
-    {
-        lambda_ *= 1.1;
     }
 
     // calculate the gradient

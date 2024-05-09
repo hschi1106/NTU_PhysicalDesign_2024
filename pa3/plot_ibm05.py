@@ -54,12 +54,12 @@ def main(node_file, pl_file):
     # 繪製blocks
     for name, (width, height) in nodes.items():
       x, y = location[name]
-      rect = plt.Rectangle((x, y), width, height, linewidth=1.5, edgecolor='r', facecolor='none')
+      rect = plt.Rectangle((x, y), width, height, linewidth=0.5, edgecolor='r', facecolor=(1, 0, 0, 0.1))
       ax.add_patch(rect)
       
     for name, (width, height) in terminals.items():
       x, y = location[name]
-      rect = plt.Rectangle((x, y), width, height, linewidth=1.5, edgecolor='b', facecolor='none')
+      rect = plt.Rectangle((x, y), width, height, linewidth=0.5, edgecolor='b', facecolor=(0, 0, 1, 0.1))
       ax.add_patch(rect)
 
     ax.set_aspect('equal')

@@ -149,7 +149,7 @@ public:
     /////////////////////////////////
     ObjectiveFunction(Placement &placement)
         : BaseFunction(placement.numModules()),
-          placement_(placement), wirelength_(placement), density_(placement), lambda_(0), iterNum_(0), spreadEnough_(false)
+          placement_(placement), wirelength_(placement), density_(placement), lambda_(0), iterNum_(0)
     {
     }
 
@@ -168,12 +168,14 @@ public:
     const double getMb() const { return density_.getMb(); }
     const double getGamma() const { return wirelength_.getGamma(); }
     const int getBinSize() const { return density_.getBinSize(); }
+    const double getLambda() const { return lambda_; }
 
     /////////////////////////////////
     // Set
     /////////////////////////////////
 
     void setGamma(double gamma) { wirelength_.setGamma(gamma); }
+    void increaseLambda() { lambda_ *= 1.1; }
 
 private:
     /////////////////////////////////
@@ -186,7 +188,6 @@ private:
     Density density_;
     double lambda_;     // Penalty weight, cost = wirelengthCost + lambda * densityCost
     int iterNum_;       // Iteration number
-    bool spreadEnough_; // Whether the cells are spread enough
 };
 
 #endif // OBJECTIVEFUNCTION_H
