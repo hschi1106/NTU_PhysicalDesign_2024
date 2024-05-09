@@ -142,7 +142,7 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
     // Initialize the bin size and the number of bins
     int outLineWidth = placement.boundryRight() - placement.boundryLeft();
     int outLineHeight = placement.boundryTop() - placement.boundryBottom();
-    binSize_ = min(outLineWidth, outLineHeight) / 1000;
+    binSize_ = min(outLineWidth, outLineHeight) / 500;
     widthBinNum_ = outLineWidth / binSize_;
     heightBinNum_ = outLineHeight / binSize_;
 
