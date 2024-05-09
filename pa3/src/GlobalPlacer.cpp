@@ -50,6 +50,12 @@ void GlobalPlacer::place()
     // Set initial positions
     for (int i = 0; i < moduleNum; ++i)
     {
+        if (_placement.module(i).isFixed())
+        {
+            t[i].x = _placement.module(i).x() + _placement.module(i).width() / 2;
+            t[i].y = _placement.module(i).y() + _placement.module(i).height() / 2;
+            continue;
+        }
         // Initialize the position of the module by its partition
         double midX = (_placement.boundryLeft() + _placement.boundryRight()) / 2;
         double midY = (_placement.boundryBottom() + _placement.boundryTop()) / 2;
@@ -91,20 +97,10 @@ void GlobalPlacer::place()
         }
 
         // Termination condition
-        if (foo.getOverflowRatio() <= 0.05 || iterNum >= 3000)
+        if (foo.getOverflowRatio() <= 0.05 || iterNum >= 2000)
         {
             break;
         }
-
-        // If the overflow ratio does not decrease, the optimization will be terminated
-        // if (iterNum % 100 == 0 && iterNum > 20)
-        // {
-        //     if (lastOverflowRatio - foo.getOverflowRatio() < 0.001 || lastOverflowRatio < foo.getOverflowRatio())
-        //     {
-        //         break;
-        //     }
-        //     lastOverflowRatio = foo.getOverflowRatio();
-        // }
 
         // randomly place out of bound modules, and place the fixed modules back to their original positions
         double outlineWidth = _placement.boundryRight() - _placement.boundryLeft();

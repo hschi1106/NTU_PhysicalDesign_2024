@@ -137,7 +137,7 @@ const std::vector<Point2<double>> &Wirelength::Backward()
     return grad_;
 }
 
-Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
+Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement), mb_(0)
 {
     // Initialize the bin size and the number of bins
     int moduleNum = placement.numModules();
@@ -162,13 +162,10 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
     }
 
     // calculate the target density of the bin
-    mb_ = 0;
     for (int i = 0; i < moduleNum; ++i)
     {
         mb_ += placement.module(i).width() * placement.module(i).height() / outLineWidth / outLineHeight;
     }
-    // mb_ *= 2.7; // 2.7 is a magic number
-    mb_ = 0.9;
     cout << "mb: " << mb_ << endl;
 }
 
@@ -191,17 +188,17 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
     int moduleNum = placement_.numModules();
     for (int i = 0; i < moduleNum; ++i)
     {
-        int startBinX = (input[i].x - placement_.boundryLeft()) / binSize_ - 3 < 0 ? 0 : (input[i].x - placement_.boundryLeft()) / binSize_ - 3;
-        int endBinX = (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ + 3 >= widthBinNum_ ? widthBinNum_ - 1 : (input[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ + 3;
-        int startBinY = (input[i].y - placement_.boundryBottom()) / binSize_ - 3 < 0 ? 0 : (input[i].y - placement_.boundryBottom()) / binSize_ - 3;
-        int endBinY = (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ + 3 >= heightBinNum_ ? heightBinNum_ - 1 : (input[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ + 3;
         double moduleWidth = placement_.module(i).width(), moduleHeight = placement_.module(i).height();
+        int startBinX = (input[i].x - moduleWidth / 2 - placement_.boundryLeft()) / binSize_ - 3 < 0 ? 0 : (input[i].x - moduleWidth / 2 - placement_.boundryLeft()) / binSize_ - 3;
+        int endBinX = (input[i].x + moduleWidth / 2 - placement_.boundryLeft()) / binSize_ + 3 >= widthBinNum_ ? widthBinNum_ - 1 : (input[i].x + moduleWidth / 2 - placement_.boundryLeft()) / binSize_ + 3;
+        int startBinY = (input[i].y - moduleHeight / 2 - placement_.boundryBottom()) / binSize_ - 3 < 0 ? 0 : (input[i].y - moduleHeight / 2 - placement_.boundryBottom()) / binSize_ - 3;
+        int endBinY = (input[i].y + moduleHeight / 2 - placement_.boundryBottom()) / binSize_ + 3 >= heightBinNum_ ? heightBinNum_ - 1 : (input[i].y + moduleHeight / 2 - placement_.boundryBottom()) / binSize_ + 3;
         for (int j = startBinX; j <= endBinX; ++j)
         {
             for (int k = startBinY; k <= endBinY; ++k)
             {
-                double inputX = abs((input[i].x - placement_.boundryLeft() + moduleWidth / 2) - (j * binSize_ + binSize_ / 2));
-                double inputY = abs((input[i].y - placement_.boundryBottom() + moduleHeight / 2) - (k * binSize_ + binSize_ / 2));
+                double inputX = abs((input[i].x - placement_.boundryLeft()) - (j * binSize_ + binSize_ / 2));
+                double inputY = abs((input[i].y - placement_.boundryBottom()) - (k * binSize_ + binSize_ / 2));
                 double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
                 double ay = 4 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2 / binSize_ / (moduleHeight + 4 * binSize_);
                 double Px, Py;
@@ -284,17 +281,17 @@ const std::vector<Point2<double>> &Density::Backward()
     int moduleNum = placement_.numModules();
     for (int i = 0; i < moduleNum; ++i)
     {
-        int startBinX = (input_[i].x - placement_.boundryLeft()) / binSize_ - 3 < 0 ? 0 : (input_[i].x - placement_.boundryLeft()) / binSize_ - 3;
-        int endBinX = (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ + 3 >= widthBinNum_ ? widthBinNum_ - 1 : (input_[i].x + placement_.module(i).width() - placement_.boundryLeft()) / binSize_ + 3;
-        int startBinY = (input_[i].y - placement_.boundryBottom()) / binSize_ - 3 < 0 ? 0 : (input_[i].y - placement_.boundryBottom()) / binSize_ - 3;
-        int endBinY = (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ + 3 >= heightBinNum_ ? heightBinNum_ - 1 : (input_[i].y + placement_.module(i).height() - placement_.boundryBottom()) / binSize_ + 3;
         double moduleWidth = placement_.module(i).width(), moduleHeight = placement_.module(i).height();
+        int startBinX = (input_[i].x - moduleWidth / 2 - placement_.boundryLeft()) / binSize_ - 3 < 0 ? 0 : (input_[i].x - moduleWidth / 2 - placement_.boundryLeft()) / binSize_ - 3;
+        int endBinX = (input_[i].x + moduleWidth / 2 - placement_.boundryLeft()) / binSize_ + 3 >= widthBinNum_ ? widthBinNum_ - 1 : (input_[i].x + moduleWidth / 2 - placement_.boundryLeft()) / binSize_ + 3;
+        int startBinY = (input_[i].y - moduleHeight / 2 - placement_.boundryBottom()) / binSize_ - 3 < 0 ? 0 : (input_[i].y - moduleHeight / 2 - placement_.boundryBottom()) / binSize_ - 3;
+        int endBinY = (input_[i].y + moduleHeight / 2 - placement_.boundryBottom()) / binSize_ + 3 >= heightBinNum_ ? heightBinNum_ - 1 : (input_[i].y + moduleHeight / 2 - placement_.boundryBottom()) / binSize_ + 3;
         for (int j = startBinX; j <= endBinX; ++j)
         {
             for (int k = startBinY; k <= endBinY; ++k)
             {
-                double inputX = (input_[i].x - placement_.boundryLeft() + moduleWidth / 2) - (j * binSize_ + binSize_ / 2);
-                double inputY = (input_[i].y - placement_.boundryBottom() + moduleHeight / 2) - (k * binSize_ + binSize_ / 2);
+                double inputX = (input_[i].x - placement_.boundryLeft()) - (j * binSize_ + binSize_ / 2);
+                double inputY = (input_[i].y - placement_.boundryBottom()) - (k * binSize_ + binSize_ / 2);
                 double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
                 double ay = 4 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2 / binSize_ / (moduleHeight + 4 * binSize_);
                 double Px, Py, dPx, dPy;
