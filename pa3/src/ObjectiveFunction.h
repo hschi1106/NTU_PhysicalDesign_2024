@@ -129,6 +129,7 @@ private:
     int heightBinNum_;                      // number of bins in height
     vector<vector<double>> binDensity_;     // density of each bin
     vector<vector<double>> binDensityGrad_; // gradient of density of each bin
+    double totalModuleArea_;                // total area of modules
 };
 
 /**

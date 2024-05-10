@@ -137,7 +137,7 @@ const std::vector<Point2<double>> &Wirelength::Backward()
     return grad_;
 }
 
-Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement), mb_(0)
+Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement), mb_(0), totalModuleArea_(0)
 {
     // Initialize the bin size and the number of bins
     int moduleNum = placement.numModules();
@@ -161,10 +161,11 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
         }
     }
 
-    // calculate the target density of the bin
+    // calculate the target density of the bin and the total area of the modules
     for (int i = 0; i < moduleNum; ++i)
     {
         mb_ += placement.module(i).width() * placement.module(i).height() / outLineWidth / outLineHeight;
+        totalModuleArea_ += placement.module(i).width() * placement.module(i).height();
     }
     cout << "mb: " << mb_ << endl;
 }
@@ -236,7 +237,16 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
         }
     }
 
-    // count how many bins are covered by the module
+    // calculate the value
+    for (int i = 0; i < widthBinNum_; ++i)
+    {
+        for (int j = 0; j < heightBinNum_; ++j)
+        {
+            value_ += (binDensity_[i][j] - mb_) * (binDensity_[i][j] - mb_);
+        }
+    }
+
+    // calculate the number of bins that are covered by the module
     int coveredBinNum = 0;
     for (int i = 0; i < widthBinNum_; ++i)
     {
@@ -250,15 +260,7 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
     }
 
     // calculate the overflow ratio
-
-    for (int i = 0; i < widthBinNum_; ++i)
-    {
-        for (int j = 0; j < heightBinNum_; ++j)
-        {
-            value_ += (binDensity_[i][j] - mb_) * (binDensity_[i][j] - mb_);
-            overflowRatio_ += max(0.0, binDensity_[i][j] - mb_) / widthBinNum_ / heightBinNum_;
-        }
-    }
+    overflowRatio_ = totalModuleArea_ / coveredBinNum / binSize_ / binSize_ - mb_;
 
     // store the input
     input_ = input;

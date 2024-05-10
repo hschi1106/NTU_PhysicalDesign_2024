@@ -96,7 +96,7 @@ void GlobalPlacer::place()
         }
 
         // Termination condition
-        if (foo.getOverflowRatio() <= 0.1 || iterNum >= 500)
+        if (foo.getOverflowRatio() <= 0.2 || iterNum >= 3000)
         {
             break;
         }
@@ -136,6 +136,8 @@ void GlobalPlacer::place()
             }
         }
     }
+
+    cout << "total iterations: " << iterNum << endl;
 
     ////////////////////////////////////////////////////////////////////
     // Global placement algorithm
