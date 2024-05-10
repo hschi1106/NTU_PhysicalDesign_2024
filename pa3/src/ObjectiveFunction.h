@@ -176,7 +176,7 @@ public:
     /////////////////////////////////
 
     void setGamma(double gamma) { wirelength_.setGamma(gamma); }
-    void increaseLambda() { lambda_ *= 1.1; }
+    void increaseLambda() { lambda_ *= 1.2; }
 
 private:
     /////////////////////////////////
@@ -187,8 +187,8 @@ private:
     Placement &placement_;
     Wirelength wirelength_;
     Density density_;
-    double lambda_;     // Penalty weight, cost = wirelengthCost + lambda * densityCost
-    int iterNum_;       // Iteration number
+    double lambda_; // Penalty weight, cost = wirelengthCost + lambda * densityCost
+    int iterNum_;   // Iteration number
 };
 
 #endif // OBJECTIVEFUNCTION_H

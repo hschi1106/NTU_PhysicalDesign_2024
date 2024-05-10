@@ -143,7 +143,7 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
     int moduleNum = placement.numModules();
     int outLineWidth = placement.boundryRight() - placement.boundryLeft();
     int outLineHeight = placement.boundryTop() - placement.boundryBottom();
-    binSize_ = min(outLineWidth, outLineHeight) / 1000;
+    binSize_ = min(outLineWidth, outLineHeight) / 300;
     widthBinNum_ = outLineWidth / binSize_;
     heightBinNum_ = outLineHeight / binSize_;
 
@@ -167,6 +167,7 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
         mb_ += placement.module(i).width() * placement.module(i).height() / outLineWidth / outLineHeight;
         totalModuleArea_ += placement.module(i).width() * placement.module(i).height();
     }
+    mb_ = 0.9;
     cout << "mb: " << mb_ << endl;
 }
 
@@ -238,20 +239,13 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
     }
 
     // calculate the value
-    for (int i = 0; i < widthBinNum_; ++i)
-    {
-        for (int j = 0; j < heightBinNum_; ++j)
-        {
-            value_ += (binDensity_[i][j] - mb_) * (binDensity_[i][j] - mb_);
-        }
-    }
-
-    // calculate the number of bins that are covered by the module
     int coveredBinNum = 0;
     for (int i = 0; i < widthBinNum_; ++i)
     {
         for (int j = 0; j < heightBinNum_; ++j)
         {
+            value_ += (binDensity_[i][j] - mb_) * (binDensity_[i][j] - mb_);
+            overflowRatio_ += binDensity_[i][j] > mb_ ? binDensity_[i][j] - mb_ : 0;
             if (binDensity_[i][j] > 0)
             {
                 coveredBinNum++;
@@ -260,7 +254,7 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
     }
 
     // calculate the overflow ratio
-    overflowRatio_ = totalModuleArea_ / coveredBinNum / binSize_ / binSize_ - mb_;
+    overflowRatio_ /= coveredBinNum;
 
     // store the input
     input_ = input;
@@ -402,10 +396,10 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
         double wirelengthGradNorm = 0, densityGradNorm = 0;
         for (int i = 0; i < moduleNum; ++i)
         {
-            wirelengthGradNorm += sqrt(wirelengthGrad[i].x * wirelengthGrad[i].x + wirelengthGrad[i].y * wirelengthGrad[i].y);
-            densityGradNorm += sqrt(densityGrad[i].x * densityGrad[i].x + densityGrad[i].y * densityGrad[i].y);
+            wirelengthGradNorm += Norm2(wirelengthGrad[i]);
+            densityGradNorm += Norm2(densityGrad[i]);
         }
-        lambda_ = wirelengthGradNorm / densityGradNorm * 0.8;
+        lambda_ = wirelengthGradNorm / densityGradNorm * 0.9;
     }
 
     // calculate the gradient

@@ -16,9 +16,10 @@ GlobalPlacer::GlobalPlacer(Placement &placement)
 void GlobalPlacer::place()
 {
     int moduleNum = _placement.numModules();
-    std::vector<Point2<double>> t(moduleNum);          // Optimization variables (in this example, there is only one t)
-    ObjectiveFunction foo(_placement);                 // Objective function
-    const double kAlpha = foo.getBinSize() * 4;        // Constant step size
+    std::vector<Point2<double>> t(moduleNum);     // Optimization variables (in this example, there is only one t)
+    ObjectiveFunction foo(_placement);            // Objective function
+    const double kAlpha = foo.getBinSize() * 0.7; // Constant step size
+    cout << "step size: " << kAlpha << endl;
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
 
     // traverse all nets to determine the initial partition
@@ -59,16 +60,18 @@ void GlobalPlacer::place()
         // Initialize the position of the module by its partition
         double midX = (_placement.boundryLeft() + _placement.boundryRight()) / 2;
         double midY = (_placement.boundryBottom() + _placement.boundryTop()) / 2;
-        if (initPlacePart[i] == 0)
-        {
-            t[i].x = midX + double(rand()) / RAND_MAX * 5 - 7.5;
-            t[i].y = midY + double(rand()) / RAND_MAX * 5 - 7.5;
-        }
-        else
-        {
-            t[i].x = midX + double(rand()) / RAND_MAX * 5 + 2.5;
-            t[i].y = midY + double(rand()) / RAND_MAX * 5 + 2.5;
-        }
+        // if (initPlacePart[i] == 0)
+        // {
+        //     t[i].x = midX + double(rand()) / RAND_MAX * 5 - 7.5;
+        //     t[i].y = midY + double(rand()) / RAND_MAX * 5 - 7.5;
+        // }
+        // else
+        // {
+        //     t[i].x = midX + double(rand()) / RAND_MAX * 5 + 2.5;
+        //     t[i].y = midY + double(rand()) / RAND_MAX * 5 + 2.5;
+        // }
+        t[i].x = midX + double(rand()) / RAND_MAX * 5 - 2.5;
+        t[i].y = midY + double(rand()) / RAND_MAX * 5 - 2.5;
     }
 
     // Initialize the optimizer
@@ -83,7 +86,7 @@ void GlobalPlacer::place()
         iterNum++;
         optimizer.Step();
         double objectiveFunctionValue = foo(t);
-        cout << "iter = " << iterNum << ", f = " << foo(t) << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
+        cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
         if (lastObjectiveFunctionValue <= objectiveFunctionValue)
         {
@@ -96,7 +99,7 @@ void GlobalPlacer::place()
         }
 
         // Termination condition
-        if (foo.getOverflowRatio() <= 0.2 || iterNum >= 3000)
+        if (foo.getOverflowRatio() <= 0.2 || iterNum >= 500)
         {
             break;
         }
@@ -114,25 +117,27 @@ void GlobalPlacer::place()
                 t[i].y = _placement.module(i).y() + moduleHeight / 2;
                 continue;
             }
+
             // out of left bound
             if (t[i].x - moduleWidth / 2 < _placement.boundryLeft())
             {
-                t[i].x = _placement.boundryLeft() + moduleWidth / 2 + double(rand()) / RAND_MAX * outlineWidth * 0.1;
+                t[i].x = _placement.boundryLeft() + moduleWidth / 2 + double(rand()) / RAND_MAX * outlineWidth * 0.001;
             }
             // out of right bound
             else if (t[i].x + moduleWidth / 2 > _placement.boundryRight())
             {
-                t[i].x = _placement.boundryRight() - moduleWidth / 2 - double(rand()) / RAND_MAX * outlineWidth * 0.1;
+                t[i].x = _placement.boundryRight() - moduleWidth / 2 - double(rand()) / RAND_MAX * outlineWidth * 0.001;
             }
+
             // out of bottom bound
             if (t[i].y - moduleHeight / 2 < _placement.boundryBottom())
             {
-                t[i].y = _placement.boundryBottom() + moduleHeight / 2 + double(rand()) / RAND_MAX * outlineHeight * 0.1;
+                t[i].y = _placement.boundryBottom() + moduleHeight / 2 + double(rand()) / RAND_MAX * outlineHeight * 0.001;
             }
             // out of top bound
             else if (t[i].y + moduleHeight / 2 > _placement.boundryTop())
             {
-                t[i].y = _placement.boundryTop() - moduleHeight / 2 - double(rand()) / RAND_MAX * outlineHeight * 0.1;
+                t[i].y = _placement.boundryTop() - moduleHeight / 2 - double(rand()) / RAND_MAX * outlineHeight * 0.001;
             }
         }
     }
