@@ -143,7 +143,7 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
     int moduleNum = placement.numModules();
     int outLineWidth = placement.boundryRight() - placement.boundryLeft();
     int outLineHeight = placement.boundryTop() - placement.boundryBottom();
-    binSize_ = min(outLineWidth, outLineHeight) / 500;
+    binSize_ = min(outLineWidth, outLineHeight) / 1000;
     widthBinNum_ = outLineWidth / binSize_;
     heightBinNum_ = outLineHeight / binSize_;
 
@@ -199,8 +199,8 @@ const double &Density::operator()(const std::vector<Point2<double>> &input)
             {
                 double inputX = abs((input[i].x - placement_.boundryLeft()) - (j * binSize_ + binSize_ / 2));
                 double inputY = abs((input[i].y - placement_.boundryBottom()) - (k * binSize_ + binSize_ / 2));
-                double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
-                double ay = 4 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2 / binSize_ / (moduleHeight + 4 * binSize_);
+                double ax = 4.0 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2.0 / binSize_ / (moduleWidth + 4 * binSize_);
+                double ay = 4.0 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2.0 / binSize_ / (moduleHeight + 4 * binSize_);
                 double Px, Py;
 
                 // calculate Px
@@ -292,8 +292,8 @@ const std::vector<Point2<double>> &Density::Backward()
             {
                 double inputX = (input_[i].x - placement_.boundryLeft()) - (j * binSize_ + binSize_ / 2);
                 double inputY = (input_[i].y - placement_.boundryBottom()) - (k * binSize_ + binSize_ / 2);
-                double ax = 4 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2 / binSize_ / (moduleWidth + 4 * binSize_);
-                double ay = 4 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2 / binSize_ / (moduleHeight + 4 * binSize_);
+                double ax = 4.0 / (moduleWidth + 2 * binSize_) / (moduleWidth + 4 * binSize_), bx = 2.0 / binSize_ / (moduleWidth + 4 * binSize_);
+                double ay = 4.0 / (moduleHeight + 2 * binSize_) / (moduleHeight + 4 * binSize_), by = 2.0 / binSize_ / (moduleHeight + 4 * binSize_);
                 double Px, Py, dPx, dPy;
 
                 // calculate Px
@@ -333,11 +333,11 @@ const std::vector<Point2<double>> &Density::Backward()
                 {
                     if (inputX > 0)
                     {
-                        dPx = 2 * bx * (inputX - moduleWidth / 2 - 2 * binSize_);
+                        dPx = -2 * bx * (abs(inputX) - moduleWidth / 2 - 2 * binSize_);
                     }
                     else
                     {
-                        dPx = -2 * bx * (inputX - moduleWidth / 2 - 2 * binSize_);
+                        dPx = 2 * bx * (abs(inputX) - moduleWidth / 2 - 2 * binSize_);
                     }
                 }
                 else
@@ -354,11 +354,11 @@ const std::vector<Point2<double>> &Density::Backward()
                 {
                     if (inputY > 0)
                     {
-                        dPy = 2 * by * (inputY - moduleHeight / 2 - 2 * binSize_);
+                        dPy = -2 * by * (abs(inputY) - moduleHeight / 2 - 2 * binSize_);
                     }
                     else
                     {
-                        dPy = -2 * by * (inputY - moduleHeight / 2 - 2 * binSize_);
+                        dPy = 2 * by * (abs(inputY) - moduleHeight / 2 - 2 * binSize_);
                     }
                 }
                 else
