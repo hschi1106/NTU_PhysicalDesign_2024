@@ -137,7 +137,7 @@ const std::vector<Point2<double>> &Wirelength::Backward()
     return grad_;
 }
 
-Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement), mb_(0), totalModuleArea_(0)
+Density::Density(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement), mb_(0.9), totalModuleArea_(0)
 {
     // Initialize the bin size and the number of bins
     int moduleNum = placement.numModules();
@@ -150,8 +150,8 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
         totalWidth += placement.module(i).width();
         totalHeight += placement.module(i).height();
     }
-    cout << "binSize: " << binSize_ << endl;
 
+    // calculate the bin number of each dimension
     widthBinNum_ = outLineWidth / binSize_;
     heightBinNum_ = outLineHeight / binSize_;
 
@@ -169,14 +169,11 @@ Density::Density(Placement &placement) : BaseFunction(placement.numModules()), p
         }
     }
 
-    // calculate the target density of the bin and the total area of the modules
+    // calculate the total area of the modules
     for (int i = 0; i < moduleNum; ++i)
     {
-        mb_ += placement.module(i).width() * placement.module(i).height() / outLineWidth / outLineHeight;
         totalModuleArea_ += placement.module(i).width() * placement.module(i).height();
     }
-    mb_ = 0.9;
-    cout << "mb: " << mb_ << endl;
 }
 
 const double &Density::operator()(const std::vector<Point2<double>> &input)
@@ -397,7 +394,7 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
     densityGrad = density_.Backward();
     int moduleNum = placement_.numModules();
 
-    // update lambda, before 10 iterations, lambda is 0, after 200 iterations and not spread enough, lambda *= 1.1
+    // update lambda, in the first 30 iterations, lambda is 0
     if (iterNum_ == 30)
     {
         double wirelengthGradNorm = 0, densityGradNorm = 0;

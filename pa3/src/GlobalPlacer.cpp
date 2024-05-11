@@ -20,7 +20,6 @@ void GlobalPlacer::place()
     std::vector<Point2<double>> t(moduleNum);     // Optimization variables (in this example, there is only one t)
     ObjectiveFunction foo(_placement);            // Objective function
     const double kAlpha = foo.getBinSize() * 0.3; // Constant step size
-    cout << "step size: " << kAlpha << endl;
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
 
     // Set initial positions
@@ -48,30 +47,32 @@ void GlobalPlacer::place()
 
     // Perform optimization, the termination condition is that the number of iterations reaches 100
     // TODO: You may need to change the termination condition, which is determined by the overflow ratio.
-    int iterNum = 0;
-    double lastObjectiveFunctionValue = foo(t); // The objective function value of the last iteration
-    double lastOverflowRatio = INT_MAX;
-    int canBeTerminated = 0;
-    double globalBestCost = 0;
+    int iterNum = 0;                                  // The number of iterations
+    double lastObjectiveFunctionValue = foo(t);       // The objective function value of the last iteration
+    double lastOverflowRatio = INT_MAX;               // The overflow ratio of the last iteration
+    int canBeTerminated = 0;                          // The iteration number that the loop can enter termination state
+    double globalBestCost = 0;                        // The best cost of the global placement
     std::vector<Point2<double>> positions(moduleNum); // remember the best positions
     while (true)
     {
         iterNum++;
         optimizer.Step();
         double objectiveFunctionValue = foo(t);
-        cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
+        // cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
+        // dynamically update gamma
         foo.setGamma(foo.getGamma() * 0.999 > 1 ? foo.getGamma() * 0.996 : 1);
 
-        // Termination
+        // Terminate the loop
         if (iterNum == canBeTerminated + 500 && canBeTerminated != 0)
         {
             break;
         }
 
-        // if the objective function value increases, increase lambda and update step size
+        // if the objective function value increases, increase lambda
         if (lastObjectiveFunctionValue <= objectiveFunctionValue && foo.getOverflowRatio() > -0.1 && canBeTerminated == 0)
         {
+            // dynamically update lambda
             if (foo.getOverflowRatio() > 1)
             {
                 foo.timesLambda(2.5);
@@ -81,7 +82,6 @@ void GlobalPlacer::place()
                 foo.timesLambda(1.1);
             }
             lastObjectiveFunctionValue = foo(t);
-            cout << "increase lambda to: " << foo.getLambda() << endl;
         }
         else
         {
@@ -92,24 +92,10 @@ void GlobalPlacer::place()
         if (objectiveFunctionValue < globalBestCost && iterNum >= canBeTerminated && canBeTerminated != 0)
         {
             globalBestCost = objectiveFunctionValue;
-            cout << "update global best cost to: " << globalBestCost << endl;
             this->writeGlobalBest(positions, t);
         }
 
-        // Termination condition
-        // if (foo.getOverflowRatio() <= -0.15)
-        // {
-        //     if (canBeTerminated == 0)
-        //     {
-        //         canBeTerminated = iterNum;
-        //         optimizer.setAlpha(kAlpha * 0.5);
-        //         globalBestCost = objectiveFunctionValue;
-        //         this->writeGlobalBest(positions, t);
-        //         // cout << "can be terminated at: " << canBeTerminated << endl;
-        //     }
-        // }
-
-        // Every 500 iterations, if the overflow ratio does not decrease, terminates
+        // Every 250 iterations, if the overflow ratio does not decrease, terminates
         if (iterNum % 250 == 0)
         {
             if (lastOverflowRatio - foo.getOverflowRatio() > 0.01)
@@ -124,7 +110,6 @@ void GlobalPlacer::place()
                     optimizer.setAlpha(kAlpha * 0.5);
                     globalBestCost = objectiveFunctionValue;
                     this->writeGlobalBest(positions, t);
-                    cout << "can be terminated at: " << canBeTerminated << endl;
                 }
             }
         }
@@ -166,8 +151,6 @@ void GlobalPlacer::place()
             }
         }
     }
-
-    cout << "total iterations: " << iterNum << endl;
 
     ////////////////////////////////////////////////////////////////////
     // Global placement algorithm

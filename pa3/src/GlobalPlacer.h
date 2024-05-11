@@ -18,7 +18,7 @@ public:
 private:
     Placement& _placement;
     void plotBoxPLT( ofstream& stream, double x1, double y1, double x2, double y2 );
-    void writeGlobalBest(vector<Point2<double>> &positions, vector<Point2<double>> &t);
+    void writeGlobalBest(vector<Point2<double>> &positions, vector<Point2<double>> &t); // write the best solution to placement
 
 };
 
