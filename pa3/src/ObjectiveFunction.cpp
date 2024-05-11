@@ -8,7 +8,7 @@
 Wirelength::Wirelength(Placement &placement) : BaseFunction(placement.numModules()), placement_(placement)
 {
     // Initialize the gamma value
-    gamma_ = max(placement_.boundryRight() - placement_.boundryLeft(), placement_.boundryTop() - placement_.boundryBottom()) * 0.0025;
+    gamma_ = max(placement_.boundryRight() - placement_.boundryLeft(), placement_.boundryTop() - placement_.boundryBottom()) * 0.05;
 }
 
 const double &Wirelength::operator()(const std::vector<Point2<double>> &input)

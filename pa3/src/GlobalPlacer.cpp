@@ -59,7 +59,9 @@ void GlobalPlacer::place()
         iterNum++;
         optimizer.Step();
         double objectiveFunctionValue = foo(t);
-        // cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
+        cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
+
+        foo.setGamma(foo.getGamma() * 0.999 > 1 ? foo.getGamma() * 0.996 : 1);
 
         // Termination
         if (iterNum == canBeTerminated + 500 && canBeTerminated != 0)
