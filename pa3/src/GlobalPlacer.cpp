@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <vector>
 #include <map>
+#include <climits>
 
 #include "ObjectiveFunction.h"
 #include "Optimizer.h"
@@ -16,62 +17,28 @@ GlobalPlacer::GlobalPlacer(Placement &placement)
 void GlobalPlacer::place()
 {
     int moduleNum = _placement.numModules();
-    std::vector<Point2<double>> t(moduleNum);   // Optimization variables (in this example, there is only one t)
-    ObjectiveFunction foo(_placement);          // Objective function
-    const double kAlpha = foo.getBinSize() * 2; // Constant step size
+    std::vector<Point2<double>> t(moduleNum);     // Optimization variables (in this example, there is only one t)
+    ObjectiveFunction foo(_placement);            // Objective function
+    const double kAlpha = foo.getBinSize() * 0.5; // Constant step size
     cout << "step size: " << kAlpha << endl;
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
-
-    // traverse all nets to determine the initial partition
-    vector<int> initPlacePart(_placement.numModules(), 0);
-    int netNum = _placement.numNets(), countAtOne = 0;
-    for (int i = 0; i < netNum; ++i)
-    {
-        Net &net = _placement.net(i);
-        int pinNum = net.numPins();
-        // traverse all pins in the net
-        for (int j = 0; j < pinNum; ++j)
-        {
-            Pin &pin = net.pin(j);
-            int moduleId = pin.moduleId();
-            if (initPlacePart[moduleId] == 0)
-            {
-                countAtOne++;
-            }
-            initPlacePart[moduleId] = 1;
-        }
-
-        // if the number of modules in partition 1 is greater than half of the total number of modules, then break
-        if (countAtOne >= moduleNum / 2)
-        {
-            break;
-        }
-    }
 
     // Set initial positions
     double outlineWidth = _placement.boundryRight() - _placement.boundryLeft();
     double outlineHeight = _placement.boundryTop() - _placement.boundryBottom();
     for (int i = 0; i < moduleNum; ++i)
     {
+        // Initialize the position of the fixed module
         if (_placement.module(i).isFixed())
         {
             t[i].x = _placement.module(i).x() + _placement.module(i).width() / 2;
             t[i].y = _placement.module(i).y() + _placement.module(i).height() / 2;
             continue;
         }
-        // Initialize the position of the module by its partition
+
+        // Randomly place the module in the center of the outline
         double midX = (_placement.boundryLeft() + _placement.boundryRight()) / 2;
         double midY = (_placement.boundryBottom() + _placement.boundryTop()) / 2;
-        // if (initPlacePart[i] == 0)
-        // {
-        //     t[i].x = midX + double(rand()) / RAND_MAX * 5 - 7.5;
-        //     t[i].y = midY + double(rand()) / RAND_MAX * 5 - 7.5;
-        // }
-        // else
-        // {
-        //     t[i].x = midX + double(rand()) / RAND_MAX * 5 + 2.5;
-        //     t[i].y = midY + double(rand()) / RAND_MAX * 5 + 2.5;
-        // }
         t[i].x = midX + double(rand()) / RAND_MAX * outlineWidth * 0.1 - outlineWidth * 0.05;
         t[i].y = midY + double(rand()) / RAND_MAX * outlineHeight * 0.1 - outlineHeight * 0.05;
     }
@@ -83,23 +50,24 @@ void GlobalPlacer::place()
     // TODO: You may need to change the termination condition, which is determined by the overflow ratio.
     int iterNum = 0;
     double lastObjectiveFunctionValue = foo(t); // The objective function value of the last iteration
+    double lastOverflowRatio = INT_MAX;
     while (true)
     {
         iterNum++;
         optimizer.Step();
         double objectiveFunctionValue = foo(t);
-        // cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
+        cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
         if (lastObjectiveFunctionValue <= objectiveFunctionValue && objectiveFunctionValue < pow(10, 100))
         {
             foo.increaseLambda();
             lastObjectiveFunctionValue = foo(t);
-            // cout << "increase lambda to: " << foo.getLambda() << endl;
-            if (optimizer.getAlpha() > foo.getBinSize() * 0.5)
-            {
-                optimizer.updateAlpha();
-                // cout << "update step size to: " << optimizer.getAlpha() << endl;
-            }
+            cout << "increase lambda to: " << foo.getLambda() << endl;
+            // if (optimizer.getAlpha() > foo.getBinSize() * 0.5)
+            // {
+            //     optimizer.updateAlpha();
+            //     cout << "update step size to: " << optimizer.getAlpha() << endl;
+            // }
         }
         else
         {
@@ -107,9 +75,21 @@ void GlobalPlacer::place()
         }
 
         // Termination condition
-        if (foo.getOverflowRatio() <= -0.05)
+        if (foo.getOverflowRatio() <= -0.1)
         {
             break;
+        }
+
+        if (iterNum % 500 == 0)
+        {
+            if (lastOverflowRatio - foo.getOverflowRatio() > 0.05)
+            {
+                lastOverflowRatio = foo.getOverflowRatio();
+            }
+            else if (foo.getOverflowRatio() < 0.01)
+            {
+                break;
+            }
         }
 
         // randomly place out of bound modules, and place the fixed modules back to their original positions
