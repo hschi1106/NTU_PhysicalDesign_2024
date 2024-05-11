@@ -125,6 +125,8 @@ private:
     double mb_;                             // max density of the bin
     double overflowRatio_;                  // overflow ratio
     int binSize_;                           // size of the bin
+    int binWidth_;                          // width of the bin
+    int binHeight_;                         // height of the bin
     int widthBinNum_;                       // number of bins in width
     int heightBinNum_;                      // number of bins in height
     vector<vector<double>> binDensity_;     // density of each bin
@@ -176,7 +178,7 @@ public:
     /////////////////////////////////
 
     void setGamma(double gamma) { wirelength_.setGamma(gamma); }
-    void increaseLambda() { lambda_ *= 1.2; }
+    void increaseLambda() { lambda_ *= 1.1; }
 
 private:
     /////////////////////////////////

@@ -68,8 +68,8 @@ def main(node_file, pl_file):
     plt.title(f'Block and Terminal Positions for {node_file.split("/")[-1]}', y=1.05)
     plt.grid(False)
     
-    plt.xlim(0, 2360)
-    plt.ylim(0, 2368)
+    plt.xlim(-100, 2500)
+    plt.ylim(-100, 2500)
     
     plt.show()
 

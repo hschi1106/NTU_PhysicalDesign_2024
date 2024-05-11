@@ -16,9 +16,9 @@ GlobalPlacer::GlobalPlacer(Placement &placement)
 void GlobalPlacer::place()
 {
     int moduleNum = _placement.numModules();
-    std::vector<Point2<double>> t(moduleNum);     // Optimization variables (in this example, there is only one t)
-    ObjectiveFunction foo(_placement);            // Objective function
-    const double kAlpha = foo.getBinSize() * 0.7; // Constant step size
+    std::vector<Point2<double>> t(moduleNum);   // Optimization variables (in this example, there is only one t)
+    ObjectiveFunction foo(_placement);          // Objective function
+    const double kAlpha = foo.getBinSize() * 2; // Constant step size
     cout << "step size: " << kAlpha << endl;
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
 
@@ -49,6 +49,8 @@ void GlobalPlacer::place()
     }
 
     // Set initial positions
+    double outlineWidth = _placement.boundryRight() - _placement.boundryLeft();
+    double outlineHeight = _placement.boundryTop() - _placement.boundryBottom();
     for (int i = 0; i < moduleNum; ++i)
     {
         if (_placement.module(i).isFixed())
@@ -70,8 +72,8 @@ void GlobalPlacer::place()
         //     t[i].x = midX + double(rand()) / RAND_MAX * 5 + 2.5;
         //     t[i].y = midY + double(rand()) / RAND_MAX * 5 + 2.5;
         // }
-        t[i].x = midX + double(rand()) / RAND_MAX * 5 - 2.5;
-        t[i].y = midY + double(rand()) / RAND_MAX * 5 - 2.5;
+        t[i].x = midX + double(rand()) / RAND_MAX * outlineWidth * 0.1 - outlineWidth * 0.05;
+        t[i].y = midY + double(rand()) / RAND_MAX * outlineHeight * 0.1 - outlineHeight * 0.05;
     }
 
     // Initialize the optimizer
@@ -86,12 +88,18 @@ void GlobalPlacer::place()
         iterNum++;
         optimizer.Step();
         double objectiveFunctionValue = foo(t);
-        cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
+        // cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
-        if (lastObjectiveFunctionValue <= objectiveFunctionValue)
+        if (lastObjectiveFunctionValue <= objectiveFunctionValue && objectiveFunctionValue < pow(10, 100))
         {
             foo.increaseLambda();
             lastObjectiveFunctionValue = foo(t);
+            // cout << "increase lambda to: " << foo.getLambda() << endl;
+            if (optimizer.getAlpha() > foo.getBinSize() * 0.5)
+            {
+                optimizer.updateAlpha();
+                // cout << "update step size to: " << optimizer.getAlpha() << endl;
+            }
         }
         else
         {
@@ -99,7 +107,7 @@ void GlobalPlacer::place()
         }
 
         // Termination condition
-        if (foo.getOverflowRatio() <= 0.2 || iterNum >= 500)
+        if (foo.getOverflowRatio() <= -0.05)
         {
             break;
         }
