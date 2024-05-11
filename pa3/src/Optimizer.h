@@ -60,7 +60,7 @@ public:
 
     // Perform one optimization step
     void Step() override;
-    void updateAlpha() { alpha_ = alpha_ * 0.999; } // Update the step size (optional)
+    void updateAlpha() { alpha_ = alpha_ * 0.99; } // Update the step size (optional)
 
     double getAlpha() { return alpha_; } // Get the step size (optional)
 

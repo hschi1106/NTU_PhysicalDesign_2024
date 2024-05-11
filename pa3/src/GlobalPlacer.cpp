@@ -51,6 +51,7 @@ void GlobalPlacer::place()
     int iterNum = 0;
     double lastObjectiveFunctionValue = foo(t); // The objective function value of the last iteration
     double lastOverflowRatio = INT_MAX;
+    int canBeTerminated = INT_MAX;
     while (true)
     {
         iterNum++;
@@ -58,26 +59,36 @@ void GlobalPlacer::place()
         double objectiveFunctionValue = foo(t);
         cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
-        if (lastObjectiveFunctionValue <= objectiveFunctionValue && objectiveFunctionValue < pow(10, 100))
+        if (lastObjectiveFunctionValue <= objectiveFunctionValue && foo.getOverflowRatio() > -0.1)
         {
             foo.increaseLambda();
             lastObjectiveFunctionValue = foo(t);
-            cout << "increase lambda to: " << foo.getLambda() << endl;
-            // if (optimizer.getAlpha() > foo.getBinSize() * 0.5)
-            // {
-            //     optimizer.updateAlpha();
-            //     cout << "update step size to: " << optimizer.getAlpha() << endl;
-            // }
+            // cout << "increase lambda to: " << foo.getLambda() << endl;
+            if (optimizer.getAlpha() > foo.getBinSize() * 0.1)
+            {
+                optimizer.updateAlpha();
+                // cout << "update step size to: " << optimizer.getAlpha() << endl;
+            }
         }
         else
         {
             lastObjectiveFunctionValue = objectiveFunctionValue;
         }
 
+        // Terminate
+        if (iterNum == canBeTerminated + 200)
+        {
+            break;
+        }
+
         // Termination condition
         if (foo.getOverflowRatio() <= -0.1)
         {
-            break;
+            // break;
+            if (canBeTerminated == INT_MAX)
+            {
+                canBeTerminated = iterNum;
+            }
         }
 
         if (iterNum % 500 == 0)
@@ -88,7 +99,11 @@ void GlobalPlacer::place()
             }
             else if (foo.getOverflowRatio() < 0.01)
             {
-                break;
+                // break;
+                if (canBeTerminated == INT_MAX)
+                {
+                    canBeTerminated = iterNum;
+                }
             }
         }
 
