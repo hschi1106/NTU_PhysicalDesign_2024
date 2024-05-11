@@ -398,7 +398,7 @@ const std::vector<Point2<double>> &ObjectiveFunction::Backward()
     int moduleNum = placement_.numModules();
 
     // update lambda, before 10 iterations, lambda is 0, after 200 iterations and not spread enough, lambda *= 1.1
-    if (iterNum_ == 0)
+    if (iterNum_ == 30)
     {
         double wirelengthGradNorm = 0, densityGradNorm = 0;
         for (int i = 0; i < moduleNum; ++i)
