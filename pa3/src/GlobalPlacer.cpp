@@ -19,7 +19,7 @@ void GlobalPlacer::place()
     int moduleNum = _placement.numModules();
     std::vector<Point2<double>> t(moduleNum);     // Optimization variables (in this example, there is only one t)
     ObjectiveFunction foo(_placement);            // Objective function
-    const double kAlpha = foo.getBinSize() * 0.4; // Constant step size
+    const double kAlpha = foo.getBinSize() * 0.3; // Constant step size
     cout << "step size: " << kAlpha << endl;
     SimpleConjugateGradient optimizer(foo, t, kAlpha); // Optimizer
 
@@ -68,11 +68,18 @@ void GlobalPlacer::place()
         }
 
         // if the objective function value increases, increase lambda and update step size
-        if (lastObjectiveFunctionValue <= objectiveFunctionValue && foo.getOverflowRatio() > -0.1)
+        if (lastObjectiveFunctionValue <= objectiveFunctionValue && foo.getOverflowRatio() > -0.1 && canBeTerminated == 0)
         {
-            foo.increaseLambda();
+            if (foo.getOverflowRatio() > 1)
+            {
+                foo.timesLambda(2.5);
+            }
+            else
+            {
+                foo.timesLambda(1.1);
+            }
             lastObjectiveFunctionValue = foo(t);
-            // cout << "increase lambda to: " << foo.getLambda() << endl;
+            cout << "increase lambda to: " << foo.getLambda() << endl;
         }
         else
         {
@@ -83,7 +90,7 @@ void GlobalPlacer::place()
         if (objectiveFunctionValue < globalBestCost && iterNum >= canBeTerminated && canBeTerminated != 0)
         {
             globalBestCost = objectiveFunctionValue;
-            // cout << "update global best cost to: " << globalBestCost << endl;
+            cout << "update global best cost to: " << globalBestCost << endl;
             this->writeGlobalBest(positions, t);
         }
 
@@ -101,9 +108,9 @@ void GlobalPlacer::place()
         // }
 
         // Every 500 iterations, if the overflow ratio does not decrease, terminates
-        if (iterNum % 500 == 0)
+        if (iterNum % 250 == 0)
         {
-            if (lastOverflowRatio - foo.getOverflowRatio() > 0.05)
+            if (lastOverflowRatio - foo.getOverflowRatio() > 0.01)
             {
                 lastOverflowRatio = foo.getOverflowRatio();
             }
@@ -115,7 +122,7 @@ void GlobalPlacer::place()
                     optimizer.setAlpha(kAlpha * 0.5);
                     globalBestCost = objectiveFunctionValue;
                     this->writeGlobalBest(positions, t);
-                    // cout << "can be terminated at: " << canBeTerminated << endl;
+                    cout << "can be terminated at: " << canBeTerminated << endl;
                 }
             }
         }

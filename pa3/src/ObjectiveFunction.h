@@ -180,6 +180,8 @@ public:
     void setGamma(double gamma) { wirelength_.setGamma(gamma); }
     void increaseLambda() { lambda_ *= 1.1; }
 
+    void timesLambda(double times) { lambda_ *= times; }
+
 private:
     /////////////////////////////////
     // Data members
