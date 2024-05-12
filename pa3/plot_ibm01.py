@@ -59,8 +59,8 @@ def main(node_file, pl_file):
     plt.title(f'Block and Terminal Positions for {node_file.split("/")[-1]}', y=1.05)
     plt.grid(False)
     
-    plt.xlim(-33330, 33396)
-    plt.ylim(-33208, 33320)
+    plt.xlim(min_x, max_x)
+    plt.ylim(min_y, max_y)
     
     plt.show()
 
