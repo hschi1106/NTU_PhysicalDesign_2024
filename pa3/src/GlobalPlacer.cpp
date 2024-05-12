@@ -61,7 +61,7 @@ void GlobalPlacer::place()
         // cout << "iter = " << iterNum << ", f = " << objectiveFunctionValue << " , overflow ratio = " << foo.getOverflowRatio() << " , gamma = " << foo.getGamma() << endl;
 
         // dynamically update gamma
-        foo.setGamma(foo.getGamma() * 0.999 > 1 ? foo.getGamma() * 0.996 : 1);
+        foo.setGamma(foo.getGamma() * 0.996 > 1 ? foo.getGamma() * 0.996 : 1);
 
         // Terminate the loop
         if (iterNum == canBeTerminated + 500 && canBeTerminated != 0)
