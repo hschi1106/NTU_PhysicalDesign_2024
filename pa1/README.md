@@ -1,22 +1,47 @@
-To compile the program, simply type:
-make
+# 2-Way F-M Circuit Partitioning
 
-Please use the following command line to execute the program: 
+## Requirements
+
+- g++
+
+## Specification
+
+`prog1_partitioning.pdf`
+
+## File Descriptions
+
+- `src/*`: All c/c++ source files.
+- `fm`: The compiled binary program.
+- `Makefile`: A Makefile to generate an executable binary
+
+## Compilation
+
+Type `make` in the current directory to generate the binary file `fm` under `bin/` directory
+
+## Usage
+
+Please use the following command line to execute the program:
+
+```bash
 ./fm <input_file_name> <output_file_name>
-For example: 
-./bin/fm ./input/input_0.dat ./output/output_0.dat
-./bin/fm ./input/input_1.dat ./output/output_1.dat
-./bin/fm ./input/input_2.dat ./output/output_2.dat
-./bin/fm ./input/input_3.dat ./output/output_3.dat
-./bin/fm ./input/input_4.dat ./output/output_4.dat
-./bin/fm ./input/input_5.dat ./output/output_5.dat
+```
 
-You can get the temporary score from the evaluator by the command below: 
-bash evaluator/evaluator.sh <input_file_name> <output_file_name>
-For example: 
+For example:
+
+```bash
+./bin/fm ./input/input_0.dat ./output/output_0.dat
+```
+
+## Score Evaluation
+
+You can get the temporary score from the evaluator by the command below:
+
+```bash
+./evaluator/evaluator.sh <input_file_name> <output_file_name>
+```
+
+For example:
+
+```bash
 ./evaluator/evaluator.sh ./input/input_0.dat ./output/output_0.dat
-./evaluator/evaluator.sh ./input/input_1.dat ./output/output_1.dat
-./evaluator/evaluator.sh ./input/input_2.dat ./output/output_2.dat
-./evaluator/evaluator.sh ./input/input_3.dat ./output/output_3.dat
-./evaluator/evaluator.sh ./input/input_4.dat ./output/output_4.dat
-./evaluator/evaluator.sh ./input/input_5.dat ./output/output_5.dat
+```

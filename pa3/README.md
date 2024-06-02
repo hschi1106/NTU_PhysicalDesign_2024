@@ -31,7 +31,6 @@ For example:
 
 ```bash
 ./bin/place -aux ./benchmark/ibm01/ibm01-cu85.aux
-./bin/place -aux ./benchmark/ibm05/ibm05.aux
 ```
 
 ## Visualization
@@ -46,7 +45,6 @@ For example:
 
 ```bash
 python ./visualizer/plot.py ./benchmark/ibm01/ibm01.nodes ./output/ibm01/ibm01-cu85.gp.pl
-python ./visualizer/plot.py ./benchmark/ibm05/ibm05.nodes ./output/ibm05/ibm05.gp.pl
 ```
 
 ## Overflow Evaluation
@@ -70,11 +68,11 @@ perl check_density_target.pl ibm05.nodes ibm05.gp.pl ibm05.scl
 You can get the temporary score from the evaluator by the command below:
 
 ```bash
-bash evaluator/evaluator.sh <inputFile.aux> <HPWL> <Time (s)>
+./evaluator/evaluator.sh <inputFile.aux> <HPWL> <Time (s)>
 ```
 
 For example:
 
 ```bash
-bash evaluator/evaluator.sh ./benchmark/ibm01/ibm01-cu85.aux 57262590 98
+./evaluator/evaluator.sh ./benchmark/ibm01/ibm01-cu85.aux 57262590 98
 ```
