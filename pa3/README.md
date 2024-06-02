@@ -1,4 +1,3 @@
-
 To compile the program, simply type:
 make
 
@@ -20,7 +19,7 @@ For example:
 python ./visualizer/plot.py ./benchmark/ibm01/ibm01.nodes ./ibm01-cu85.gp.pl
 python ./visualizer/plot.py ./benchmark/ibm05/ibm05.nodes ./ibm05.gp.pl
 
-You can get your temporary score from the evaluator by the command below: 
-bash evaluator/evaluator <inputFile.aux> <HPWL> <Time (s)> 
+You can get the temporary score from the evaluator by the command below: 
+bash evaluator/evaluator.sh <inputFile.aux> <HPWL> <Time (s)> 
 For example: 
 bash evaluator/evaluator.sh ./benchmark/ibm01/ibm01-cu85.aux 57262590 98

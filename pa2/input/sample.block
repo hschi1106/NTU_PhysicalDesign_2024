@@ -1,9 +1,0 @@
-Outline: 10 10
-NumBlocks: 5                                                                             
-NumTerminals: 0
-
-blk1 2 3
-blk2 2 1
-blk3 3 1
-blk4 2 2
-blk5 3 1
