@@ -34,8 +34,8 @@
 ./evaluator/evaluator.sh ./input/xerox.block ./input/xerox.nets ./output/xerox.output 0.75
 
 
-python plot.py ./input/ami33.block ./input/ami33.nets ./output/ami33.output
-python plot.py ./input/ami49.block ./input/ami49.nets ./output/ami49.output
-python plot.py ./input/apte.block ./input/apte.nets ./output/apte.output
-python plot.py ./input/hp.block ./input/hp.nets ./output/hp.output
-python plot.py ./input/xerox.block ./input/xerox.nets ./output/xerox.output
+python ./visualizer/plot.py ./input/ami33.block ./input/ami33.nets ./output/ami33.output
+python ./visualizer/plot.py ./input/ami49.block ./input/ami49.nets ./output/ami49.output
+python ./visualizer/plot.py ./input/apte.block ./input/apte.nets ./output/apte.output
+python ./visualizer/plot.py ./input/hp.block ./input/hp.nets ./output/hp.output
+python ./visualizer/plot.py ./input/xerox.block ./input/xerox.nets ./output/xerox.output
