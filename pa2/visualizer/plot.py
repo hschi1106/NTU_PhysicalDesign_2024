@@ -107,12 +107,12 @@ def main(block_file, nets_file, output_file):
         ax.text(x, y, name, fontsize=8, va='bottom', ha='left', color='green')
         
     # 繪製nets
-    for net in nets:
-        min_x, min_y, max_x, max_y = calculate_hpwl(net, blocks, terminals)
+    # for net in nets:
+    #     min_x, min_y, max_x, max_y = calculate_hpwl(net, blocks, terminals)
         
-        # 繪製矩形的右邊和下邊
-        plt.plot([min_x, max_x], [min_y, min_y], color='b', linestyle='--', linewidth=1)
-        plt.plot([max_x, max_x], [min_y, max_y], color='b', linestyle='--', linewidth=1)
+    #     # 繪製矩形的右邊和下邊
+    #     plt.plot([min_x, max_x], [min_y, min_y], color='b', linestyle='--', linewidth=1)
+    #     plt.plot([max_x, max_x], [min_y, max_y], color='b', linestyle='--', linewidth=1)
 
         
     ax.set_xlim(0, max(outlineWidth, chipWidth))

@@ -60,3 +60,7 @@ For example:
 ```bash
 ./evaluator/evaluator.sh ./input/ami33.block ./input/ami33.nets ./output/ami33.output 0.5
 ```
+
+![img](https://github.com/hschi1106/NTU_PhysicalDesign_2024/tree/main/pa2/visualizer/png/ami33.png)
+
+*Floorplanning result for case "ami33"*
