@@ -8,7 +8,7 @@ This is the GitHub repo of all programming assignments of the class. This repo i
 ## Contents
 - **pa1**: 2-Way F-M Circuit Partitioning
 - **pa2**: Fixed-outline Floorplanning
-- **pa3**: 
+- **pa3**: Global Placement
 
 ## 溫馨提醒
 可以參考，但別用抄的...  
