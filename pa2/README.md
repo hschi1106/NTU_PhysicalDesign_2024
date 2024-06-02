@@ -61,5 +61,7 @@ For example:
 ./evaluator/evaluator.sh ./input/ami33.block ./input/ami33.nets ./output/ami33.output 0.5
 ```
 
+## Result
+
 *Floorplanning result for case "ami33"*
 ![img](https://github.com/hschi1106/NTU_PhysicalDesign_2024/blob/main/pa2/visualizer/png/ami33.png)
