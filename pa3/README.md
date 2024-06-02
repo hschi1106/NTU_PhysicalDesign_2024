@@ -77,6 +77,6 @@ For example:
 ./evaluator/evaluator.sh ./benchmark/ibm01/ibm01-cu85.aux 57262590 98
 ```
 
-![img](https://github.com/hschi1106/NTU_PhysicalDesign_2024/tree/main/pa3/visualizer/png/ibm01.gp.png)
+![img](https://github.com/hschi1106/NTU_PhysicalDesign_2024/blob/main/pa3/visualizer/png/ibm01.gp.png)
 
 *Global placement result for case "ibm01"*
