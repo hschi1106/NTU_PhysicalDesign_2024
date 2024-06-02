@@ -11,12 +11,11 @@ def main(node_file, pl_file):
         pl_lines = file.readlines()
 
     # 跳過前面幾行
-    node_lines = node_lines[7:]
+    node_lines = node_lines[8:]
     pl_lines = pl_lines[2:]
 
     # 儲存node的大小
     nodes = {}
-    terminals = {}
 
     # 解析每一行，並將node的大小存入字典
     for line in node_lines:
@@ -24,9 +23,6 @@ def main(node_file, pl_file):
         if len(parts) == 3:  # 假設只有node的行有3個部分
             name, width, height = parts
             nodes[name] = (float(width), float(height))
-        if len(parts) == 4:
-            name, width, height, _ = parts
-            terminals[name] = (float(width), float(height))
             
     # 儲存node的位置
     location = {}
@@ -42,24 +38,19 @@ def main(node_file, pl_file):
     fig, ax = plt.subplots()
     
     # 設定範圍
-    # leftest_node_name = min(location.keys(), key=lambda x: location[x][0])
-    # rightest_node_name = max(location.keys(), key=lambda x: location[x][0])
-    # top_node_name = max(location.keys(), key=lambda x: location[x][1])
-    # bottom_node_name = min(location.keys(), key=lambda x: location[x][1])
-    # min_x = location[leftest_node_name][0]
-    # max_x = location[rightest_node_name][0] + nodes[rightest_node_name][0]
-    # min_y = location[bottom_node_name][1]
-    # max_y = location[top_node_name][1] + nodes[top_node_name][1]
+    leftest_node_name = min(location.keys(), key=lambda x: location[x][0])
+    rightest_node_name = max(location.keys(), key=lambda x: location[x][0])
+    top_node_name = max(location.keys(), key=lambda x: location[x][1])
+    bottom_node_name = min(location.keys(), key=lambda x: location[x][1])
+    min_x = location[leftest_node_name][0]
+    max_x = location[rightest_node_name][0]
+    min_y = location[bottom_node_name][1]
+    max_y = location[top_node_name][1]
     
     # 繪製blocks
     for name, (width, height) in nodes.items():
       x, y = location[name]
       rect = plt.Rectangle((x, y), width, height, linewidth=0.5, edgecolor='r', facecolor=(1, 0, 0, 0.1))
-      ax.add_patch(rect)
-      
-    for name, (width, height) in terminals.items():
-      x, y = location[name]
-      rect = plt.Rectangle((x, y), width, height, linewidth=0.5, edgecolor='b', facecolor=(0, 0, 1, 0.1))
       ax.add_patch(rect)
 
     ax.set_aspect('equal')
@@ -68,8 +59,8 @@ def main(node_file, pl_file):
     plt.title(f'Block and Terminal Positions for {node_file.split("/")[-1]}', y=1.05)
     plt.grid(False)
     
-    plt.xlim(-100, 2500)
-    plt.ylim(-100, 2500)
+    plt.xlim(min_x, max_x)
+    plt.ylim(min_y, max_y)
     
     plt.show()
 
@@ -81,4 +72,5 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     main(args.node_file, args.pl_file)
+
 

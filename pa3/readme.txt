@@ -15,9 +15,10 @@ gradient descent
 ./bin/place -aux ./benchmark/ibm08/ibm08-cu90.aux
 ./bin/place -aux ./benchmark/ibm09/ibm09-cu90.aux
 perl check_density_target.pl ./benchmark/ibm01/ibm01.nodes ibm01-cu85.gp.pl ./benchmark/ibm01/ibm01-cu85.scl
-python plot_ibm01.py ./benchmark/ibm01/ibm01.nodes ./ibm01-cu85.gp.pl
-python plot_ibm05.py ./benchmark/ibm05/ibm05.nodes ./ibm05.gp.pl
-python plot_ibm01.py ./benchmark/ibm07/ibm07.nodes ./ibm07-cu90.gp.pl
+python ./visualizer/plot_ibm01.py ./benchmark/ibm01/ibm01.nodes ./ibm01-cu85.gp.pl
+python ./visualizer/plot_ibm01.py ./benchmark/ibm05/ibm05.nodes ./ibm05.gp.pl
+python ./visualizer/plot_ibm05.py ./benchmark/ibm05/ibm05.nodes ./ibm05.gp.pl
+python ./visualizer/plot_ibm01.py ./benchmark/ibm07/ibm07.nodes ./ibm07-cu90.gp.pl
 bash evaluator/evaluator.sh ./benchmark/ibm01/ibm01-cu85.aux
 
 ./bin/place -aux ../sample_codes/benchmark/ibm01/ibm01-cu85.aux
