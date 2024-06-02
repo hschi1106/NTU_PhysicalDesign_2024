@@ -1,0 +1,229 @@
+Benchmark: ibm01-cu85
+HPWL: 5899472
+Memory usage: 8.3 MB
+Core region: (-33330,-33208)-(33396,33320)
+
+////// Global Placement ///////
+
+HPWL: 52300714
+
+////// Legalization ///////
+macro size: 0
+--legalization success!
+
+HPWL: 59522654 (13.81%)
+
+////// Detail Placement ///////
+ run: 0 HPWL=57872209 (-2.773%)(-2.773%)   time: 0 sec   all: 0 sec
+ run: 1 HPWL=57512018 (-0.622%)(-3.378%)   time: 0 sec   all: 0 sec
+ run: 2 HPWL=57394625 (-0.204%)(-3.575%)   time: 0 sec   all: 0 sec
+ run: 3 HPWL=57317999 (-0.134%)(-3.704%)   time: 0 sec   all: 0 sec
+ run: 4 HPWL=57262590 (-0.097%)(-3.797%)   time: 0 sec   all: 0 sec
+
+HPWL: 57262590 (-3.80%)
+
+
+////////////////////
+Benchmark: ibm01-cu85
+
+Global HPWL: 52300714   Time:   91.0 sec (1.5 min)
+ Legal HPWL: 59522654   Time:    2.0 sec (0.0 min)
+Detail HPWL: 57262590   Time:    2.0 sec (0.0 min)
+ ===================================================================
+       HPWL: 57262590   Time:   95.0 sec (1.6 min)
+Benchmark: ibm05
+HPWL: 3335877
+Memory usage: 18.0 MB
+Core region: (0,0)-(2360,2368)
+
+////// Global Placement ///////
+
+HPWL: 8926957
+
+////// Legalization ///////
+macro size: 0
+-----legalization success!
+
+HPWL: 13956829 (56.34%)
+
+////// Detail Placement ///////
+ run: 0 HPWL=12993805 (-6.900%)(-6.900%)   time: 0 sec   all: 0 sec
+ run: 1 HPWL=12595788 (-3.063%)(-9.752%)   time: 0 sec   all: 0 sec
+ run: 2 HPWL=12372033 (-1.776%)(-11.355%)   time: 0 sec   all: 1 sec
+ run: 3 HPWL=12235136 (-1.107%)(-12.336%)   time: 0 sec   all: 1 sec
+ run: 4 HPWL=12149212 (-0.702%)(-12.951%)   time: 0 sec   all: 2 sec
+ run: 5 HPWL=12089693 (-0.490%)(-13.378%)   time: 0 sec   all: 2 sec
+ run: 6 HPWL=12055455 (-0.283%)(-13.623%)   time: 0 sec   all: 3 sec
+ run: 7 HPWL=12035705 (-0.164%)(-13.765%)   time: 0 sec   all: 4 sec
+ run: 8 HPWL=12021792 (-0.116%)(-13.864%)   time: 0 sec   all: 5 sec
+
+HPWL: 12021792 (-13.86%)
+
+
+////////////////////
+Benchmark: ibm05
+
+Global HPWL: 8926957   Time:  234.0 sec (3.9 min)
+ Legal HPWL: 13956829   Time:    4.0 sec (0.1 min)
+Detail HPWL: 12021792   Time:    8.0 sec (0.1 min)
+ ===================================================================
+       HPWL: 12021792   Time:  246.0 sec (4.1 min)
+Benchmark: ibm02-cu90
+HPWL: 7993661
+Memory usage: 12.4 MB
+Core region: (-38676,-38528)-(38742,38584)
+
+////// Global Placement ///////
+
+HPWL: 141847520
+
+////// Legalization ///////
+macro size: 0
+---legalization success!
+
+HPWL: 154810227 (9.14%)
+
+////// Detail Placement ///////
+ run: 0 HPWL=151372614 (-2.221%)(-2.221%)   time: 0 sec   all: 0 sec
+ run: 1 HPWL=150500417 (-0.576%)(-2.784%)   time: 0 sec   all: 0 sec
+ run: 2 HPWL=150041398 (-0.305%)(-3.080%)   time: 0 sec   all: 0 sec
+ run: 3 HPWL=149745371 (-0.197%)(-3.272%)   time: 0 sec   all: 0 sec
+ run: 4 HPWL=149548739 (-0.131%)(-3.399%)   time: 0 sec   all: 1 sec
+
+HPWL: 149548739 (-3.40%)
+
+
+////////////////////
+Benchmark: ibm02-cu90
+
+Global HPWL: 141847520   Time:  151.0 sec (2.5 min)
+ Legal HPWL: 154810227   Time:    3.0 sec (0.1 min)
+Detail HPWL: 149548739   Time:    3.0 sec (0.1 min)
+ ===================================================================
+       HPWL: 149548739   Time:  157.0 sec (2.6 min)
+Benchmark: ibm07-cu90
+HPWL: 24535295
+Memory usage: 24.1 MB
+Core region: (-58674,-58688)-(58740,58744)
+
+////// Global Placement ///////
+
+HPWL: 343855238
+
+////// Legalization ///////
+macro size: 0
+--------------legalization success!
+
+HPWL: 632130714 (83.84%)
+
+////// Detail Placement ///////
+ run: 0 HPWL=550371044 (-12.934%)(-12.934%)   time: 0 sec   all: 0 sec
+ run: 1 HPWL=513877639 (-6.631%)(-18.707%)   time: 0 sec   all: 0 sec
+ run: 2 HPWL=495885008 (-3.501%)(-21.553%)   time: 0 sec   all: 1 sec
+ run: 3 HPWL=486240553 (-1.945%)(-23.079%)   time: 0 sec   all: 1 sec
+ run: 4 HPWL=480577561 (-1.165%)(-23.975%)   time: 0 sec   all: 2 sec
+ run: 5 HPWL=477283415 (-0.685%)(-24.496%)   time: 0 sec   all: 2 sec
+ run: 6 HPWL=475062236 (-0.465%)(-24.847%)   time: 0 sec   all: 3 sec
+ run: 7 HPWL=473479630 (-0.333%)(-25.098%)   time: 0 sec   all: 4 sec
+ run: 8 HPWL=472176264 (-0.275%)(-25.304%)   time: 0 sec   all: 4 sec
+ run: 9 HPWL=470885765 (-0.273%)(-25.508%)   time: 0 sec   all: 5 sec
+ run:10 HPWL=469897678 (-0.210%)(-25.664%)   time: 0 sec   all: 6 sec
+ run:11 HPWL=469334173 (-0.120%)(-25.754%)   time: 0 sec   all: 7 sec
+ run:12 HPWL=468748253 (-0.125%)(-25.846%)   time: 1 sec   all: 9 sec
+
+HPWL: 468748253 (-25.85%)
+
+
+////////////////////
+Benchmark: ibm07-cu90
+
+Global HPWL: 343855238   Time:  405.0 sec (6.8 min)
+ Legal HPWL: 632130714   Time:    9.0 sec (0.1 min)
+Detail HPWL: 468748253   Time:   14.0 sec (0.2 min)
+ ===================================================================
+       HPWL: 468748253   Time:  428.0 sec (7.1 min)
+Benchmark: ibm08-cu90
+HPWL: 19819116
+Memory usage: 27.8 MB
+Core region: (-61182,-61208)-(61248,61264)
+
+////// Global Placement ///////
+
+HPWL: 343368916
+
+////// Legalization ///////
+macro size: 0
+-----------------legalization success!
+
+HPWL: 760099922 (121.37%)
+
+////// Detail Placement ///////
+ run: 0 HPWL=647368871 (-14.831%)(-14.831%)   time: 0 sec   all: 0 sec
+ run: 1 HPWL=587394870 (-9.264%)(-22.721%)   time: 0 sec   all: 1 sec
+ run: 2 HPWL=554370742 (-5.622%)(-27.066%)   time: 0 sec   all: 1 sec
+ run: 3 HPWL=537721137 (-3.003%)(-29.257%)   time: 0 sec   all: 2 sec
+ run: 4 HPWL=527951765 (-1.817%)(-30.542%)   time: 0 sec   all: 2 sec
+ run: 5 HPWL=522540539 (-1.025%)(-31.254%)   time: 0 sec   all: 3 sec
+ run: 6 HPWL=518305383 (-0.810%)(-31.811%)   time: 0 sec   all: 4 sec
+ run: 7 HPWL=515055254 (-0.627%)(-32.238%)   time: 0 sec   all: 5 sec
+ run: 8 HPWL=512763214 (-0.445%)(-32.540%)   time: 0 sec   all: 6 sec
+ run: 9 HPWL=510616028 (-0.419%)(-32.823%)   time: 0 sec   all: 6 sec
+ run:10 HPWL=508825003 (-0.351%)(-33.058%)   time: 1 sec   all: 8 sec
+ run:11 HPWL=507677042 (-0.226%)(-33.209%)   time: 1 sec   all: 9 sec
+ run:12 HPWL=506589385 (-0.214%)(-33.352%)   time: 1 sec   all: 10 sec
+ run:13 HPWL=505632008 (-0.189%)(-33.478%)   time: 1 sec   all: 11 sec
+ run:14 HPWL=504871432 (-0.150%)(-33.578%)   time: 1 sec   all: 13 sec
+
+HPWL: 504871432 (-33.58%)
+
+
+////////////////////
+Benchmark: ibm08-cu90
+
+Global HPWL: 343368916   Time:  552.0 sec (9.2 min)
+ Legal HPWL: 760099922   Time:   13.0 sec (0.2 min)
+Detail HPWL: 504871432   Time:   19.0 sec (0.3 min)
+ ===================================================================
+       HPWL: 504871432   Time:  584.0 sec (9.7 min)
+Benchmark: ibm09-cu90
+HPWL: 26045716
+Memory usage: 27.3 MB
+Core region: (-62172,-61936)-(62238,62048)
+
+////// Global Placement ///////
+
+HPWL: 293742342
+
+////// Legalization ///////
+macro size: 0
+-------------legalization success!
+
+HPWL: 680270225 (131.59%)
+
+////// Detail Placement ///////
+ run: 0 HPWL=575318317 (-15.428%)(-15.428%)   time: 0 sec   all: 0 sec
+ run: 1 HPWL=525650794 (-8.633%)(-22.729%)   time: 0 sec   all: 1 sec
+ run: 2 HPWL=500556188 (-4.774%)(-26.418%)   time: 0 sec   all: 1 sec
+ run: 3 HPWL=487676398 (-2.573%)(-28.311%)   time: 0 sec   all: 2 sec
+ run: 4 HPWL=480030480 (-1.568%)(-29.435%)   time: 0 sec   all: 2 sec
+ run: 5 HPWL=475376111 (-0.970%)(-30.120%)   time: 0 sec   all: 3 sec
+ run: 6 HPWL=471682158 (-0.777%)(-30.663%)   time: 0 sec   all: 3 sec
+ run: 7 HPWL=468825452 (-0.606%)(-31.082%)   time: 0 sec   all: 4 sec
+ run: 8 HPWL=466287896 (-0.541%)(-31.455%)   time: 0 sec   all: 5 sec
+ run: 9 HPWL=464179459 (-0.452%)(-31.765%)   time: 0 sec   all: 6 sec
+ run:10 HPWL=462788319 (-0.300%)(-31.970%)   time: 1 sec   all: 7 sec
+ run:11 HPWL=461786679 (-0.216%)(-32.117%)   time: 0 sec   all: 8 sec
+ run:12 HPWL=460903755 (-0.191%)(-32.247%)   time: 1 sec   all: 9 sec
+ run:13 HPWL=460090648 (-0.176%)(-32.366%)   time: 1 sec   all: 11 sec
+
+HPWL: 460090648 (-32.37%)
+
+
+////////////////////
+Benchmark: ibm09-cu90
+
+Global HPWL: 293742342   Time:  541.0 sec (9.0 min)
+ Legal HPWL: 680270225   Time:   10.0 sec (0.2 min)
+Detail HPWL: 460090648   Time:   17.0 sec (0.3 min)
+ ===================================================================
+       HPWL: 460090648   Time:  568.0 sec (9.5 min)
